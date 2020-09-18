@@ -42,7 +42,8 @@ HEADERS += \
     typedSignalConnect.h \
     systeminfo.h \
     colorundoredocommand.h \
-    opacityundoredocommand.h
+    opacityundoredocommand.h \
+    deferredtexture.h
 
 SOURCES +=     \
     colorpalette.cpp \
@@ -61,6 +62,7 @@ SOURCES +=     \
     extCommand.cpp \
     systeminfo.cpp \
     colorundoredocommand.cpp \
-    opacityundoredocommand.cpp
+    opacityundoredocommand.cpp \
+    deferredtexture.cpp
 
 
