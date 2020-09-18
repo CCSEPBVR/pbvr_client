@@ -39,8 +39,11 @@ kvs::visclient::TimerEvent* RenderArea::g_timer_event=0;
 
 
 RenderArea::RenderArea( QWidget* parent_surface):
-    obj_id_pair (-1,-1)
+     m_obj_id_pair (-1,-1)
 {
+
+    Q_UNUSED(parent_surface);
+    //    MOD BY)T.Osaki 2020.04.28
     pixelRatio= QApplication::desktop()->devicePixelRatioF();
 
     this->m_scene->background()->setColor( kvs::RGBAColor(0,0,22,1.0f) );
@@ -204,9 +207,7 @@ void RenderArea::setupEventHandlers()
     g_timer_event->setObject( id_pair.first );
     g_timer_event->setRenderer( extCommand->m_renderer );
 #else
-    //    this->registerObject( m_control_object, extCommand->renderer );
-    //    this->m_scene->registerObject( m_control_object, extCommand->m_renderer );
-
+    this->attachPointObject( m_control_object );
 #endif
     //KVS2.7.0
     //ADD BY)T.Osaki  2020.06.19
@@ -252,6 +253,26 @@ void RenderArea::attachPointObject(const kvs::PointObject* point)
         objectReplaced=true;
     }
     doneCurrent();
+    this->update();
+    std::cout<<"attachPointObject end"<<std::endl;
+}
+
+/**
+ * @brief RenderArea::attachPointObject
+ *        Attaches a new point to the scene, using the apropriate registerObject, or
+ *        replaceObject, depending on wether a prevous object has been registered.
+ * @param point, the point to be attached
+ */
+void RenderArea::attachPointObject(kvs::PointObject* point)
+{
+    std::cout<<"attachPointObject"<<std::endl;
+    if (m_obj_id_pair.first ==-1 && m_obj_id_pair.second == -1){
+        m_obj_id_pair=this->m_scene->registerObject(point,m_renderer);
+    }
+    else {
+        this->m_scene->replaceObject(m_obj_id_pair.first,point,false);
+//        objectReplaced=true;
+    }
     this->update();
     std::cout<<"attachPointObject end"<<std::endl;
 }
