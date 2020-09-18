@@ -67,7 +67,7 @@ public:
 
     QTimer*     m_idle_mouse_timer;
     QPainter    m_painter; // Shouldn't be public, but used by orientation axis
-
+    bool m_gl_initialized=false;
     QGlue::StepLabel*       m_stepLabel=NULL;
     QGlue::FPSLabel*        m_fpsLabel=NULL;
     QGlue::LegendBar*       g_legend=NULL;
