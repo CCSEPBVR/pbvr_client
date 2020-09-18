@@ -17,6 +17,7 @@ public:
     bool complete=false;
     void load( const size_t width, const size_t height, const void* data, const size_t xoffset=0, const size_t yoffset=0);
     void bind();
+    void unbind();
 };
 
 class DeferredTexture1D: public kvs::Texture1D
@@ -28,6 +29,7 @@ public:
     bool complete=false;
     void load(int width, const void* data, bool hasContext);
     void bind();
+    void unbind();
 };
 }
 #endif // DEFERREDTEXTURE_H

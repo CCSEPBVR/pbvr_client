@@ -323,7 +323,11 @@ void Histogram::create_texture( void )
     m_texture.setPixelFormat( nchannels, sizeof( kvs::UInt8 ) );
     m_texture.setMinFilter( GL_LINEAR );
     m_texture.setMagFilter( GL_LINEAR );
-    m_texture.load( width, height, this->get_histogram_image().data() );
+    //KVS2.7.0
+    //MOD BY)T.Osaki 2020.07.20
+    m_texture.create( width, height, this->get_histogram_image().data() );
+//    m_texture.download( width, height, this->get_histogram_image().pointer() );
+//    m_texture.unbind();
 }
 
 /*===========================================================================*/

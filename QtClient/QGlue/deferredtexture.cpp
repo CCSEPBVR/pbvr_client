@@ -50,6 +50,11 @@ void  DeferredTexture2D::bind()
     kvs::Texture2D::bind();
 }
 
+void DeferredTexture2D::unbind()
+{
+    if (this->isBound())
+        Texture2D::unbind();
+}
 
 void  DeferredTexture1D::load(int width, const void* data, bool hasContext){
     __data=data;
@@ -92,6 +97,12 @@ void  DeferredTexture1D::bind()
     }
 
     kvs::Texture1D::bind();
+}
+
+void DeferredTexture1D::unbind()
+{
+    if (this->isBound())
+        Texture1D::unbind();
 }
 
 }

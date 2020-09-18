@@ -1,92 +1,47 @@
 #include <GL/glew.h>
 #include "screen.h"
 #include <kvs/FrameBufferObject>>
-#include <kvs/OpenGL>
-#include <kvs/Camera>
-#include <QElapsedTimer>
-#include <QMutex>
 
-extern QMutex paint_mutex;
-/**
- * @brief Screen::Screen
- * @param parent_surface, parent Qt Widget
- */
 Screen::Screen( QWidget* parent_surface)
 {
     Q_UNUSED(parent_surface);
+    std::cout<< "Screen::Screen"<<std::endl;
     m_scene = new kvs::Scene(this);
     Screen::setFocusPolicy(Qt::StrongFocus );
     ScreenBase::create();
     update();
 }
-/**
- * @brief Screen::paintGL, paint GL method - automatically called as part of Qt Event chain.
- *                         Do not call directly.
- *
- *                         Attains paint_mutex lock, checks opengl status and paints the scene.
- *                         After painting scene, the virtual method onPaintGL is called to allow
- *                         any subclass to paint additional items on top of scene.
- */
-void Screen::paintGL()
-{
+
+void Screen::paintGL(){
+
+//    std::cout<<"Begin Screen::paintGL"<<std::endl;
     if (QThread::currentThread() != this->thread()) {
         qWarning("Screen::paintGL was not called from main thread, skipping frame");
         return;
     }
-    if (!Screen::m_gl_initialized || m_hold_paintGL){
+    if (!Screen::hasInitializedGL || m_hold_paintGL){
         qWarning("Screen either not initialized or on hold, skipping this frame");
         return;
     }
-    int e;
-    if (objectReplaced){
-        objectReplaced=false;
-    }
-    // Check and clear GL errors
-    paint_mutex.lock();
-    while (e = glGetError()){
-        qCritical("Screen::paintGL GL HAS ERROR BEFORE %d",e);
-    }
-    // This allows KVS to work with QOpenGLWidgets
-    // Requires future release of KVS which includes commit
-    // https://github.com/naohisas/KVS/commit/4e3a36473cc0b7cc1418e49b949e5f8d62d8c489
     kvs::FrameBufferObject::m_unbind_id=QOpenGLWidget::defaultFramebufferObject();
-    QElapsedTimer timer;
-
     glPushAttrib( GL_ALL_ATTRIB_BITS );
     kvs::OpenGL::WithPushedMatrix p( GL_MODELVIEW );
     p.loadIdentity();
     {
-        timer.start();
         m_scene->paintFunction();
-        m_fps = 1.0 / ((double)timer.elapsed()/1000.0);
     }
     glPopAttrib();
     onPaintGL();
-
-    // Check and clear GL errors
-    while (e = glGetError()){
-        qCritical("Screen::paintGL GL GOT GL ERROR %d",e);
-    }
-    paint_mutex.unlock();
+//    std::cout<<"End Screen::paintGL"<<std::endl;
 }
 
-/**
- * @brief Screen::resizeGL automatically called as part of Qt Event chain.
- *                         Do not call directly. Handles scene and  camera resizing based on devicePixelRatio.
- *
- *                         After resizing scene and camera, virtual onResizeGL is called to allow subclass to
- *                         take additional action if needed
- * @param width in pixels
- * @param height in pixels
- */
 void Screen::resizeGL(int width, int height)
 {
     std::cout<< "Screen::resizeGL"<<std::endl;
-    // This allows KVS to work with QOpenGLWidgets
-    // Requires future release of KVS which includes commit
-    // https://github.com/naohisas/KVS/commit/4e3a36473cc0b7cc1418e49b949e5f8d62d8c489
+    // This is the first point in time where QOpenGLWidget::defaultFramebufferObject()
+    // is reliably set, so we update kvs::FrameBufferObject::m_unbind_id
     kvs::FrameBufferObject::m_unbind_id=QOpenGLWidget::defaultFramebufferObject();
-    const int dpr = QOpenGLWidget::devicePixelRatio();
+    const int dpr = QBaseClass::devicePixelRatio();
     size_t dpr_width = static_cast<size_t>( width / dpr + 0.5 );
     size_t dpr_height = static_cast<size_t>( height / dpr + 0.5 );
     m_scene->resizeFunction( dpr_width, dpr_height );
@@ -94,13 +49,7 @@ void Screen::resizeGL(int width, int height)
     onResizeGL(width,height);
 }
 
-/**
- * @brief Screen::initializeGL automatically called as part of Qt Event chain.
- *                             Do not call directly. Handles initialization of OpenGL context (initializeOpenGLFunctions)
- *
- *                             After context has been initialized, virtual onInitializeGL is called to allow
- *                             a subclass to take additional actions
- */
+
 void Screen::initializeGL()
 {
     std::cout<< "Screen::initializeGL"<<std::endl;
@@ -117,7 +66,7 @@ void Screen::initializeGL()
     }
     initializeOpenGLFunctions();
     onInitializeGL();
-    m_gl_initialized=true;
+    hasInitializedGL=true;
 }
 
 Screen::~Screen()
@@ -125,5 +74,11 @@ Screen::~Screen()
     delete (m_scene);
 }
 
+
+const std::pair<int,int> Screen::registerObject( kvs::ObjectBase* object, kvs::RendererBase* renderer )
+{
+    std::cout<< "Screen::registerObject"<<std::endl;
+    return m_scene->registerObject( object, renderer );
+}
 
 
