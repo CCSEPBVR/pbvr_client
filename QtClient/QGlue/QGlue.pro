@@ -43,8 +43,7 @@ HEADERS += \
     systeminfo.h \
     colorundoredocommand.h \
     opacityundoredocommand.h \
-    deferredtexture.h \
-    screen.h
+    deferredtexture.h
 
 SOURCES +=     \
     colorpalette.cpp \
@@ -64,7 +63,6 @@ SOURCES +=     \
     systeminfo.cpp \
     colorundoredocommand.cpp \
     opacityundoredocommand.cpp \
-    deferredtexture.cpp \
-    screen.cpp
+    deferredtexture.cpp
 
 
