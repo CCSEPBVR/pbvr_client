@@ -105,6 +105,7 @@ void QGLUEBaseWidget::initializeGL()
     initializeOpenGLFunctions();
     QColor bg=QWidget::palette().color(QWidget::backgroundRole());
     glClearColor(bg.redF(), bg.blueF(),bg.greenF(),1.0);
+    m_gl_initialized=true;
 }
 
 

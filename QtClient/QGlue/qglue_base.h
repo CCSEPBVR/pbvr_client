@@ -81,6 +81,7 @@ protected:
     size_t      m_frameCount=0;
     float       m_fps;
     bool        m_editable;
+    bool        m_gl_initialized=false;
 
     int         m_margin;
 
