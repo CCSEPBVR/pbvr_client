@@ -159,7 +159,7 @@ void LegendBar::create_texture( void )
     //KVS2.7.0
     //MOD BY)T.Osaki 2020.07.20
     m_texture.create( width, height, data );
-    m_texture.download( width, height, data );
+//    m_texture.download( width, height, data );
 }
 
 /*===========================================================================*/
