@@ -38,7 +38,7 @@ LIBS += -L$$(KVS_DIR)/lib -lkvsCore
 win32{
 LIBS += -L$$(GLEW_DIR)/lib -lglew32
 }
-else{
+else {
 LIBS += -L$$(GLEW_DIR)/lib -lglew
 }
 unix:!macx:LIBS += -lGLU
