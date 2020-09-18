@@ -1,5 +1,6 @@
 //KVS2.7.0
 //ADD BY)T.Osaki 2020.06.08
+#include <GL/glew.h>
 #include <QOpenGLContext>
 
 #include "QGlue/renderarea.h"
@@ -55,7 +56,7 @@ RenderArea::RenderArea( QWidget* parent_surface):
     kvs::RGBColor color( 0, 0, 0 );
     kvs::ValueArray<kvs::Real32> normals( 3 );
     m_control_object = new kvs::PointObject( coords, color, normals, 1.0 );
-
+    attachPointObject(m_control_object);
     // Setup Step Label
     m_stepLabel =new QGlue::StepLabel(this,extCommand);
     m_stepLabel->setPosition(150*pixelRatio,50);
@@ -121,6 +122,17 @@ void RenderArea::updateCommandInfo(ExtCommand* extCommand)
 void RenderArea::initializeGL( void )
 {
     qInfo("KVSRenderArea::initializeGL( void )");
+    if (! isValid())
+     {
+         qWarning("Screen::initalizeGL while surface still not valid ");
+         return;
+     }
+     GLenum result = glewInit();
+     if ( result != GLEW_OK )
+     {
+         const GLubyte* message = glewGetErrorString( result );
+         qFatal("GLEW initialization failed. ");
+     }
     initializeOpenGLFunctions();
     m_orientation_axis->initializeOpenGLFunctions();
     g_legend->initializeOpenGLFunctions();
@@ -138,6 +150,8 @@ void RenderArea::initializeGL( void )
     //    kvs::Mouse::attachCamera(this->kvs::Scene::camera());
     //m_light->on();
     //m_mouse->attachCamera( m_camera );
+    m_gl_initialized=true;
+
 }
 /**
  * @brief RenderArea::resizeGL, GL Surface resized handler
@@ -147,6 +161,8 @@ void RenderArea::initializeGL( void )
 void RenderArea::resizeGL(int w, int h)
 {
     //    MOD BY)T.Osaki 2020.04.28
+    if (!m_gl_initialized)
+        return;
     float scale= QApplication::desktop()->devicePixelRatioF();
     int h_scaled = h * scale;
     int w_scaled = w  * scale;
@@ -157,12 +173,23 @@ void RenderArea::resizeGL(int w, int h)
     int size=90*scale;
     m_orientation_axis->setPosition( w_scaled -(size + 10),10);
     g_legend->setPosition( 10, h_scaled -10 );
+    kvs::FrameBufferObject::m_unbind_id=QOpenGLWidget::defaultFramebufferObject();
 }
 /**
  * @brief RenderArea::paintGL
  */
 void RenderArea::paintGL(void)
 {
+    if (!m_gl_initialized)
+        return;
+    if(!kvs::FrameBufferObject::m_unbind_id)
+        return;
+    if (QThread::currentThread() != this->thread()) {
+         qWarning("Screen::paintGL was not called from main thread, skipping frame");
+         return;
+     }
+    kvs::FrameBufferObject::m_unbind_id=QOpenGLWidget::defaultFramebufferObject();
+
     QElapsedTimer timer;
 
     glPushAttrib( GL_ALL_ATTRIB_BITS );
