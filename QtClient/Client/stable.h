@@ -1,4 +1,4 @@
-
+#include <QOpenGLContext>
 
 #ifdef __cplusplus
 #include <stdio.h>
@@ -11,7 +11,7 @@
 #include <iostream>
 #include <functional>
 #include <fstream>
-#include <direct.h>
+//#include <direct.h>
 
 
 #include "kvs/CommandLine"
@@ -31,7 +31,7 @@
 #include <kvs/KeyPressEventListener>
 #include <kvs/PointImporter>
 #include <kvs/PointExporter>
-#include <kvs/KVSMLObjectPoint>
+//#include <kvs/KVSMLObjectPoint>
 #include <kvs/TimerEventListener>
 #include <kvs/ParticleVolumeRenderer>
 

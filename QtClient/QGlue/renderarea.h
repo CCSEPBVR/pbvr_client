@@ -9,7 +9,10 @@
 #include <QGlue/timer.h>
 #include <QGlue/orientationaxis.h>
 
-
+//KVS2.7.0
+//MOD BY)T.Osaki 2020.06.04
+#include <kvs/Scene>
+#include <kvs/Mouse>
 #define PBVR_DEBUG
 #define PBVR_IMAGE         0
 #define PBVR_I_H_OFFSET   55
@@ -21,14 +24,19 @@ class PBVRGUI;
  * @brief
  *
  */
+//KVS2.7.0
+//MOD BY)T.Osaki 2020.06.04
 class RenderArea : public QOpenGLWidget, public kvs::ScreenBase, protected QOpenGLFunctions
 {
 public:
 
     explicit RenderArea( QWidget* parent_surface);
 
-    static void ScreenShot( kvs::ScreenBase* screen, const int tstep );
-    static void ScreenShotKeyFrame( kvs::ScreenBase* screen, const int tstep );
+    //MOD BY)T.Osaki 2020.06.29
+    //static void ScreenShot( kvs::ScreenBase* screen, const int tstep );
+    //static void ScreenShotKeyFrame( kvs::ScreenBase* screen, const int tstep );
+    static void ScreenShot( kvs::Scene* screen, const int tstep );
+    static void ScreenShotKeyFrame( kvs::Scene* screen, const int tstep );
 
     void drawLabelList( QList<QGlue::Label*> list,QColor fontColor);
     void keyPressEvent(QKeyEvent *kbEvent);
@@ -42,7 +50,11 @@ public:
     void setShaderParams( );
     void setupEventHandlers( );
 
-    int show( void ){QOpenGLWidget::show(); return 1;}
+    //KVS2.7.0
+    //MOD BY)T.Osaki 2020.05.28
+    //DEL BY)T.Osaki 2020.06.15
+//    int show( void ){QOpenGLWidget::show(); return 1;}
+    void show( void ){QOpenGLWidget::show();}
     void updateCommandInfo(ExtCommand* command_q);
 
 public:
@@ -65,6 +77,10 @@ public:
 
     std::list<QGlue::Timer*> m_timer_event_handler;
     QList<QGlue::Label*>     m_labels;
+    double m_fps = 0.0;
+    //KVS2.7.0
+    //MOD BY)T.Osaki 2020.07.20
+    kvs::Scene* m_scene;
 
 
     void toggleTimer(bool state){
@@ -81,7 +97,7 @@ private:
     //    MOD BY)T.Osaki 2020.04.28
     float pixelRatio=1;
     kvs::visclient::ExtendedParticleVolumeRenderer* m_renderer;
-
+    int m_reset_count = 0;
 protected:
     void initializeGL( void );
     void resizeGL(int w, int h);

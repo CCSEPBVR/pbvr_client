@@ -40,10 +40,19 @@ public:
     {
 //        std::cout<<("THIS WASN'T CALLED FROM CPUMODE UNTIL INSITU MERGE")<<std::endl;
 //        std::cout<<"  ## recreateImageBuffer starts ## \n    size: "<<m_width<<":"<<m_height<<std::endl;
+        //KVS2.7.0
+        //MOD BY)T.Osaki 2020.05.28
+        /*
         this->delete_particle_buffer();
         this->create_particle_buffer(
                     BaseClass::m_width,
                     BaseClass::m_height,
+                    m_subpixel_level );
+        */
+        this->deleteParticleBuffer();
+        this->createParticleBuffer(
+                    BaseClass::windowWidth(),
+                    BaseClass::windowHeight(),
                     m_subpixel_level );
 //        std::cout<<"  ## recreateImageBuffer ends: ##"<<std::endl;
     }

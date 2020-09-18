@@ -4,7 +4,7 @@
 #include <kvs/File>
 #include <kvs/PointImporter>
 #include <kvs/PointExporter>
-#include <kvs/KVSMLObjectPoint>
+//#include <kvs/KVSMLObjectPoint>
 #include "ParticleMerger.h"
 #include "KVSMLObjectPointWriter.h"
 

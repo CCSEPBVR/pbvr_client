@@ -46,7 +46,10 @@ public:
         m_min_range = min;
         m_max_range = max;
         m_nbins = nbins;
-        m_bin.deepCopy( bins, nbins );
+        //KVS2.7.0
+        //MOD BY)T.Osaki 2020.05.28
+        //m_bin.deepCopy( bins, nbins );
+        m_bin.assign( bins, nbins );
 
         m_max_count = 0;
         for ( int n = 0; n < nbins; n++ )

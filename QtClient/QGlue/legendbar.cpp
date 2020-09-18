@@ -20,8 +20,9 @@ float pixelRatio=1;
 
 namespace QGlue
 {
-
+//MOD BY)T.Osaki 2020.06.29
 LegendBar::LegendBar( kvs::ScreenBase* screen, const Command& command ) :
+//LegendBar::LegendBar( kvs::Scene* screen, const Command& command ) :
     m_command( &command ),
     QGLUEBase(0)
 {
@@ -155,7 +156,9 @@ void LegendBar::create_texture( void )
     m_texture.setPixelFormat( nchannels, sizeof( kvs::UInt8 ) );
     m_texture.setMinFilter( GL_NEAREST );
     m_texture.setMagFilter( GL_NEAREST );
-    m_texture.create( width, height );
+    //KVS2.7.0
+    //MOD BY)T.Osaki 2020.07.20
+    m_texture.create( width, height, data );
     m_texture.download( width, height, data );
 }
 

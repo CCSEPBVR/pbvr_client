@@ -1,4 +1,8 @@
-﻿#include "coordinatepanel.h"
+﻿//KVS2.7.0
+//ADD BY)T.Osaki 2020.06.08
+#include <QOpenGLContext>
+
+#include "coordinatepanel.h"
 #include "ui_coordinatepanel.h"
 #include "QGlue/renderarea.h"
 

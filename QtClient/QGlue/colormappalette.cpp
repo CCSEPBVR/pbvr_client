@@ -451,7 +451,9 @@ void ColorMapPalette::initialize_texture( const kvs::ColorMap& color_map )
     m_texture.setPixelFormat( nchannels, sizeof( kvs::UInt8 ) );
     m_texture.setMinFilter( GL_LINEAR );
     m_texture.setMagFilter( GL_LINEAR );
-    m_texture.create( width );
+    //KVS2.7.0
+    //MOD BY)T.Osaki 2020.07.20
+    m_texture.create( width, data );
     m_texture.download( width, data );
     m_texture_downloaded=false;
     update();

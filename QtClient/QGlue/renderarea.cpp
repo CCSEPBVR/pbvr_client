@@ -1,3 +1,7 @@
+//KVS2.7.0
+//ADD BY)T.Osaki 2020.06.08
+#include <QOpenGLContext>
+
 #include "QGlue/renderarea.h"
 
 #include <QApplication>
@@ -18,6 +22,11 @@
 #include <QGlue/timer.h>
 #include <Client/v3defines.h>
 
+//KVS2.7.0
+//ADD BY)T.Osaki 2020.06.04
+#include <kvs/Background>
+#include <kvs/ObjectManager>
+
 #ifdef PBVR_DEBUG
 int     timestep = 0;
 #endif
@@ -32,7 +41,10 @@ RenderArea::RenderArea( QWidget* parent_surface)
     Q_UNUSED(parent_surface);
     //    MOD BY)T.Osaki 2020.04.28
     pixelRatio= QApplication::desktop()->devicePixelRatioF();
-    this->background()->setColor( kvs::RGBAColor(0,0,22,1.0f) );
+    //KVS2.7.0
+    //MOD BY)T.Osaki 2020.07.20
+    m_scene = new kvs::Scene(this);
+    this->m_scene->background()->setColor( kvs::RGBAColor(0,0,22,1.0f) );
     this->i_w= 620;//Qthis->width();
     this->i_h= 620;//Qthis->height();
     this->setSize(i_w,i_h);
@@ -54,7 +66,6 @@ RenderArea::RenderArea( QWidget* parent_surface)
     m_orientation_axis->setBoxType( QGlue::OrientationAxis::SolidBox );
     m_orientation_axis->setSize(size);
     m_orientation_axis->show();
-
     // Setup Legend bar
     g_legend= new QGlue::LegendBar( this, *extCommand );
     g_legend->setOrientation( QGlue::LegendBar::Horizontal );
@@ -64,7 +75,7 @@ RenderArea::RenderArea( QWidget* parent_surface)
 
     g_legend->screenResizedAfterSelectTransferFunction( 1 );
     g_legend->show();
-
+//    m_scene = new kvs::Scene(this);
 }
 
 
@@ -74,8 +85,9 @@ RenderArea::RenderArea( QWidget* parent_surface)
  */
 void RenderArea::updateCommandInfo(ExtCommand* extCommand)
 {
-
-    extCommand->m_parameter.m_camera = this->camera();
+    //KVS2.7.0
+    //MOD BY)T.Osaki 2020.07.20
+    extCommand->m_parameter.m_camera = this->m_scene->camera();
     // Setup Controll Object
     kvs::PointObject* object1 = extCommand->m_abstract_particles[0];
     const kvs::Vector3f& min = object1->minObjectCoord();
@@ -115,8 +127,15 @@ void RenderArea::initializeGL( void )
     //    this->initializeEvent();
     //    connect( m_idle_mouse_timer,&QTimer::timeout, this,&Screen::idleMouseEvent );
     //    m_idle_mouse_timer->start( kvs::Mouse::SpinTime );
-    m_light->on();
-    m_mouse->attachCamera( m_camera );
+    //KVS2.7.0
+    //MOD BY)T.Osaki 2020.06.04
+//    kvs::Scene::light()->on();
+//    kvs::Scene::mouse()->attachCamera(this->kvs::Scene::camera());
+    m_scene->light()->on();
+    m_scene->mouse()->attachCamera(m_scene->camera());
+    //    kvs::Mouse::attachCamera(this->kvs::Scene::camera());
+    //m_light->on();
+    //m_mouse->attachCamera( m_camera );
 }
 /**
  * @brief RenderArea::resizeGL, GL Surface resized handler
@@ -144,12 +163,16 @@ void RenderArea::paintGL(void)
 {
     QElapsedTimer timer;
 
-    timer.start();
     glPushAttrib( GL_ALL_ATTRIB_BITS );
     glMatrixMode( GL_MODELVIEW );
     glLoadIdentity();
     glPushMatrix();
-    ScreenBase::paintFunction();
+    //KVS2.7.0
+    //MOD BY)T.Osaki 2020.07.20
+    timer.start();
+    this->m_scene->paintFunction();
+    m_fps = 1.0 / ((double)timer.elapsed()/1000.0);
+    //ScreenBase::paintFunction();
     glPopMatrix();
     glPopAttrib();
     if (m_orientation_axis){
@@ -192,13 +215,19 @@ void RenderArea::setupEventHandlers()
     g_timer_event=new kvs::visclient::TimerEvent( extCommand,&extCommand->comthread );
 #ifdef CPUMODE
     std::pair<int, int> id_pair;
-    id_pair = this->registerObject( m_control_object, extCommand->m_renderer );
+    //KVS2.7.0
+    //MOD BY)T.Osaki 2020.07.20
+    //    id_pair = this->registerObject( m_control_object, extCommand->m_renderer );
+    id_pair = this->m_scene->registerObject( m_control_object, extCommand->m_renderer );
+    std::cout << *m_scene->objectManager() << std::endl;
     g_timer_event->setObject( id_pair.first );
     g_timer_event->setRenderer( extCommand->m_renderer );
 #else
     this->registerObject( m_control_object, extCommand->renderer );
 #endif
-
+    //KVS2.7.0
+    //ADD BY)T.Osaki  2020.06.19
+    g_timer_event->setScene( m_scene );
     g_timer_event->setScreen( this );
     qt_timer->setEventListener( g_timer_event );
     qt_timer->start();
@@ -212,9 +241,16 @@ void RenderArea::setCoordinateBoundaries(float  crd[6])
 {
     kvs::Vector3f min_t( crd[0], crd[1], crd[2] );
     kvs::Vector3f max_t( crd[3], crd[4], crd[5] );
-    this->objectManager()->object()->setMinMaxObjectCoords( min_t, max_t );
-    this->objectManager()->object()->setMinMaxExternalCoords( min_t, max_t );
-    this->objectManager()->updateExternalCoords();
+    //KVS2.7.0
+    //MOD BY)T.Osaki 2020.07.20
+    this->m_scene->objectManager()->object()->setMinMaxObjectCoords( min_t, max_t );
+    this->m_scene->objectManager()->object()->setMinMaxExternalCoords( min_t, max_t );
+    this->m_scene->objectManager()->updateExternalCoords();
+    if(m_reset_count == 0){
+        m_reset_count++;
+    }else{
+        this->m_scene->reset();
+    }
     std::cout << " !!!!!!!!!!!!!!!!!!! Reset Viewer Scale !!!!!!!!!!!!!!!!!!!!!!!! " << std::endl;
 }
 
@@ -329,13 +365,19 @@ void RenderArea::keyPressEvent(QKeyEvent *kbEvent){
     switch (ucode)
     {
     case kvs::Key::l:
-        controlTarget() = TargetLight;
+        //KVS2.7.0
+        //MOD BY)T.Osaki 2020.07.20
+        m_scene->controlTarget() = m_scene->TargetLight;
         break;
     case kvs::Key::c:
-        controlTarget() = TargetCamera;
+        //KVS2.7.0
+        //MOD BY)T.Osaki 2020.07.20
+        m_scene->controlTarget() = m_scene->TargetCamera;
         break;
     case kvs::Key::o:
-        controlTarget() = TargetObject;
+        //KVS2.7.0
+        //MOD BY)T.Osaki 2020.07.20
+        m_scene->controlTarget() = m_scene->TargetObject;
         break;
 
     case kvs::Key::x:
@@ -372,7 +414,9 @@ void RenderArea::keyPressEvent(QKeyEvent *kbEvent){
     }
     if(kbEvent->key()==Qt::Key_Home){
         qInfo(" [debug] 'HOME' pressed. (Reset the viewer)");
-        kvs::ScreenBase::reset();
+        //MOD BY)T.Osaki 2020.06.29
+        m_scene->reset();
+        //kvs::ScreenBase::reset();
         this->redraw();
     }
 }
@@ -383,7 +427,9 @@ void RenderArea::keyPressEvent(QKeyEvent *kbEvent){
  * @param screen
  * @param tstep
  */
-void    RenderArea::ScreenShot( kvs::ScreenBase* screen, const int tstep )
+//MOD BY)T.Osaki 2020.06.29
+//void    RenderArea::ScreenShot( kvs::ScreenBase* screen, const int tstep )
+void    RenderArea::ScreenShot( kvs::Scene* screen, const int tstep )
 {
 
     std::stringstream step;
@@ -395,7 +441,9 @@ void    RenderArea::ScreenShot( kvs::ScreenBase* screen, const int tstep )
 #endif
         PBVR_TIMER_STA( 160 );
 
-        screen->redraw();
+        //KVS2.7.0
+        //MOD BY)T.Osaki 2020.07.20
+        screen->screen()->redraw();
 
         step << '.' << std::setw( 5 ) << std::setfill( '0' ) << tstep;
 
@@ -427,7 +475,9 @@ void    RenderArea::ScreenShot( kvs::ScreenBase* screen, const int tstep )
  * @param screen
  * @param tstep
  */
-void    RenderArea::ScreenShotKeyFrame( kvs::ScreenBase* screen, const int tstep )
+//MOD BY)T.Osaki 2020.06.29
+//void    RenderArea::ScreenShotKeyFrame( kvs::ScreenBase* screen, const int tstep )
+void    RenderArea::ScreenShotKeyFrame( kvs::Scene* screen, const int tstep )
 {
 
     std::stringstream step;
@@ -439,7 +489,9 @@ void    RenderArea::ScreenShotKeyFrame( kvs::ScreenBase* screen, const int tstep
 #endif
         PBVR_TIMER_STA( 160 );
 
-        screen->redraw();
+        //KVS2.7.0
+        //MOD BY)T.Osaki 2020.07.20
+        screen->screen()->redraw();
 
         step << '.' << std::setw( 6 ) << std::setfill( '0' ) << tstep;
 
@@ -485,14 +537,21 @@ void RenderArea::mousePressEvent( QMouseEvent *event)
     }
     else if ( BTN_LEFT ){
         mode = kvs::Mouse::Rotation;
-        kvs::ScreenBase::updateCenterOfRotation();
+        //KVS2.7.0
+        //MOD BY)T.Osaki 2020.06.04
+        m_scene->updateCenterOfRotation();
+        //kvs::ScreenBase::updateCenterOfRotation();
     }
 
     if (mode >=0){
         const int x = event->x()*pixelRatio;
         const int y = event->y()*pixelRatio;
-        kvs::Mouse::TransMode kvsMode=(kvs::Mouse::TransMode)mode;
-        kvs::ScreenBase::mousePressFunction(x,y,kvsMode );
+        //KVS2.7.0
+        //MOD BY)T.Osaki 2020.06.04
+        kvs::Mouse::OperationMode kvsMode=(kvs::Mouse::OperationMode)mode;
+        m_scene->mousePressFunction(x,y,kvsMode);
+        //kvs::Mouse::TransMode kvsMode=(kvs::Mouse::TransMode)mode;
+        //kvs::ScreenBase::mousePressFunction(x,y,kvsMode );
     }
 }
 
@@ -503,20 +562,29 @@ void RenderArea::mousePressEvent( QMouseEvent *event)
 void RenderArea::mouseMoveEvent(QMouseEvent *event)
 {
     //    BaseClass::eventHandler()->notify( event );
-    if( kvs::ScreenBase::controlTarget() == kvs::ScreenBase::TargetObject )
+    //KVS2.7.0
+    //MOD BY)T.Osaki 2020.06.04
+    //if( kvs::ScreenBase::controlTarget() == kvs::ScreenBase::TargetObject )
+    if( m_scene->controlTarget() == m_scene->TargetObject );
     {
-        if( !kvs::ScreenBase::objectManager()->isEnableAllMove() )
+        //if( !kvs::ScreenBase::objectManager()->isEnableAllMove() )
+        if( !m_scene->isEnabledObjectOperation())
         {
-            if( !kvs::ScreenBase::objectManager()->hasActiveObject() )
+            //if( !kvs::ScreenBase::objectManager()->hasActiveObject() )
+            if( !m_scene->objectManager()->hasActiveObject() )
             {
                 return;
             }
+
         }
     }
 
     const int x = event->x()*pixelRatio;
     const int y = event->y()*pixelRatio;
-    kvs::ScreenBase::mouseMoveFunction(x,y );
+    //KVS2.7.0
+    //MOD BY)T.Osaki 2020.06.04
+    m_scene->mouseMoveFunction(x,y);
+    //kvs::ScreenBase::mouseMoveFunction(x,y );
     this->redraw();
 }
 
@@ -527,7 +595,10 @@ void RenderArea::mouseMoveEvent(QMouseEvent *event)
 void RenderArea::mouseReleaseEvent(QMouseEvent *event)
 {
     //    BaseClass::eventHandler()->notify( event );
-    kvs::ScreenBase::mouseReleaseFunction( event->x(), event->y() );
+    //KVS2.7.0
+    //MOD BY)T.Osaki 2020.06.04
+    m_scene->mouseReleaseFunction(event->x(),event->y());
+    //kvs::ScreenBase::mouseReleaseFunction( event->x(), event->y() );
 }
 
 /**
@@ -541,10 +612,12 @@ void RenderArea::setSize( const int width, const int height )
     int w_scaled = width  * pixelRatio;
 
     kvs::ScreenBase::setSize( w_scaled, h_scaled);
-
-    if ( kvs::ScreenBase::camera() ) kvs::ScreenBase::camera()->setWindowSize( w_scaled, h_scaled);
-    if ( kvs::ScreenBase::mouse()  ) kvs::ScreenBase::mouse()->setWindowSize( w_scaled, h_scaled);
-
+    //KVS2.7.0
+    //MOD BY)T.Osaki 2020.06.04
+    if ( m_scene->camera() ) m_scene->camera()->setWindowSize( w_scaled, h_scaled);
+    if ( m_scene->mouse() ) m_scene->camera()->setWindowSize( w_scaled, h_scaled );
+    //if ( kvs::ScreenBase::camera() ) kvs::ScreenBase::camera()->setWindowSize( w_scaled, h_scaled);
+    //if ( kvs::ScreenBase::mouse()  ) kvs::ScreenBase::mouse()->setWindowSize( w_scaled, h_scaled);
     QOpenGLWidget::resize( w_scaled, h_scaled);
 }
 

@@ -1,4 +1,8 @@
-﻿#include "QGlue/timer.h"
+﻿//KVS2.7.0
+//ADD BY)T.Osaki 2020.06.08
+#include <QOpenGLContext>
+
+#include "QGlue/timer.h"
 #include <kvs/DebugNew>
 #include <kvs/IgnoreUnusedVariable>
 #include <QDebug>
@@ -11,6 +15,10 @@
 #include "Panels/systemstatuspanel.h"
 
 #include "QGlue/renderarea.h"
+
+//KVS2.7.0
+//MOD BY)T.Osaki 2020.06.04
+#include <kvs/Quaternion>
 
 static kvs::Xform InterpolateXform( const int interp_step, const int num_frame, const kvs::Xform& start, const kvs::Xform& end );
 namespace  QGlue
@@ -254,7 +262,9 @@ void Timer::comThreadExitEvent()
         m_renderer->attachPointObject( m_front_object );
 
         m_back_object = m_front_object;
-        m_screen->objectManager()->change( m_object_id, m_front_object );
+        //KVS2.7.0
+        //MOD BY)T.Osaki 2020.07.20
+        m_screen->m_scene->objectManager()->change( m_object_id, m_front_object );
 
         //        qInfo("Timer::comThreadExitEvent not updating m_orientation_axis");
         //        m_command->m_screen->m_orientation_axis->setObject( m_front_object );
@@ -489,7 +499,10 @@ static float Norm( const float a, const float b, const float c, const float d )
 }
 
 //High precision conversion of Rotation Matrix to Quaternion
-static kvs::Quaternion<float> RtoQ( const kvs::Matrix33f& R )
+//KVS2.7.0
+//MOD BY)T.Osaki 2020.06.04
+//static kvs::Quaternion<float> RtoQ( const kvs::Matrix33f& R )
+static kvs::Quaternion RtoQ( const kvs::Matrix33f& R )
 {
     float r11 = R[0][0];
     float r12 = R[0][1];
@@ -551,7 +564,10 @@ static kvs::Quaternion<float> RtoQ( const kvs::Matrix33f& R )
     q2 /= r;
     q3 /= r;
 
-    return kvs::Quaternion<float>( q1, q2, q3, q0 );
+    //KVS2.7.0
+    //MOD BY)T.Osaki 2020.06.04
+    //return kvs::Quaternion<float>( q1, q2, q3, q0 );
+    return kvs::Quaternion( q1, q2, q3, q0 );
 }
 
 
@@ -569,10 +585,16 @@ static kvs::Xform InterpolateXform( const int interp_step, const int num_frame, 
     kvs::Vector3f translation_1( end.translation() );
     kvs::Vector3f scaling_1( end.scaling() );
 
-    kvs::Quaternion<float> q_0 = RtoQ( rotation_0 );
-    kvs::Quaternion<float> q_1 = RtoQ( rotation_1 );
-    kvs::Quaternion<float> q =
-            kvs::Quaternion<float>::sphericalLinearInterpolation( q_0, q_1, t, true, true );
+    //KVS2.7.0
+    //MOD BY)T.Osaki 2020.06.04
+    //    kvs::Quaternion<float> q_0 = RtoQ( rotation_0 );
+    //    kvs::Quaternion<float> q_1 = RtoQ( rotation_1 );
+    //    kvs::Quaternion<float> q =
+    //            kvs::Quaternion<float>::sphericalLinearInterpolation( q_0, q_1, t, true, true );
+        kvs::Quaternion q_0 = RtoQ( rotation_0 );
+        kvs::Quaternion q_1 = RtoQ( rotation_1 );
+        kvs::Quaternion q =
+                kvs::Quaternion::sphericalLinearInterpolation( q_0, q_1, t, true, true );
     kvs::Matrix33f rotation = q.toMatrix();
 
     kvs::Vector3f translation = translation_1 * t + translation_0 * ( 1 - t );

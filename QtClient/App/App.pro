@@ -6,6 +6,7 @@ CONFIG += console
 #PRECOMPILED_HEADER=stable.h
 
 CONFIG += warn_off
+QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.14
 #QMAKE_CFLAGS_WARN_ON -= -Wall
 #QMAKE_CXXFLAGS_WARN_ON -= -Wall
 #QMAKE_CFLAGS_WARN_ON -= -W
@@ -14,7 +15,12 @@ CONFIG += warn_off
 #QMAKE_CXXFLAGS_WARN_OFF += -Wall
 #QMAKE_CFLAGS_WARN_OFF += -W
 #QMAKE_CXXFLAGS_WARN_OFF += -W
-
+win32{
+QMAKE_CFLAGS_RELEASE += /MT
+QMAKE_CXXFLAGS_RELEASE += /MT
+QMAKE_CFLAGS_RELEASE -= -MD
+QMAKE_CXXFLAGS_RELEASE -= -MD
+}
 include(../SETTINGS.pri)
 message (Building PBVR:$${TARGET} -  Mode:$${PBVR_MODE}  - Platform: $${PLATFORM}  - ReleaseType: $${RELTYPE})
 
@@ -27,7 +33,11 @@ LIBS += -L../QGlue  -lQGlue
 LIBS += -L../Client -lClient
 LIBS += -L../FunctionParser -lpbvrFunc
 LIBS += -L../Common -lCommon
-LIBS += -L$${KVS_DIR} -lKVS
+#LIBS += -L$${KVS_DIR} -lKVS
+LIBS += -L$$(KVS_DIR)/lib -lkvsCore
+win32{
+LIBS += -L$$(GLEW_DIR)/lib -lglew32
+}
 unix:!macx:LIBS += -lGLU
 #QT += opengl
 #QT += core gui opengl widgets

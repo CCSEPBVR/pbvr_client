@@ -9,6 +9,7 @@ include( ../SETTINGS.pri)
 message (Building PBVR:$${TARGET} -  Mode:$${PBVR_MODE}  - Platform: $${PLATFORM}  - ReleaseType: $${RELTYPE})
 
 CONFIG += warn_off
+QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.14
 #QMAKE_CFLAGS_WARN_ON -= -Wall
 #QMAKE_CXXFLAGS_WARN_ON -= -Wall
 #QMAKE_CFLAGS_WARN_ON -= -W
@@ -17,7 +18,12 @@ CONFIG += warn_off
 #QMAKE_CXXFLAGS_WARN_OFF += -Wall
 #QMAKE_CFLAGS_WARN_OFF += -W
 #QMAKE_CXXFLAGS_WARN_OFF += -W
-
+win32{
+QMAKE_CFLAGS_RELEASE += /MT
+QMAKE_CXXFLAGS_RELEASE += /MT
+QMAKE_CFLAGS_RELEASE -= -MD
+QMAKE_CXXFLAGS_RELEASE -= -MD
+}
 HEADERS += \
     colorpalette.h \
     colormappalette.h \

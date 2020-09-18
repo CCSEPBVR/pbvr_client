@@ -61,43 +61,46 @@ public:
         kvs::CommandLine( argc, argv )
     {
         // Add help option (generate help message automatically).
-        add_help_option();
+        //KVS2.7.0
+        //MOD BY)T.Osaki 2020.05.28 add_help_option() to addHelpOption()
+        //MOD BY)T.Osaki 2020.05.28 add_option() to addOption()
+        addHelpOption();
 //      add_value( "If \"s\" is specified, it starts in standalone mode.", false );
-        add_option( "tf", "transfer_function", 1, false );
+        addOption( "tf", "transfer_function", 1, false );
 // MODIFIED START BY)M.Tanaka 2015.03.03
 //		add_option( "sl","subpixel_level",1,false);
 //		add_option( "rl","repeat_level",1, false);
 // APPEND START BY)M.Tanaka 2015.03.11
-        add_option( "S", "sampling type", 1, false );
-        add_option( "tdata", "detailed particle transfer type", 1, false );
-        add_option( "shading", "shading", 1, false );
+        addOption( "S", "sampling type", 1, false );
+        addOption( "tdata", "detailed particle transfer type", 1, false );
+        addOption( "shading", "shading", 1, false );
 // APPEND END   BY)M.Tanaka 2015.03.11
-        add_option( "viewer", "resolution wxh", 1, false );
-        add_option( "plimit", "particle_limit", 1, false );
+        addOption( "viewer", "resolution wxh", 1, false );
+        addOption( "plimit", "particle_limit", 1, false );
 #ifdef IS_MODE
         add_option( "pslimit", "particle data size limit", 1, false );
 #endif
-        add_option( "pd", "particle_density", 1, false );
-        add_option( "hn", "hostname", 1, false );
-        add_option( "p", "port", 1, false );
-        add_option( "pa", "parameter file", 1, false );
-        add_option( "vin", "server subvolume directory", 1, false );
+        addOption( "pd", "particle_density", 1, false );
+        addOption( "hn", "hostname", 1, false );
+        addOption( "p", "port", 1, false );
+        addOption( "pa", "parameter file", 1, false );
+        addOption( "vin", "server subvolume directory", 1, false );
 // MODIFIED END   BY)M.Tanaka 2015.03.03
-        add_option( "pout", "particle file output directory.", 1, false ); // // APPEND By Fj 2015.04.21
-        add_option( "iout", "image file output directory.", 1, false );
-        add_option( "pin1", "particle directory No.1", 1, false );
-        add_option( "pin2", "particle directory No.2", 1, false );
-        add_option( "pin3", "particle directory No.3", 1, false );
-        add_option( "pin4", "particle directory No.4", 1, false );
-        add_option( "pin5", "particle directory No.5", 1, false );
-        add_option( "pin6", "particle directory No.6", 1, false );
-        add_option( "pin7", "particle directory No.7", 1, false );
-        add_option( "pin8", "particle directory No.8", 1, false );
-        add_option( "pin9", "particle directory No.9", 1, false );
-        add_option( "pin10", "particle directory No.10", 1, false );
+        addOption( "pout", "particle file output directory.", 1, false ); // // APPEND By Fj 2015.04.21
+        addOption( "iout", "image file output directory.", 1, false );
+        addOption( "pin1", "particle directory No.1", 1, false );
+        addOption( "pin2", "particle directory No.2", 1, false );
+        addOption( "pin3", "particle directory No.3", 1, false );
+        addOption( "pin4", "particle directory No.4", 1, false );
+        addOption( "pin5", "particle directory No.5", 1, false );
+        addOption( "pin6", "particle directory No.6", 1, false );
+        addOption( "pin7", "particle directory No.7", 1, false );
+        addOption( "pin8", "particle directory No.8", 1, false );
+        addOption( "pin9", "particle directory No.9", 1, false );
+        addOption( "pin10", "particle directory No.10", 1, false );
         // add by @hira at 2016/12/01
 #ifdef CS_MODE
-        add_option( "fin", "filter parameter filename", 1, false );
+        addOption( "fin", "filter parameter filename", 1, false );
 #endif
         if ( !this->parse() ) exit( EXIT_FAILURE );
 

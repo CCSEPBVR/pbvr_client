@@ -418,7 +418,10 @@ kvs::PointObject* ParticleServer::getPointObjectFromServer( const VisualizationP
         kvs::File outdir_pfx = std::string( getenv( pout.c_str() ) );
         outdir = outdir_pfx.pathName();
         kvs::Directory kvsoutdir( outdir );
-        if ( kvsoutdir.isExisted() )
+        //KVS2.7.0
+        //MOD BY)T.Osaki 2020.06.06
+        //if ( kvsoutdir.isExisted() )
+        if ( kvsoutdir.exists() )
         {
     std::cout<<" getPointObjectFromServer 478"<<std::endl;
             if ( outdir_pfx.fileName() != "" )
@@ -433,10 +436,17 @@ kvs::PointObject* ParticleServer::getPointObjectFromServer( const VisualizationP
                 std::string filename = outdir + prefix + suffix.str() + ".kvsml";
                 std::cout << filename << std::endl;
                 const kvs::File file( filename );
-                kvs::KVSMLObjectPoint* kvsml = new kvs::PointExporter<kvs::KVSMLObjectPoint>( object );
-                kvsml->setWritingDataType( kvs::KVSMLObjectPoint::ExternalBinary );
+                //KVS2.7.0
+                //MOD BY)T.Osaki 2020.06.06
+                //kvs::KVSMLObjectPoint* kvsml = new kvs::PointExporter<kvs::KVSMLObjectPoint>( object );
+                //kvsml->setWritingDataType( kvs::KVSMLObjectPoint::ExternalBinary );
+                kvs::KVSMLPointObject* kvsml = new kvs::PointExporter<kvs::KVSMLPointObject>(object);
+                kvsml->setWritingDataType( kvs::KVSMLPointObject::ExternalBinary );
                 kvsml->write( filename );
-                std::cout << *kvsml << std::endl << std::endl;
+                //KVS2.7.0
+                //MOD BY)T.Osaki 2020.06.06
+                //std::cout << *kvsml << std::endl << std::endl;
+                kvsml->print( std::cout );
                 delete kvsml;
             }
             else

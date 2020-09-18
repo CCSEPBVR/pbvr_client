@@ -14,7 +14,9 @@
 #include "Client/ParticleMerger.h"
 
 #include <kvs/RGBColor>
-
+//KVS2.7.0
+//ADD BY)T.Osaki 2020.06.06
+#include <kvs/Background>
 ExtCommand* extCommand;
 /**
  * @brief PBVRClient::PBVRClient constructor
@@ -392,6 +394,10 @@ void PBVRGUI::onImportMenuAction()
 void PBVRGUI::onExportMenuAction()
 {
     QString fileName = QFileDialog::getSaveFileName(this, tr("Export Current Settings to Parameter File"), ".", tr("Parameter Files (*.ini *.INI)"));
+    if( fileName.right(4) != ".ini" && fileName.right(4) != ".INI" )
+    {
+        fileName += ".ini";
+    }
     if (!fileName.isEmpty()){
         VizParameterFile::ConversionClassToFloat();
         VizParameterFile::WriteParamFile( fileName.toStdString().c_str() ); // APPEND BY)M.Tanaka 2015.03.03
@@ -489,20 +495,24 @@ void PBVRGUI::keyPressEvent(QKeyEvent* ke)
 }
 
 void PBVRGUI::setBackgroundColor(kvs::RGBColor c){
-
-    extCommand->m_screen->background()->setColor(c);
+    //KVS2.7.0
+    //MOD BY)T.Osaki 2020.07.20
+    extCommand->m_screen->m_scene->background()->setColor(c);
     extCommand->m_screen->update();
     update();
 }
 void PBVRGUI::onViewer_ControlsMenuAction()
 {
     qInfo("VIEWER CONTROLS");
-
-    vc.selected_color=kvs_renderarea->background()->color();
+    //KVS2.7.0
+    //MOD BY)T.Osaki 2020.07.20
+    vc.selected_color=kvs_renderarea->m_scene->background()->color();
     vc.setCurrentFont(kvs_renderarea->font());
     int result = vc.exec();
     if (result == QDialog::Accepted){
-        kvs_renderarea->background()->setColor(vc.selected_color);
+        //KVS2.7.0
+        //MOD BY)T.Osaki 2020.07.20
+        kvs_renderarea->m_scene->background()->setColor(vc.selected_color);
         kvs_renderarea->setLabelFont(vc.getFontSelection());
     }
 }

@@ -309,7 +309,9 @@ void OpacityMapPalette::initialize_texture( const kvs::OpacityMap& opacity_map )
     m_texture.setMinFilter( GL_LINEAR );
     m_texture.setMagFilter( GL_LINEAR );
     m_texture.setPixelFormat( GL_ALPHA, GL_ALPHA, GL_FLOAT );
-    m_texture.create( width );
+    //KVS2.7.0
+    //MOD BY)T.Osaki 2020.07.20
+    m_texture.create( width, data );
     m_texture.download( width, data );
     m_texture.unbind();
 }
@@ -353,7 +355,9 @@ void OpacityMapPalette::initialize_checkerboard( void )
     m_checkerboard.setMagFilter( GL_NEAREST );
     m_checkerboard.setWrapS( GL_REPEAT );
     m_checkerboard.setWrapT( GL_REPEAT );
-    m_checkerboard.create( width, height );
+    //KVS2.7.0
+    //MOD BY)T.Osaki 2020.07.20
+    m_checkerboard.create( width, height, data );
     m_checkerboard.download( width, height, data );
     m_checkerboard.unbind();
 

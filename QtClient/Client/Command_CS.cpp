@@ -1,4 +1,8 @@
-﻿#include "ExtendedParticleVolumeRenderer.h"
+﻿//KVS2.7.0
+//ADD BY)T.Osaki 2020.06.08
+#include <QOpenGLContext>
+
+#include "ExtendedParticleVolumeRenderer.h"
 
 #include <QThread>
 #include <algorithm>
@@ -44,7 +48,7 @@ char filter_parameter_filename[256];
 
 // add:end by @hira at 2016/12/01
 int start_store_step = -1;
-float Command::PVBRmaxcoords[3]={0.0,0.0,0.0};
+float Command::PVBRmaxcoords[3]={1.0,1.0,1.0};
 float Command::PVBRmincoords[3]={0.0,0.0,0.0};
 
 
@@ -207,7 +211,10 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
         {
             kvs::PointObject* p = NULL;
             kvs::PointObject* object;
-            if ( m_server_particles[step]->nvertices() <= 1 )
+            //KVS2.7.0
+            //MOD BY)T.Osaki 2020.06.17
+            //if ( m_server_particles[step]->nvertices() <= 1 )
+            if( object->numberOfVertices() <= 1 )
             {
                 object = NULL;
             }
@@ -333,9 +340,9 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
 						if ((stepno = getServerStep(param)) >= 0 ){
 							delete m_detailed_particles[param->m_time_step];
 							m_detailed_particles[param->m_time_step] = m_server->getPointObjectFromServer(*param, result, numvol, stepno);
-							// ADD START FEAST 2016.01.07
+                            // ADD START FEAST 2016.01.07
 							if (m_detailed_particles[param->m_time_step] == NULL)
-							{
+                            {
 //                                m_timectrl_panel->toggleStop(true);
                                 m_timectrl_panel->toggleActive();
 							}
@@ -380,7 +387,7 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
 							if (m_detailed_particles[param->m_time_step])
 								delete m_detailed_particles[param->m_time_step];
 							m_detailed_particles[param->m_time_step] = m_server->getPointObjectFromServer(*param, result, numvol, stepno);
-						}
+                        }
 						else{
 							m_detailed_particles.push_back(m_server->getPointObjectFromServer(*param, result, numvol, stepno));
 						}
@@ -400,14 +407,14 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
 						
 						// ADD START FEAST 2016.01.07
 						if (m_detailed_particles[param->m_time_step] == NULL)
-						{
+                        {
 //                            m_timectrl_panel->toggleStop(true);
                             m_timectrl_panel->toggleActive();
 						}
 						// ADD END FEAST 2016.01.07
 					}// 2018.12.19 end
 					else if (param->m_client_server_mode == 0){
-						if (m_detailed_particles[param->m_time_step]) delete m_detailed_particles[param->m_time_step];
+                        if (m_detailed_particles[param->m_time_step]) delete m_detailed_particles[param->m_time_step];
 					}
 				}
                 else
@@ -437,7 +444,7 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
 			{
 				// add by @hira at 2016/12/01
 				if (m_server_particles[param->m_time_step]->coords().pointer() != NULL) {
-					m_server_particles[param->m_time_step]->updateMinMaxCoords();
+                    m_server_particles[param->m_time_step]->updateMinMaxCoords();
 					m_server_coord_min[param->m_time_step] = m_server_particles[param->m_time_step]->minObjectCoord();
 					m_server_coord_max[param->m_time_step] = m_server_particles[param->m_time_step]->maxObjectCoord();
 					m_server_coord_flag[param->m_time_step] = true;
@@ -456,7 +463,7 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
         object = merger.doMerge( *server_object, param->m_time_step );
         result->m_min_merged_time_step = merger.getMergedInitialTimeStep();
         result->m_max_merged_time_step = merger.getMergedFinalTimeStep();
-		// サーバにないステップは対象としない 2018.12.19 start
+        // サーバにないステップは対象としない 2018.12.19 start
 		if (m_detailed_particles.size() > param->m_time_step){
 			m_detailed_particles[param->m_time_step] = object;
 		}
@@ -803,7 +810,9 @@ void Command::postUpdate()
 
     if ( pretimestep != TimecontrolPanel::g_curStep )
     {
-        RenderArea::ScreenShot( m_screen, TimecontrolPanel::g_curStep );
+        //KVS2.7.0
+        //MOD BY)T.Osaki 2020.07.20
+        RenderArea::ScreenShot( m_screen->m_scene, TimecontrolPanel::g_curStep );
 
         pretimestep = TimecontrolPanel::g_curStep;
     }
@@ -963,7 +972,15 @@ void Command::initializeAbstractParticles( VisualizationParameter* param, Receiv
     }
     else
     {
-        m_abstract_particles.front() = m_server->getPointObjectFromServer( *param, result, numvol, param->m_time_step );
+        //KVS2.7.0
+        //MOD BY)T.Osaki 2020.06.17
+        //m_abstract_particles.front() = m_server->getPointObjectFromServer( *param, result, numvol, param->m_time_step );
+        kvs::Vector3f minObjectCoord;
+        kvs::Vector3f maxObjectCoord;
+        std::cout << PVBRmincoords << std::endl;
+        std::cout << PVBRmaxcoords << std::endl;
+        minObjectCoord.set(PVBRmincoords);
+        maxObjectCoord.set(PVBRmaxcoords);
     }
 }
 

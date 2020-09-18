@@ -16,7 +16,10 @@ class LegendBar: public QGLUEBase
 {
 
 public:
+    //MOD BY)T.Osaki 2020.06.29
     LegendBar( kvs::ScreenBase* screen, const Command& command ) ;
+//    LegendBar( kvs::Scene* screen, const Command& command ) ;
+
     Label captionLabel, minLabel, maxLabel;
 public:
 

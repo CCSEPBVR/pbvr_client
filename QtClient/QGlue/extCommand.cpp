@@ -1,4 +1,8 @@
-﻿#include "extCommand.h"
+﻿//KVS2.7.0
+//ADD BY)T.Osaki 2020.06.08
+#include <QOpenGLContext>
+
+#include "extCommand.h"
 
 #include <Client/v3defines.h>
 #include "Client/ExtendedParticleVolumeRenderer.h"
@@ -362,7 +366,13 @@ void ExtCommand::CallBackApply( const int i )
                      lookat_upvectory_level << ", " <<
                      lookat_upvectorz_level << std::endl;
     }
-    m_screen->reset(); //camera()->resetXform();
+    //KVS2.7.0
+    //MOD BY)T.Osaki 2020.06.06
+    //m_screen->kvs::ScreenBase::reset();
+    //m_screen->reset(); //camera()->resetXform();
+//    m_screen->Scene::reset();
+    m_screen->m_scene->reset();
+    /*
     m_screen->objectManager()->translate( kvs::Vector3f(
                                             TransformPanel::param.translateX,
                                             TransformPanel::param.translateY,
@@ -373,6 +383,19 @@ void ExtCommand::CallBackApply( const int i )
                                          TransformPanel::param.rotationAxisX) );
     float s = TransformPanel::param.scalingLevel;
     m_screen->objectManager()->scale( kvs::Vector3f( s, s, s ) );
+    */
+    //KVS2.7.0
+    //MOD BY)T.Osaki 2020.07.20
+    m_screen->m_scene->objectManager()->translate( kvs::Vector3f(
+                                            TransformPanel::param.translateX,
+                                            TransformPanel::param.translateY,
+                                            TransformPanel::param.translateZ) );
+    m_screen->m_scene->objectManager()->rotate( kvs::RPYRotationMatrix33<float>(
+                                         TransformPanel::param.rotationAxisZ,
+                                         TransformPanel::param.rotationAxisY,
+                                         TransformPanel::param.rotationAxisX) );
+    float s = TransformPanel::param.scalingLevel;
+    m_screen->m_scene->objectManager()->scale( kvs::Vector3f( s, s, s ) );
 
     // APPEND START FP)K.YAJIMA & M.Tanaka 2015.03.03
     if ( wk_resolution_width_level != RenderoptionPanel::resolution_width_level )

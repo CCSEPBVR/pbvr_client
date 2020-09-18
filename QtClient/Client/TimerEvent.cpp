@@ -1,4 +1,8 @@
-﻿#include "TimerEvent.h"
+﻿//KVS2.7.0
+//ADD BY)T.Osaki 2020.06.08
+#include <QOpenGLContext>
+
+#include "TimerEvent.h"
 #include "Command.h"
 //#include "sighandler.h"
 #include "KeyFrameAnimation.h"
@@ -13,12 +17,19 @@
 #include "Panels/systemstatuspanel.h"
 #include <QGlue/renderarea.h>
 #include <QMutex>
+//KVS2.7.0
+//ADD BY)T.Osaki 2020.06.02
+#include <kvs/Quaternion>
+#include <kvs/ObjectManager>
 extern QMutex paint_mutex;
 
 static kvs::Xform InterpolateXform( const int interp_step, const int num_frame, const kvs::Xform& start, const kvs::Xform& end );
 static float Sign( const float x );
 static float Norm( const float a, const float b, const float c, const float d );
-static kvs::Quaternion<float> RtoQ( const kvs::Matrix33f& R );
+//KVS2.7.0
+//MOD BY)T.Osaki 2020.06.04
+//static kvs::Quaternion<float> RtoQ( const kvs::Matrix33f& R );
+static kvs::Quaternion RtoQ( const kvs::Matrix33f& R );
 
 using namespace kvs::visclient;
 
@@ -82,23 +93,35 @@ void TimerEvent::update( kvs::TimeEvent* event )
             m_front_object = new PointObject();
             if ( m_command->m_parameter.m_transfer_type == VisualizationParameter::Abstract )
             {
+                std::cout << "Abstract" << std::endl;
                 *m_front_object = *( m_command->m_abstract_particles[m_command->m_parameter.m_time_step] );
                 m_renderer->setSubpixelLevel( m_command->m_parameter.m_abstract_subpixel_level );
             }
             else if ( m_command->m_parameter.m_transfer_type == VisualizationParameter::Detailed )
             {
+                std::cout << "Detailed" << std::endl;
                 *m_front_object = *( m_command->m_detailed_particles[m_command->m_parameter.m_time_step] );
                 m_renderer->setSubpixelLevel( m_command->m_parameter.m_detailed_subpixel_level );
             }
             else
             {
+                std::cout << "else" << std::endl;
                 assert( false );
             }
             if ( m_command->m_parameter.m_shading_type_flag )
                 m_renderer->enableShading();
             m_renderer->attachPointObject( m_front_object );
             m_back_object = m_front_object;
-            screen()->objectManager()->change( m_object_id, m_front_object );
+            //KVS2.7.0
+            //MOD BY)T.Osaki 2020.06.04
+            //screen()->objectManager()->change( m_object_id, m_front_object );
+//            scene()->objectManager()->change( m_object_id, m_front_object );
+//            scene()->objectManager()->change( m_object_id, m_front_object );
+            m_front_object->setMinMaxObjectCoords(kvs::Vector3f(extCommand->PVBRmincoords),kvs::Vector3f(extCommand->PVBRmaxcoords));
+            m_front_object->setMinMaxExternalCoords(kvs::Vector3f(extCommand->PVBRmincoords),kvs::Vector3f(extCommand->PVBRmaxcoords));
+            //KVS2.7.0
+            //MOD BY)T.Osaki 2020.07.20
+            m_command->m_screen->m_scene->objectManager()->change(m_object_id,m_front_object);
             m_command->m_screen->m_orientation_axis->setObject( m_front_object );
             view_flag = true;
             m_command->m_particle_assign_flag = false;
@@ -300,7 +323,9 @@ void TimerEvent::update( kvs::TimeEvent* event )
 
     if ( m_is_key_frame_animation && m_command->m_previous_key_frame != m_command->m_step_key_frame )
     {
-        RenderArea::ScreenShotKeyFrame( m_command->m_screen, m_command->m_step_key_frame );
+        //KVS2.7.0
+        //MOD BY)T.Osaki 2020.07.20
+        RenderArea::ScreenShotKeyFrame( m_command->m_screen->m_scene, m_command->m_step_key_frame );
         m_command->m_previous_key_frame = m_command->m_step_key_frame;
     }
 
@@ -329,10 +354,18 @@ static kvs::Xform InterpolateXform( const int interp_step, const int num_frame, 
     kvs::Vector3f translation_1( end.translation() );
     kvs::Vector3f scaling_1( end.scaling() );
 
-    kvs::Quaternion<float> q_0 = RtoQ( rotation_0 );
-    kvs::Quaternion<float> q_1 = RtoQ( rotation_1 );
-    kvs::Quaternion<float> q =
-        kvs::Quaternion<float>::sphericalLinearInterpolation( q_0, q_1, t, true, true );
+    //KVS2.7.0
+    //MOD BY)T.Osaki 2020.06.04
+    //kvs::Quaternion<float> q_0 = RtoQ( rotation_0 );
+    //kvs::Quaternion<float> q_1 = RtoQ( rotation_1 );
+    //kvs::Quaternion<float> q =
+    //      kvs::Quaternion<float>::sphericalLinearInterpolation( q_0, q_1, t, true, true );
+
+    kvs::Quaternion q_0 = RtoQ( rotation_0 );
+    kvs::Quaternion q_1 = RtoQ( rotation_1 );
+    kvs::Quaternion q =
+            kvs::Quaternion::SphericalLinearInterpolation( q_0, q_1, t, true, true );
+
     kvs::Matrix33f rotation = q.toMatrix();
 
     kvs::Vector3f translation = translation_1 * t + translation_0 * ( 1 - t );
@@ -353,7 +386,10 @@ static float Norm( const float a, const float b, const float c, const float d )
     return sqrt( a * a + b * b + c * c + d * d );
 }
 //High precision conversion of Rotation Matrix to Quaternion
-static kvs::Quaternion<float> RtoQ( const kvs::Matrix33f& R )
+//KVS2.7.0
+//MOD BY)T.Osaki 2020.06.04
+//static kvs::Quaternion<float> RtoQ( const kvs::Matrix33f& R )
+static kvs::Quaternion RtoQ( const kvs::Matrix33f& R )
 {
     float r11 = R[0][0];
     float r12 = R[0][1];
@@ -415,5 +451,9 @@ static kvs::Quaternion<float> RtoQ( const kvs::Matrix33f& R )
     q2 /= r;
     q3 /= r;
 
-    return kvs::Quaternion<float>( q1, q2, q3, q0 );
+    //KVS2.7.0
+    //MOD BY)T.Osaki 2020.06.04
+    //return kvs::Quaternion<float>( q1, q2, q3, q0 );
+    return kvs::Quaternion( q1, q2, q3, q0 );
+
 }

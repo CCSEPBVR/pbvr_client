@@ -1,3 +1,7 @@
+//KVS2.7.0
+//ADD BY)T.Osaki 2020.06.08
+#include <QOpenGLContext>
+
 #include <QGlue/renderarea.h>
 #include <QGlue/orientationaxis.h>
 #include <kvs/EventHandler>
@@ -7,6 +11,9 @@
 #include <QString>
 #include <QGLFunctions>
 // Default parameters.
+//KVS2.7.0
+//MOD BY)T.Osaki 2020.06.04
+#include <kvs/IgnoreUnusedVariable>
 namespace { namespace Default
 {
 const size_t AxisWindowSize = 80;
@@ -23,8 +30,12 @@ namespace QGlue
  */
 /*===========================================================================*/
 OrientationAxis::OrientationAxis(RenderArea *screen ):
+    //KVS2.7.0
+    //MOD BY)T.Osaki 2020.06.04
     //    kvs::glut::WidgetBase( screen ),
-    m_object( screen->objectManager() ),
+    m_object( screen->m_scene->objectManager() ),
+    //m_object( scene()->objectManager() ),
+    //m_object_manager(screen->objectManager()),
     m_x_tag( "x" ),
     m_y_tag( "y" ),
     m_z_tag( "z" ),
@@ -456,7 +467,10 @@ void OrientationAxis::paintEvent( void )
             // Perspective projection.
             const float field_of_view = 45.0f;
             const float aspect = 1.0f;
-            gluPerspective( field_of_view, aspect, front, back );
+            //KVS2.7.0
+            //MOD BY)T.Osaki 2020.06.04
+            //gluPerspective( field_of_view, aspect, front, back );
+            kvs::OpenGL::SetPerspective( field_of_view, aspect, front, back );
         }
         else
         {
@@ -477,12 +491,21 @@ void OrientationAxis::paintEvent( void )
         const kvs::Vector3f eye( 0.0f, 0.0f, 12.0f );
         const kvs::Vector3f center( 0.0f, 0.0f, 0.0f );
         const kvs::Vector3f up( 0.0f, 1.0f, 0.0f );
+        //KVS2.7.0
+        //MOD BY)T.Osaki 2020.06.04
+        /*
         gluLookAt( eye.x(), eye.y(), eye.z(),
                    center.x(), center.y(), center.z(),
                    up.x(), up.y(), up.z() );
-
+        */
+        kvs::OpenGL::SetLookAt( eye.x(), eye.y(), eye.z(),
+                   center.x(), center.y(), center.z(),
+                   up.x(), up.y(), up.z() );
         // Rotate the axis and the box using the object's rotation matrix.
-        const kvs::Matrix33f r = m_object->rotation();
+        //KVS2.7.0
+        //MOD BY)T.Osaki 2020.06.04
+        const kvs::Matrix33f r = m_object->xform().rotation();
+        //const kvs::Matrix33f r = m_object->rotation();
         const float xform[16] = {
             r[0][0], r[1][0], r[2][0], 0.0f,
             r[0][1], r[1][1], r[2][1], 0.0f,

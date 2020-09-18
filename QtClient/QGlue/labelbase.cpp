@@ -1,3 +1,7 @@
+//KVS2.7.0
+//ADD BY)T.Osaki 2020.06.08
+#include <QOpenGLContext>
+
 #include "labelbase.h"
 #include <QGlue/labelbase.h>
 //#include <QGlue/screen.h>
@@ -114,7 +118,8 @@ void FPSLabel::contentUpdate( )
 {
     QString fps;
     if(m_renderer !=NULL){
-        fps= "fps:" + QString::number( m_renderer->timer().fps(),'G',4);
+//        fps= "fps:" + QString::number( m_renderer->timer().fps(),'G',4);
+        fps= "fps:" + QString::number( m_screen->m_fps,'G',4);
     }
     else {
         fps= "fps:---";

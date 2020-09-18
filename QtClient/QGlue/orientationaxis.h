@@ -11,6 +11,10 @@
 
 #include <QGlue/renderarea.h>
 #include <QGlue/labelbase.h>
+
+//KVS2.7.0
+//ADD BY)T.Osaki 2020.06.04
+#include <kvs/ObjectManager>
 namespace QGlue
 {
 
@@ -57,6 +61,9 @@ public:
 protected:
 
     const kvs::ObjectBase* m_object; ///< pointer to the object
+    //KVS2.7.0
+    //ADD BY)T.Osaki 2020.07.20
+    const kvs::ObjectManager* m_object_manager;
     RenderArea* m_screen;
     std::string m_x_tag; ///< x axis tag
     std::string m_y_tag; ///< y axis tag

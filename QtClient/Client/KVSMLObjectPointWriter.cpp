@@ -34,7 +34,10 @@ void KVSMLObjectPointWriter::write_main_tag()
 #ifdef KVS_COMPILER_VC
     fprintf( kvsml_file, "<Vertex nvertices=\"%Iu\">\n", m_object->nvertices() );
 #else
-    fprintf( kvsml_file, "<Vertex nvertices=\"%zu\">\n", m_object->nvertices() );
+    //KVS2.7.0
+    //MOD BY)T.Osaki 2020.06.20
+    //fprintf( kvsml_file, "<Vertex nvertices=\"%zu\">\n", m_object->nvertices() );
+    fprintf( kvsml_file, "<Vertex nvertices=\"%zu\">\n", m_object->numberOfVertices() );
 #endif
     fprintf( kvsml_file, "<Coord>\n" );
     fprintf( kvsml_file, "<DataArray type=\"float\" format=\"binary\" file=\"%s\"/>\n", coords_filename.c_str() );
@@ -63,7 +66,9 @@ void KVSMLObjectPointWriter:: write_coords()
     std::string coords_filename   = m_basename + "_coords.dat";
     FILE* coords_file = fopen( coords_filename.c_str(), "wb" );
 
-    size_t nvertices = m_object->nvertices();
+    //KVS2.7.0
+    //size_t nvertices = m_object->nvertices();
+    size_t nvertices = m_object->numberOfVertices();
     const float* coords_pointer = m_object->coords().pointer();
 
     size_t size = sizeof( float );
@@ -104,8 +109,9 @@ void KVSMLObjectPointWriter::write_normals()
 {
     std::string normals_filename  = m_basename + "_normals.dat";
     FILE* normals_file = fopen( normals_filename.c_str(), "wb" );
-
-    size_t nvertices = m_object->nvertices();
+    //KVS2.7.0
+    //size_t nvertices = m_object->nvertices();
+    size_t nvertices = m_object->numberOfVertices();
     const float* normals_pointer = m_object->normals().pointer();
 
     size_t size = sizeof( float );
