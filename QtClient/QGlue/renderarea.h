@@ -38,6 +38,8 @@ public:
     static void ScreenShot( kvs::Scene* screen, const int tstep );
     static void ScreenShotKeyFrame( kvs::Scene* screen, const int tstep );
 
+    void attachPointObject(kvs::PointObject* point);
+
     void drawLabelList( QList<QGlue::Label*> list,QColor fontColor);
     void keyPressEvent(QKeyEvent *kbEvent);
     void redraw( void ){ this->update();}
@@ -80,7 +82,10 @@ public:
     double m_fps = 0.0;
     //KVS2.7.0
     //MOD BY)T.Osaki 2020.07.20
-    kvs::Scene* m_scene;
+
+    kvs::Scene* scene(){
+        return m_scene;
+    }
 
 
     void toggleTimer(bool state){
@@ -94,10 +99,15 @@ private:
     int i_h=0;
     int yl0=0;
     int msec = DEFAULT_MSEC;
+    kvs::Scene* m_scene;
+
+    std::pair<int,int> m_obj_id_pair;
     //    MOD BY)T.Osaki 2020.04.28
     float pixelRatio=1;
     kvs::visclient::ExtendedParticleVolumeRenderer* m_renderer;
     int m_reset_count = 0;
+
+
 protected:
     void initializeGL( void );
     void resizeGL(int w, int h);
