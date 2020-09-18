@@ -337,8 +337,8 @@ void Histogram::create_texture( void )
     //KVS2.7.0
     //MOD BY)T.Osaki 2020.07.20
     m_texture.create( width, height, this->get_histogram_image().data() );
-    m_texture.download( width, height, this->get_histogram_image().pointer() );
-    m_texture.unbind();
+//    m_texture.download( width, height, this->get_histogram_image().pointer() );
+//    m_texture.unbind();
 }
 
 /*===========================================================================*/
