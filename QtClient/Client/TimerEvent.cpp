@@ -1,7 +1,7 @@
 ﻿//KVS2.7.0
 //ADD BY)T.Osaki 2020.06.08
 #include <QOpenGLContext>
-
+#include <QGlue/renderarea.h>
 #include "TimerEvent.h"
 #include "Command.h"
 //#include "sighandler.h"
@@ -15,7 +15,7 @@
 #include "Panels/coordinatepanel.h"
 #include "Panels/timecontrolpanel.h"
 #include "Panels/systemstatuspanel.h"
-#include <QGlue/renderarea.h>
+
 #include <QMutex>
 //KVS2.7.0
 //ADD BY)T.Osaki 2020.06.02
@@ -148,7 +148,7 @@ void TimerEvent::update( kvs::TimeEvent* event )
                 {
                     m_command->m_parameter.m_time_step = m_command->m_parameter.m_min_time_step;
                 }
-              //float ratio = float(m_command->param.m_time_step -m_command->param.m_min_time_step ) / float(m_command->param.m_max_time_step -m_command->param.m_min_time_step ) * 100;
+              //float ratio = float(m_command->m_parameter.m_time_step -m_command->m_parameter.m_min_time_step ) / float(m_command->m_parameter.m_max_time_step -m_command->m_parameter.m_min_time_step ) * 100;
                 int min_time_step = static_cast<int>( m_command->m_timectrl_panel->minValue() );
                 int max_time_step = static_cast<int>( m_command->m_timectrl_panel->maxValue() );
                 float ratio = float( m_command->m_parameter.m_time_step - min_time_step + 1.0 ) / float( max_time_step - min_time_step + 1.0 ) * 100;
@@ -172,7 +172,7 @@ void TimerEvent::update( kvs::TimeEvent* event )
             if ( m_command->m_parameter.m_transfer_type == VisualizationParameter::Detailed )
             {
 #ifndef CPUMODE
-                if ( m_command->param.repeatLevel ==m_command->param.detailedRepeatLevel )
+                if (m_command->m_parameter.m_repeat_level ==m_command->m_parameter.m_detailed_repeat_level)
                 {
 #endif
                     TimecontrolPanel::g_curStep = m_command->m_parameter.m_time_step;
@@ -186,7 +186,7 @@ void TimerEvent::update( kvs::TimeEvent* event )
             else if ( m_command->m_parameter.m_transfer_type == VisualizationParameter::Abstract )
             {
 #ifndef CPUMODE
-                if (m_command->param.repeatLevel ==m_command->param.abstractRepeatLevel )
+                if (m_command->m_parameter.m_repeat_level ==m_command->m_parameter.m_abstract_repeat_level )
                 {
 #endif
                     TimecontrolPanel::g_curStep = m_command->m_parameter.m_time_step;
@@ -217,7 +217,7 @@ void TimerEvent::update( kvs::TimeEvent* event )
 			#ifdef CS_MODE
                 m_command->m_parameter.m_min_time_step = m_command->m_timectrl_panel->minValue();
 			#else
-				m_command->param.minTimeStep = m_command->m_timectrl_panel->minValue();
+                m_command->m_parameter.minTimeStep = m_command->m_timectrl_panel->minValue();
 			#endif
             }
             else
@@ -225,7 +225,7 @@ void TimerEvent::update( kvs::TimeEvent* event )
 			#ifdef CS_MODE
                 m_command->m_parameter.m_min_time_step = m_command->m_parameter.m_min_time_step;
 			#else
-				m_command->param.minTimeStep = m_command->param.minTimeStep;
+               m_command->m_parameter.minTimeStep =m_command->m_parameter.minTimeStep;
 			#endif
             }
         }
@@ -234,8 +234,8 @@ void TimerEvent::update( kvs::TimeEvent* event )
 #ifdef IS_MODE
         if( m_command->lastStepCheckBoxState )
         {
-            m_command->param.timeStep = m_command->param.maxTimeStep;
-//            m_command->m_timectrl_panel->setStepValue(m_command->param.timeStep);
+           m_command->m_parameter.timeStep =m_command->m_parameter.maxTimeStep;
+//            m_command->m_timectrl_panel->setStepValue(m_command->m_parameter.timeStep);
         }
 #endif
     }
@@ -325,13 +325,13 @@ void TimerEvent::update( kvs::TimeEvent* event )
     {
         //KVS2.7.0
         //MOD BY)T.Osaki 2020.07.20
-        RenderArea::ScreenShotKeyFrame( m_command->m_screen->m_scene, m_command->m_step_key_frame );
+        RenderArea::ScreenShotKeyFrame( m_command->m_screen->scene(), m_command->m_step_key_frame );
         m_command->m_previous_key_frame = m_command->m_step_key_frame;
     }
 
 //    if ( IsSignal() ) // Letting Qt handle this
 //    {
-//        if (m_command->param.m_client_server_mode == 1 )
+//        if (m_command->m_parameter.m_client_server_mode == 1 )
 //        {
 //            m_command->closeServer();
 //        }
