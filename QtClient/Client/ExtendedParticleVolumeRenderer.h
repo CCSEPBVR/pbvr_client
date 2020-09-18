@@ -6,9 +6,9 @@
 #define RENDERER_BASE   kvs::ParticleVolumeRenderer
 #define BASE_INIT_ARGS  &point, subpixel_level
 #else
-#include "kvs/glew/ParticleVolumeRenderer"
-#define RENDERER_BASE   kvs::glew::ParticleVolumeRenderer
-#define BASE_INIT_ARGS  &(const_cast<kvs::PointObject&>(point)), subpixel_level, repeat_level
+#include <kvs/ParticleBasedRenderer>
+#define RENDERER_BASE   kvs::glsl::ParticleBasedRenderer
+#define BASE_INIT_ARGS  //&(const_cast<kvs::PointObject&>(point)), subpixel_level, repeat_level
 #endif
 
 namespace kvs
@@ -26,14 +26,16 @@ public:
     ~ExtendedParticleVolumeRenderer() {};
 
 
-    void changePointObject( const kvs::PointObject& point )
-    {
-        this->attachPointObject( &point );
-#ifndef CPUMODE
-        this->align_particles();
-        this->create_vertexbuffer();
-#endif
-    }
+//    void changePointObject( const kvs::PointObject& point )
+//    {
+////        this->attachPointObject( &point );
+//        m_screen->attachPointObject( &point );
+
+//#ifndef CPUMODE
+////        this->align_particles();
+////        this->create_vertexbuffer();
+//#endif
+//    }
 
 #ifdef CPUMODE
     void recreateImageBuffer()

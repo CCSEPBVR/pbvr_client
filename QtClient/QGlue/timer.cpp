@@ -320,7 +320,7 @@ void Timer::comThreadExitEvent()
         if ( m_command->m_parameter.m_transfer_type == VisualizationParameter::Detailed )
         {
 #ifndef CPUMODE
-            if ( m_command->param.repeatLevel == m_command->param.detailedRepeatLevel )
+            if ( m_command->m_parameter.m_repeat_level == m_command->m_parameter.m_detailed_repeat_level )
             {
 #endif
                 TimecontrolPanel::g_curStep = m_command->m_parameter.m_time_step;
@@ -332,7 +332,7 @@ void Timer::comThreadExitEvent()
         else if ( m_command->m_parameter.m_transfer_type == VisualizationParameter::Abstract )
         {
 #ifndef CPUMODE
-            if ( m_command->param.repeatLevel == m_command->param.abstractRepeatLevel )
+            if ( m_command->m_parameter.m_repeat_level == m_command->m_parameter.m_abstract_repeat_level )
             {
 #endif
                 TimecontrolPanel::g_curStep = m_command->m_parameter.m_time_step;

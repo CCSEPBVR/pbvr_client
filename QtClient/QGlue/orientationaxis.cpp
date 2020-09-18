@@ -33,7 +33,7 @@ OrientationAxis::OrientationAxis(RenderArea *screen ):
     //KVS2.7.0
     //MOD BY)T.Osaki 2020.06.04
     //    kvs::glut::WidgetBase( screen ),
-    m_object( screen->m_scene->objectManager() ),
+    m_object( screen->scene()->objectManager() ),
     //m_object( scene()->objectManager() ),
     //m_object_manager(screen->objectManager()),
     m_x_tag( "x" ),
