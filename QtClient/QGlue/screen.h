@@ -25,6 +25,8 @@ public:
     typedef kvs::ScreenBase BaseClass;
     typedef kvs::Scene::ControlTarget ControlTarget;
     bool m_hold_paintGL=false;
+    double m_fps = 0.0;
+
 private:
     bool m_enable_default_paint_event;
 
