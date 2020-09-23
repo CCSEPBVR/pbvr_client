@@ -5,7 +5,7 @@
 #include "colorpalette.h"
 
 #include <kvs/Vector2>
-#include "deferredtexture.h"
+#include <kvs/Texture1D>
 #include <kvs/ColorMap>
 #include <Client/ColorMapLibrary.h>
 
@@ -55,7 +55,7 @@ private:
     //ADD BY)T.Osaki 2020.02.28
     kvs::ColorMap        m_fromColorMap;     ///< Undo from color map
 
-    DeferredTexture1D     m_texture;          ///< color map texture
+    QGlue::Texture1D       m_texture;          ///< color map texture
     QRect m_palette;          ///< palette
     QColor        m_upper_edge_color; ///< upper edge color
     QColor        m_lower_edge_color; ///< lower edge color

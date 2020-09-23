@@ -25,7 +25,6 @@
 #include "timer_simple.h"
 #include "ParamExTransFunc.h"
 
-
 #ifdef KVS_COMPILER_VC
 #include <direct.h>
 #define mkdir( dir, mode ) _mkdir( dir )
@@ -142,9 +141,9 @@ kvs::PointObject* ParticleServer::getPointObjectFromServer( const VisualizationP
         }
         message.m_particle_limit = param.m_particle_limit;
         message.m_particle_density = param.m_particle_density;
-//#ifdef IS_MODE
+        //#ifdef IS_MODE
         message.particle_data_size_limit = param.particle_data_size_limit;
-//#endif
+        //#endif
         message.m_camera = param.m_camera;
         //      message.m_transfer_function = const_cast<TransferFunction*>(&param.m_transfer_function);
         message.m_message_size = message.byteSize();
@@ -228,7 +227,7 @@ kvs::PointObject* ParticleServer::getPointObjectFromServer( const VisualizationP
                 message.m_initialize_parameter = -1;
                 message.m_message_size = message.byteSize();
                 client.sendMessage( message );
-                client.recvMessage( &reply );
+                client.recvMessage( &reply  );
                 client.termClient();
                 setStatus( Idle );
                 return NULL;
@@ -250,6 +249,7 @@ kvs::PointObject* ParticleServer::getPointObjectFromServer( const VisualizationP
             /* 140319 for client stop by server Ctrl+c */
 
             int nmemb = reply.m_number_particle * 3;
+
 #ifdef IS_MODE
             if( reply.flag_send_bins )
             {
@@ -259,14 +259,14 @@ kvs::PointObject* ParticleServer::getPointObjectFromServer( const VisualizationP
                     kvs::ValueArray<kvs::Real32> positions ( reply.m_positions, nmemb );
                     kvs::ValueArray<kvs::Real32> normals ( reply.m_normals, nmemb );
                     kvs::ValueArray<kvs::UInt8>  colors ( reply.m_colors, nmemb );
+
                     kvs::PointObject obj;
                     obj.setCoords( positions );
                     obj.setNormals( normals );
                     obj.setColors( colors );
 
-                    ( *object ) += obj;
-                    obj.clear();
-    std::cout<<" getPointObjectFromServer 331"<<std::endl;
+                    object->add(obj);
+                    std::cout<<" getPointObjectFromServer 331"<<std::endl;
                     allParticle = allParticle + reply.m_number_particle;
 #ifdef CS_MODE
                     delete[] reply.m_colors;
@@ -338,7 +338,7 @@ kvs::PointObject* ParticleServer::getPointObjectFromServer( const VisualizationP
                 result->o_bins[tf] = kvs::visclient::FrequencyTable( 0.0, 1.0, reply.o_nbins[tf], reply.o_bins[tf] );
             }
         }
-    std::cout<<" getPointObjectFromServer 403"<<std::endl;
+        std::cout<<" getPointObjectFromServer 403"<<std::endl;
         result->subPixelLevel = reply.subPixelLevel;
         lavel_time_step       = reply.timeStep;
 
@@ -383,7 +383,7 @@ kvs::PointObject* ParticleServer::getPointObjectFromServer( const VisualizationP
         result->m_subpixel_level = reply.m_subpixel_level;
 #endif
 
-    std::cout<<" getPointObjectFromServer 448"<<std::endl;
+        std::cout<<" getPointObjectFromServer 448"<<std::endl;
         for ( int tf = 0; tf < reply.m_transfer_function_count; tf++ )
         {
             delete[] reply.m_color_bins[tf];
@@ -423,7 +423,7 @@ kvs::PointObject* ParticleServer::getPointObjectFromServer( const VisualizationP
         //if ( kvsoutdir.isExisted() )
         if ( kvsoutdir.exists() )
         {
-    std::cout<<" getPointObjectFromServer 478"<<std::endl;
+            std::cout<<" getPointObjectFromServer 478"<<std::endl;
             if ( outdir_pfx.fileName() != "" )
             {
                 prefix = outdir_pfx.Separator() + std::string( outdir_pfx.fileName().c_str() ) + "_";
@@ -516,7 +516,7 @@ void ParticleServer::close( const VisualizationParameter& param )
 {
     std::cout<<"#### !!! ParticleServer::close() !!!! #####"<<std::endl;
     setStatus( Exit );
-exit(99);
+    exit(99);
     jpv::ParticleTransferClient client( param.m_hostname, param.m_port );
     jpv::ParticleTransferServerMessage reply;
     jpv::ParticleTransferClientMessage message;
