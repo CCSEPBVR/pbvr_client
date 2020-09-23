@@ -171,6 +171,7 @@ void Histogram::setNumberOfBins( const kvs::UInt64 nbins )
 }
 void Histogram::resizeGL(int w, int h)
 {
+    return;
     int h_scaled = h * pixelRatio-1;
     int w_scaled = w  * pixelRatio-2;
     const int x = m_margin;
@@ -181,6 +182,7 @@ void Histogram::resizeGL(int w, int h)
 }
 void Histogram::paintGL( void )
 {
+    return;
     this->screenUpdated();
     BaseClass::begin_draw();
 
@@ -252,13 +254,22 @@ void Histogram::draw_palette( void )
     glColor3ub( 240, 240, 240 );
     BaseClass::drawQuad(x0,y0,x1,y1);
 
-    // Draw histogram texture.
-    if(m_texture.bind()){
-        glEnable( GL_BLEND );
-        glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+    // Draw checkerboard texture.
+    glDisable( GL_TEXTURE_1D );
+    glEnable( GL_TEXTURE_2D );
+#if defined( GL_TEXTURE_3D )
+    glDisable( GL_TEXTURE_3D );
+#endif
+
+    glEnable( GL_BLEND );
+    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+
+    if ( m_texture.isValid() )
+    {
+        m_texture.bind();
         BaseClass::drawUVQuad(0.0,1.0,1.0,0.0,x0,y0,x1,y1);
         m_texture.unbind();
-        glDisable( GL_BLEND );
+
     }
 
     glPopAttrib();
@@ -320,13 +331,14 @@ void Histogram::create_texture( void )
     const size_t width = m_table.nbins();
     const size_t height = width;
 
+//    m_texture.release();
     m_texture.setPixelFormat( nchannels, sizeof( kvs::UInt8 ) );
     m_texture.setMinFilter( GL_LINEAR );
     m_texture.setMagFilter( GL_LINEAR );
     //KVS2.7.0
     //MOD BY)T.Osaki 2020.07.20
-    m_texture.create( width, height, this->get_histogram_image().data() );
-//    m_texture.download( width, height, this->get_histogram_image().pointer() );
+//    m_texture.create( width, height, this->get_histogram_image().data() );
+    m_texture.load( width, height, this->get_histogram_image().pointer() );
 //    m_texture.unbind();
 }
 

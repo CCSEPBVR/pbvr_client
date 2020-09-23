@@ -2,9 +2,10 @@
 #define KVSQScreen_H
 
 #include "screen.h"
-
+//#include "Client/ExtendedParticleVolumeRenderer.h"
 #include "Client/TimerEvent.h"
 #include <QGlue/labelbase.h>
+//#include <QGlue/extCommand.h>
 #include <QGlue/legendbar.h>
 #include <QGlue/timer.h>
 #include <QGlue/orientationaxis.h>
@@ -38,8 +39,6 @@ public:
     static void ScreenShot( kvs::Scene* screen, const int tstep );
     static void ScreenShotKeyFrame( kvs::Scene* screen, const int tstep );
 
-    void attachPointObject(kvs::PointObject* point);
-
     void drawLabelList( QList<QGlue::Label*> list,QColor fontColor);
     void keyPressEvent(QKeyEvent *kbEvent);
 //    void redraw( void ){ this->update();}
@@ -65,30 +64,30 @@ public:
     static char shadinglevel[256];
     static kvs::visclient::TimerEvent* g_timer_event;
 
-    bool GLInitComplete=false;
+    bool m_glInit_complete=false;
+    size_t frame_number=0;
+//    QTimer*     m_idle_mouse_timer;
+//    QPainter    m_painter; // Shouldn't be public, but used by orientation axis
 
-    QTimer*     m_idle_mouse_timer;
-    QPainter    m_painter; // Shouldn't be public, but used by orientation axis
-    bool m_gl_initialized=false;
     QGlue::StepLabel*       m_stepLabel=NULL;
     QGlue::FPSLabel*        m_fpsLabel=NULL;
     QGlue::LegendBar*       g_legend=NULL;
     QGlue::OrientationAxis* m_orientation_axis=NULL;
     QGlue::Timer*           qt_timer;
 
-    kvs::PointObject*  m_control_object;
+//    kvs::glsl::ParticleBasedRenderer* m_pbr;
 
+    kvs::PointObject*  m_control_object;
+//    kvs::EventHandler* m_initialize_event_handler;
+
+//    std::list<QGlue::Timer*> m_timer_event_handler;
     QList<QGlue::Label*>     m_labels;
     //KVS2.7.0
     //MOD BY)T.Osaki 2020.07.20
-
-    kvs::Scene* scene(){
-        return m_scene;
-    }
-
+//    kvs::Scene* m_scene;
 
     std::pair<int, int> obj_id_pair;
-    void attachPointObject(const kvs::PointObject *point);
+    void attachPointObject(kvs::PointObject* point);
     void toggleTimer(bool state){
         if (state)
             qt_timer->start();
@@ -100,16 +99,13 @@ private:
     int i_h=0;
     int yl0=0;
     int msec = DEFAULT_MSEC;
-    kvs::Scene* m_scene;
-
-    std::pair<int,int> m_obj_id_pair;
     //    MOD BY)T.Osaki 2020.04.28
     float pixelRatio=1;
     ExtendedParticleVolumeRenderer* m_renderer;
 
+    kvs::glsl::ParticleBasedRenderer* m_pbr;
     int m_reset_count = 0;
-
-
+    bool objectReplaced=false;
 protected:
 
     void mouseReleaseEvent(QMouseEvent *event);

@@ -20,7 +20,7 @@ void QGLUEBase::setCharacterType( FontType font )
 
 
 void QGLUEBase::renderLabel(kvs::Vector3f v, const float length, Label &lbl)
-{
+{return;
 //    const float padding = static_cast<float>( length ) / 4.0f;
     lbl.renderBitMap(v.x()  , v.y() , v.z() );
 }
@@ -31,7 +31,7 @@ void QGLUEBase::renderLabel(kvs::Vector3f v, const float length, Label &lbl)
  */
 /*===========================================================================*/
 void QGLUEBase::begin_draw( void )
-{
+{return;
     GLint vp[4]; glGetIntegerv( GL_VIEWPORT, vp );
     const GLint left   = vp[0];
     const GLint bottom = vp[1];
@@ -51,7 +51,7 @@ void QGLUEBase::begin_draw( void )
  */
 /*===========================================================================*/
 void QGLUEBase::end_draw( void )
-{
+{return;
     glPopMatrix();
     glMatrixMode( GL_MODELVIEW );
     glPopMatrix();
@@ -102,6 +102,7 @@ QGLUEBaseWidget::QGLUEBaseWidget(QWidget* parent) :
 
 void QGLUEBaseWidget::initializeGL()
 {
+return;
     initializeOpenGLFunctions();
     QColor bg=QWidget::palette().color(QWidget::backgroundRole());
     glClearColor(bg.redF(), bg.blueF(),bg.greenF(),1.0);
@@ -111,6 +112,7 @@ void QGLUEBaseWidget::initializeGL()
 
 void QGLUEBaseWidget::drawText(int x, int y,std::string text,QColor fontColor)
 {
+    return;
     y=this->height()-y;
     m_painter.begin(this);
     m_painter.setPen(fontColor);
@@ -136,6 +138,7 @@ void QGLUEBaseWidget::drawRectangle(
         const QColor& upper_edge_color,
         const QColor& lower_edge_color )
 {
+    return;
     GLfloat x0 = static_cast<GLfloat>( rect.x() );
     GLfloat y0 = static_cast<GLfloat>( rect.y() );
     GLfloat x1 = static_cast<GLfloat>( rect.x() + rect.width() );
@@ -156,6 +159,7 @@ void QGLUEBaseWidget::drawRectangle(
 }
 void QGLUEBaseWidget::drawQuad( int x0, int y0, int x1, int y1)
 {
+    return;
     glBegin( GL_QUADS );
     glVertex2i( x0, y0 );
     glVertex2i( x1, y0 );
@@ -165,6 +169,7 @@ void QGLUEBaseWidget::drawQuad( int x0, int y0, int x1, int y1)
 }
 void QGLUEBaseWidget::drawUVQuad(float u0, float v0, float u1, float v1, int x0, int y0, int x1, int y1)
 {
+    return;
     glBegin( GL_QUADS );
     glTexCoord2f( u0, v0 ); glVertex2i( x0, y0 );
     glTexCoord2f( u1,    v0 ); glVertex2i( x1, y0 );

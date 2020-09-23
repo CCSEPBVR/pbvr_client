@@ -1,8 +1,8 @@
 //KVS2.7.0
 //ADD BY)T.Osaki 2020.06.08
-#include <GL/glew.h>
-#include <QOpenGLContext>
-
+//#include <GL/glew.h>
+//#include <QOpenGLContext>
+#include "screen.h"
 #include "QGlue/renderarea.h"
 
 //#include <QApplication>
@@ -29,6 +29,15 @@
 #include <kvs/Background>
 #include <kvs/ObjectManager>
 
+
+#include <kvs/StructuredVolumeObject>
+#include <kvs/HydrogenVolumeData>
+#include <kvs/PointObject>
+#include <kvs/CellByCellMetropolisSampling>
+#include <kvs/RayCastingRenderer>
+
+#include <random>
+
 #ifdef PBVR_DEBUG
 int     timestep = 0;
 #endif
@@ -39,16 +48,13 @@ kvs::visclient::TimerEvent* RenderArea::g_timer_event=0;
 
 
 RenderArea::RenderArea( QWidget* parent_surface):
-     m_obj_id_pair (-1,-1)
+    obj_id_pair (-1,-1)
 {
-
-    Q_UNUSED(parent_surface);
-    //    MOD BY)T.Osaki 2020.04.28
     pixelRatio= QApplication::desktop()->devicePixelRatioF();
 
     this->m_scene->background()->setColor( kvs::RGBAColor(0,0,22,1.0f) );
 
-//    m_renderer= new kvs::glsl::ParticleBasedRenderer();
+//    m_pbr= new kvs::glsl::ParticleBasedRenderer();
     this->i_w= 620;//Qthis->width();
     this->i_h= 620;//Qthis->height();
     this->setSize(i_w,i_h);
@@ -57,8 +63,7 @@ RenderArea::RenderArea( QWidget* parent_surface):
     kvs::RGBColor color( 0, 0, 0 );
     kvs::ValueArray<kvs::Real32> normals( 3 );
     m_control_object = new kvs::PointObject( coords, color, normals, 1.0 );
-    attachPointObject(m_control_object);
-    // Setup Step Label
+//    this->attachPointObject(m_control_object);
     m_stepLabel =new QGlue::StepLabel(this,extCommand);
     m_stepLabel->setPosition(150*pixelRatio,50);
     m_labels.append(m_stepLabel);
@@ -105,11 +110,11 @@ void RenderArea::updateCommandInfo(ExtCommand* extCommand)
     {
         kvsMessageError( "Cannot create a point m_renderer." );
     }
-
+    m_pbr = m_renderer;
     extCommand->m_renderer=m_renderer;
 
     // Setup FPS Label
-    m_fpsLabel  =new QGlue::FPSLabel(this,*m_renderer);
+    m_fpsLabel  =new QGlue::FPSLabel(this,*m_pbr);
     m_fpsLabel->setPosition(50*pixelRatio,50);
     m_labels.append(m_fpsLabel);
 
@@ -124,29 +129,13 @@ void RenderArea::updateCommandInfo(ExtCommand* extCommand)
 void RenderArea::onInitializeGL( void )
 {
     qInfo("KVSRenderArea::initializeGL( void )");
-    if (! isValid())
-     {
-         qWarning("Screen::initalizeGL while surface still not valid ");
-         return;
-     }
-     GLenum result = glewInit();
-     if ( result != GLEW_OK )
-     {
-         const GLubyte* message = glewGetErrorString( result );
-         qFatal("GLEW initialization failed. ");
-     }
-    initializeOpenGLFunctions();
     m_orientation_axis->initializeOpenGLFunctions();
     g_legend->initializeOpenGLFunctions();
+    m_glInit_complete=true;
     this->setAutoFillBackground(false);
 
     m_scene->light()->on();
     m_scene->mouse()->attachCamera(m_scene->camera());
-    //    kvs::Mouse::attachCamera(this->kvs::Scene::camera());
-    //m_light->on();
-    //m_mouse->attachCamera( m_camera );
-    m_gl_initialized=true;
-
 }
 /**
  * @brief RenderArea::resizeGL, GL Surface resized handler
@@ -156,8 +145,6 @@ void RenderArea::onInitializeGL( void )
 void RenderArea::onResizeGL(int w, int h)
 {
     //    MOD BY)T.Osaki 2020.04.28
-    if (!m_gl_initialized)
-        return;
     float scale= QApplication::desktop()->devicePixelRatioF();
     int h_scaled = h * scale;
     int w_scaled = w  * scale;
@@ -168,37 +155,13 @@ void RenderArea::onResizeGL(int w, int h)
     int size=90*scale;
     m_orientation_axis->setPosition( w_scaled -(size + 10),10);
     g_legend->setPosition( 10, h_scaled -10 );
-    kvs::FrameBufferObject::m_unbind_id=QOpenGLWidget::defaultFramebufferObject();
+
 }
-/**
- * @brief RenderArea::onPaintGL
- */
+///**
+// * @brief RenderArea::onPaintGL
+// */
 void RenderArea::onPaintGL(void)
 {
-    if (!m_gl_initialized)
-        return;
-    if(!kvs::FrameBufferObject::m_unbind_id)
-        return;
-    if (QThread::currentThread() != this->thread()) {
-         qWarning("Screen::paintGL was not called from main thread, skipping frame");
-         return;
-     }
-    kvs::FrameBufferObject::m_unbind_id=QOpenGLWidget::defaultFramebufferObject();
-
-    QElapsedTimer timer;
-
-    glPushAttrib( GL_ALL_ATTRIB_BITS );
-    glMatrixMode( GL_MODELVIEW );
-    glLoadIdentity();
-    glPushMatrix();
-    //KVS2.7.0
-    //MOD BY)T.Osaki 2020.07.20
-    timer.start();
-    this->m_scene->paintFunction();
-    m_fps = 1.0 / ((double)timer.elapsed()/1000.0);
-    //ScreenBase::paintFunction();
-    glPopMatrix();
-    glPopAttrib();
     if (m_orientation_axis){
         glPushMatrix();
         m_orientation_axis->paintEvent();
@@ -251,7 +214,9 @@ void RenderArea::setupEventHandlers()
     g_timer_event->setObject( id_pair.first );
     g_timer_event->setRenderer( extCommand->m_renderer );
 #else
-    this->attachPointObject( m_control_object );
+    //    this->registerObject( m_control_object, extCommand->renderer );
+    //    this->m_scene->registerObject( m_control_object, extCommand->m_renderer );
+
 #endif
     //KVS2.7.0
     //ADD BY)T.Osaki  2020.06.19
@@ -264,58 +229,17 @@ void RenderArea::setupEventHandlers()
  * @brief RenderArea::attachPointObject
  *        Attaches a new point to the scene, using the apropriate registerObject, or
  *        replaceObject, depending on wether a prevous object has been registered.
- *
- *        Ensures context current by explict makeCurrent() call.
- *
- *        Creates local copy of point object, to ensure life time.
- * @param point, the point to be attached
- */
-void RenderArea::attachPointObject(const kvs::PointObject* point)
-{
-    std::cout<<"attachPointObject"<<std::endl;
-    if (QThread::currentThread() != this->thread()) {
-        qWarning("RenderArea::attachPointObject was not called from main thread, ignoring point object");
-        return;
-    }
-    if (point->coords().size() <= 3){
-        // The cause of this condition should be found
-          qCritical("RenderArea::attachPointObject ignoring point object with zero or single point\n" );
-          QThread::sleep(2);
-          return;
-    }
-    pobj.clear();
-    pobj.add(*point);
-
-    makeCurrent();
-    if (obj_id_pair.first ==-1 && obj_id_pair.second == -1){
-        obj_id_pair=this->m_scene->registerObject(&pobj,m_renderer);
-    }
-    else {
-
-        this->m_scene->replaceObject(obj_id_pair.first,&pobj,false);
-
-        objectReplaced=true;
-    }
-    doneCurrent();
-    this->update();
-    std::cout<<"attachPointObject end"<<std::endl;
-}
-
-/**
- * @brief RenderArea::attachPointObject
- *        Attaches a new point to the scene, using the apropriate registerObject, or
- *        replaceObject, depending on wether a prevous object has been registered.
  * @param point, the point to be attached
  */
 void RenderArea::attachPointObject(kvs::PointObject* point)
 {
     std::cout<<"attachPointObject"<<std::endl;
-    if (m_obj_id_pair.first ==-1 && m_obj_id_pair.second == -1){
-        m_obj_id_pair=this->m_scene->registerObject(point,m_renderer);
+    if (obj_id_pair.first ==-1 && obj_id_pair.second == -1){
+        obj_id_pair=this->m_scene->registerObject(point,m_pbr);
     }
     else {
-        this->m_scene->replaceObject(m_obj_id_pair.first,point,false);
-//        objectReplaced=true;
+        this->m_scene->replaceObject(obj_id_pair.first,point,false);
+        objectReplaced=true;
     }
     this->update();
     std::cout<<"attachPointObject end"<<std::endl;
@@ -396,50 +320,50 @@ void RenderArea::setLabelFont(const QFont& f)
 void RenderArea::setShaderParams( )
 {
     // For shading.
-    m_renderer->disableShading();
+    m_pbr->disableShading();
     // APPEND START BY)M.Tanaka 2015.03.11
     float sd_ka, sd_kd, sd_ks, sd_n;
     if ( strcmp( shadinglevel, "L" ) == 0 )
     {
         printf( "***** shading : L\n" );
-        m_renderer->enableShading();
-        m_renderer->setShader( kvs::Shader::Lambert() );
+        m_pbr->enableShading();
+        m_pbr->setShader( kvs::Shader::Lambert() );
     }
     else if ( strcmp( shadinglevel, "P" ) == 0 )
     {
         printf( "***** shading : P\n" );
-        m_renderer->enableShading();
-        m_renderer->setShader( kvs::Shader::Phong() );
+        m_pbr->enableShading();
+        m_pbr->setShader( kvs::Shader::Phong() );
     }
     else if ( strcmp( shadinglevel, "B" ) == 0 )
     {
         printf( "***** shading : B\n" );
-        m_renderer->enableShading();
-        m_renderer->setShader( kvs::Shader::BlinnPhong() );
+        m_pbr->enableShading();
+        m_pbr->setShader( kvs::Shader::BlinnPhong() );
     }
     else if ( strncmp( shadinglevel, "L,", 2 ) == 0 )
     {
-        m_renderer->enableShading();
+        m_pbr->enableShading();
         sscanf( &shadinglevel[2], "%f,%f", &sd_ka, &sd_kd );
         printf( "***** shading : L %f %f\n", sd_ka, sd_kd );
-        m_renderer->setShader( kvs::Shader::Lambert( sd_ka, sd_kd ) );
+        m_pbr->setShader( kvs::Shader::Lambert( sd_ka, sd_kd ) );
     }
     else if ( strncmp( shadinglevel, "P,", 2 ) == 0 )
     {
-        m_renderer->enableShading();
+        m_pbr->enableShading();
         sscanf( &shadinglevel[2], "%f,%f,%f,%f", &sd_ka, &sd_kd, &sd_ks, &sd_n );
         printf( "***** shading : P %f %f %f %f\n", sd_ka, sd_kd, sd_ks, sd_n );
-        m_renderer->setShader( kvs::Shader::Phong( sd_ka, sd_kd, sd_ks, sd_n ) );
+        m_pbr->setShader( kvs::Shader::Phong( sd_ka, sd_kd, sd_ks, sd_n ) );
     }
     else if ( strncmp( shadinglevel, "B,", 2 ) == 0 )
     {
-        m_renderer->enableShading();
+        m_pbr->enableShading();
         sscanf( &shadinglevel[2], "%f,%f,%f,%f", &sd_ka, &sd_kd, &sd_ks, &sd_n );
         printf( "***** shading : B %f %f %f %f\n", sd_ka, sd_kd, sd_ks, sd_n );
-        m_renderer->setShader( kvs::Shader::BlinnPhong( sd_ka, sd_kd, sd_ks, sd_n ) );
+        m_pbr->setShader( kvs::Shader::BlinnPhong( sd_ka, sd_kd, sd_ks, sd_n ) );
     }
 #ifndef CPUMODE
-    this->m_renderer->disableLODControl();
+    this->m_pbr->disableLODControl();
 #endif
 }
 

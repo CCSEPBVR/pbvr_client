@@ -25,7 +25,6 @@
 #include "timer_simple.h"
 #include "ParamExTransFunc.h"
 
-
 #ifdef KVS_COMPILER_VC
 #include <direct.h>
 #define mkdir( dir, mode ) _mkdir( dir )
@@ -142,9 +141,9 @@ kvs::PointObject* ParticleServer::getPointObjectFromServer( const VisualizationP
         }
         message.m_particle_limit = param.m_particle_limit;
         message.m_particle_density = param.m_particle_density;
-//#ifdef IS_MODE
+        //#ifdef IS_MODE
         message.particle_data_size_limit = param.particle_data_size_limit;
-//#endif
+        //#endif
         message.m_camera = param.m_camera;
         //      message.m_transfer_function = const_cast<TransferFunction*>(&param.m_transfer_function);
         message.m_message_size = message.byteSize();
@@ -228,7 +227,7 @@ kvs::PointObject* ParticleServer::getPointObjectFromServer( const VisualizationP
                 message.m_initialize_parameter = -1;
                 message.m_message_size = message.byteSize();
                 client.sendMessage( message );
-                client.recvMessage( &reply );
+                client.recvMessage( &reply  );
                 client.termClient();
                 setStatus( Idle );
                 return NULL;
@@ -267,7 +266,6 @@ kvs::PointObject* ParticleServer::getPointObjectFromServer( const VisualizationP
                     obj.setColors( colors );
 
                     object->add(obj);
-		    obj.clear();
                     std::cout<<" getPointObjectFromServer 331"<<std::endl;
                     allParticle = allParticle + reply.m_number_particle;
 #ifdef CS_MODE

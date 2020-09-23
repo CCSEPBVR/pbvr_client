@@ -24,16 +24,16 @@ ExtCommand* extCommand;
  */
 PBVRGUI::PBVRGUI(ExtCommand* command) :
     QMainWindow(Q_NULLPTR),
-    ui(new Ui::PBVRGUI),
-    particlePanel(this),
+    animationControls(this),
     filterinfoPanel(this),
     legendPanel(this),
+    particlePanel(this),
     renderoptionPanel(this),
     systemstatusPanel(this),
     timecontrolPanel(this),
     transformPanel(this),
-    animationControls(this),
-    vc(this)
+    vc(this),
+    ui(new Ui::PBVRGUI)
 {
 
     if (command== NULL){
@@ -43,9 +43,9 @@ PBVRGUI::PBVRGUI(ExtCommand* command) :
     extCommand=command;
     ui->setupUi(this);
     kvs_renderarea= ui->kvs_renderarea;
-
+    kvs_renderarea->m_hold_paintGL=true;
     showNormal();
-        restoreAllState();
+    restoreAllState();
     setWindowTitle("PBVR Viewer");
 
 #ifdef IS_MODE
@@ -111,6 +111,7 @@ PBVRGUI::PBVRGUI(ExtCommand* command) :
 
 
 
+
 PBVRGUI::~PBVRGUI()
 {
     // Closing this down, crashes mac osx
@@ -157,6 +158,7 @@ void PBVRGUI::start()
 
     extCommand->CallBackApply(0);
     showNormal();
+    kvs_renderarea->m_hold_paintGL=false;
 }
 
 
