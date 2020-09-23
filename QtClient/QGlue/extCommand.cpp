@@ -386,17 +386,16 @@ void ExtCommand::CallBackApply( const int i )
     */
     //KVS2.7.0
     //MOD BY)T.Osaki 2020.07.20
-    //TODO: Martin, restore this
-//    m_screen->scene()->objectManager()->translate( kvs::Vector3f(
-//                                            TransformPanel::param.translateX,
-//                                            TransformPanel::param.translateY,
-//                                            TransformPanel::param.translateZ) );
-//    m_screen->scene()->objectManager()->rotate( kvs::RPYRotationMatrix33<float>(
-//                                         TransformPanel::param.rotationAxisZ,
-//                                         TransformPanel::param.rotationAxisY,
-//                                         TransformPanel::param.rotationAxisX) );
-//    float s = TransformPanel::param.scalingLevel;
-//    m_screen->scene()->objectManager()->scale( kvs::Vector3f( s, s, s ) );
+    m_screen->scene()->objectManager()->translate( kvs::Vector3f(
+                                            TransformPanel::param.translateX,
+                                            TransformPanel::param.translateY,
+                                            TransformPanel::param.translateZ) );
+    m_screen->scene()->objectManager()->rotate( kvs::RPYRotationMatrix33<float>(
+                                         TransformPanel::param.rotationAxisZ,
+                                         TransformPanel::param.rotationAxisY,
+                                         TransformPanel::param.rotationAxisX) );
+    float s = TransformPanel::param.scalingLevel;
+    m_screen->scene()->objectManager()->scale( kvs::Vector3f( s, s, s ) );
 
     // APPEND START FP)K.YAJIMA & M.Tanaka 2015.03.03
     if ( wk_resolution_width_level != RenderoptionPanel::resolution_width_level )
