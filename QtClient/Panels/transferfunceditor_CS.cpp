@@ -604,6 +604,10 @@ void TransferFuncEditor::onExportButtonClicked()
     QString fileName =
             QFileDialog::getSaveFileName(this, tr("Export Current Settings to Parameter File"),
                                          ".", tr("Transfer Function Files (*.tfe *.TFE *.tf *.TF )")  );
+    if( fileName.right(4) != ".tfe" && fileName.right(4) != ".TFE" && fileName.right(3) != ".tf" && fileName.right(3) != ".TF")
+    {
+        fileName += ".tfe";
+    }
     this->exportFile(fileName.toStdString(), false);
 }
 
