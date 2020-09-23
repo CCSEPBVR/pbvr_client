@@ -1,7 +1,7 @@
 #include <GL/glew.h>
 #include "screen.h"
 #include <kvs/FrameBufferObject>>
-
+#include <QElapsedTimer>
 Screen::Screen( QWidget* parent_surface)
 {
     Q_UNUSED(parent_surface);
@@ -24,11 +24,14 @@ void Screen::paintGL(){
         return;
     }
     kvs::FrameBufferObject::m_unbind_id=QOpenGLWidget::defaultFramebufferObject();
+    QElapsedTimer timer;
     glPushAttrib( GL_ALL_ATTRIB_BITS );
     kvs::OpenGL::WithPushedMatrix p( GL_MODELVIEW );
     p.loadIdentity();
     {
+        timer.start();
         m_scene->paintFunction();
+        m_fps = 1.0 / ((double)timer.elapsed()/1000.0);
     }
     glPopAttrib();
     onPaintGL();
