@@ -152,14 +152,15 @@ void LegendBar::create_texture( void )
     const size_t      height = 1;
     const kvs::UInt8* data   = m_colormap.table().pointer();
 
-    m_texture.release();
+//    m_texture.release();
     m_texture.setPixelFormat( nchannels, sizeof( kvs::UInt8 ) );
     m_texture.setMinFilter( GL_NEAREST );
     m_texture.setMagFilter( GL_NEAREST );
     //KVS2.7.0
     //MOD BY)T.Osaki 2020.07.20
-    m_texture.create( width, height, data );
+//    m_texture.create( width, height, data );
 //    m_texture.download( width, height, data );
+    m_texture.load(width,height,data);
 }
 
 /*===========================================================================*/
@@ -203,6 +204,8 @@ void LegendBar::draw_color_bar( const int x, const int y, const int width, const
     }
 
     m_texture.unbind();
+
+
 
 }
 

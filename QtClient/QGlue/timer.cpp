@@ -264,7 +264,7 @@ void Timer::comThreadExitEvent()
         m_back_object = m_front_object;
         //KVS2.7.0
         //MOD BY)T.Osaki 2020.07.20
-        m_screen->scene()->objectManager()->change( m_object_id, m_front_object );
+        m_screen->m_scene->objectManager()->change( m_object_id, m_front_object );
 
         //        qInfo("Timer::comThreadExitEvent not updating m_orientation_axis");
         //        m_command->m_screen->m_orientation_axis->setObject( m_front_object );
