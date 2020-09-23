@@ -18,7 +18,12 @@ QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.14
 #QMAKE_CXXFLAGS_WARN_OFF += -Wall
 #QMAKE_CFLAGS_WARN_OFF += -W
 #QMAKE_CXXFLAGS_WARN_OFF += -W
-
+win32{
+QMAKE_CFLAGS_RELEASE += /MT
+QMAKE_CXXFLAGS_RELEASE += /MT
+QMAKE_CFLAGS_RELEASE -= -MD
+QMAKE_CXXFLAGS_RELEASE -= -MD
+}
 HEADERS += \
     colorpalette.h \
     colormappalette.h \
@@ -38,6 +43,7 @@ HEADERS += \
     systeminfo.h \
     colorundoredocommand.h \
     opacityundoredocommand.h \
+    deferredtexture.h \
     screen.h
 
 SOURCES +=     \
@@ -58,6 +64,7 @@ SOURCES +=     \
     systeminfo.cpp \
     colorundoredocommand.cpp \
     opacityundoredocommand.cpp \
+    deferredtexture.cpp \
     screen.cpp
 
 
