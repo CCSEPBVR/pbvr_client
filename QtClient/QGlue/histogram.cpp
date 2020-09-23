@@ -170,7 +170,6 @@ void Histogram::setNumberOfBins( const kvs::UInt64 nbins )
 }
 void Histogram::resizeGL(int w, int h)
 {
-    return;
     int h_scaled = h * pixelRatio-1;
     int w_scaled = w  * pixelRatio-2;
     const int x = m_margin;
@@ -181,7 +180,6 @@ void Histogram::resizeGL(int w, int h)
 }
 void Histogram::paintGL( void )
 {
-    return;
     this->screenUpdated();
     BaseClass::begin_draw();
 
