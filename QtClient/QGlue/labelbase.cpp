@@ -118,7 +118,8 @@ void FPSLabel::contentUpdate( )
 {
     QString fps;
     if(m_renderer !=NULL){
-        fps= "fps:" + QString::number( m_renderer->timer().fps(),'G',4);
+//        fps= "fps:" + QString::number( m_renderer->timer().fps(),'G',4);
+        fps= "fps:" + QString::number( m_screen->m_fps,'G',4);
     }
     else {
         fps= "fps:---";
