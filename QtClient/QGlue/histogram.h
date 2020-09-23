@@ -20,7 +20,7 @@
 #include <kvs/RGBColor>
 #include <kvs/RGBAColor>
 #include <kvs/FrequencyTable>
-#include <kvs/Texture2D>
+#include "deferredtexture.h"
 
 // Default parameters.
 namespace { namespace Default
@@ -61,7 +61,7 @@ protected:
     kvs::FrequencyTable  m_table;             ///< frequency distribution table
     kvs::RGBAColor       m_graph_color;       ///< graph color
     float                m_bias_parameter;    ///< bias parameter
-    QGlue::Texture2D       m_texture;           ///< histogram texture
+    DeferredTexture2D       m_texture;           ///< histogram texture
     QRect                m_palette;           ///< palette
     QColor        m_upper_edge_color;  ///< upper edge color
     QColor        m_lower_edge_color;  ///< lower edge color
