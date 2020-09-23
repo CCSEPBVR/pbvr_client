@@ -109,6 +109,7 @@ const kvs::RGBColor GetInterpolatedColor( const float ratio, const kvs::RGBColor
 /*===========================================================================*/
 void ColorPalette::resizeGL(int w, int h)
 {
+    return;
     int h_scaled = h * pixelRatio;
     int w_scaled = w  * pixelRatio;
 
@@ -162,6 +163,7 @@ void ColorPalette::resizeGL(int w, int h)
 void ColorPalette::paintGL( void )
 {
 
+    return;
     if ( !isVisible() ) return;
 
     BaseClass::begin_draw();

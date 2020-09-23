@@ -1,8 +1,8 @@
 //KVS2.7.0
 //ADD BY)T.Osaki 2020.06.08
-#include <GL/glew.h>
-#include <QOpenGLContext>
-
+//#include <GL/glew.h>
+//#include <QOpenGLContext>
+#include "screen.h"
 #include "QGlue/renderarea.h"
 
 #include <QApplication>
@@ -28,6 +28,15 @@
 #include <kvs/Background>
 #include <kvs/ObjectManager>
 
+
+#include <kvs/StructuredVolumeObject>
+#include <kvs/HydrogenVolumeData>
+#include <kvs/PointObject>
+#include <kvs/CellByCellMetropolisSampling>
+#include <kvs/RayCastingRenderer>
+
+#include <random>
+
 #ifdef PBVR_DEBUG
 int     timestep = 0;
 #endif
@@ -38,37 +47,33 @@ kvs::visclient::TimerEvent* RenderArea::g_timer_event=0;
 
 
 RenderArea::RenderArea( QWidget* parent_surface):
-     m_obj_id_pair (-1,-1)
+    obj_id_pair (-1,-1)
 {
-
-    Q_UNUSED(parent_surface);
-    //    MOD BY)T.Osaki 2020.04.28
     pixelRatio= QApplication::desktop()->devicePixelRatioF();
-    //KVS2.7.0
-    //MOD BY)T.Osaki 2020.07.20
-    m_scene = new kvs::Scene(this);
+
     this->m_scene->background()->setColor( kvs::RGBAColor(0,0,22,1.0f) );
+
+//    m_pbr= new kvs::glsl::ParticleBasedRenderer();
     this->i_w= 620;//Qthis->width();
     this->i_h= 620;//Qthis->height();
     this->setSize(i_w,i_h);
-
+    std::cout<< "RenderArea::RenderArea"<<std::endl;
     kvs::ValueArray<kvs::Real32> coords( 3 );
     kvs::RGBColor color( 0, 0, 0 );
     kvs::ValueArray<kvs::Real32> normals( 3 );
     m_control_object = new kvs::PointObject( coords, color, normals, 1.0 );
-    attachPointObject(m_control_object);
-    // Setup Step Label
+//    this->attachPointObject(m_control_object);
     m_stepLabel =new QGlue::StepLabel(this,extCommand);
     m_stepLabel->setPosition(150*pixelRatio,50);
     m_labels.append(m_stepLabel);
 
-    // Setup Orientation Axis
     int size=90*pixelRatio;
     m_orientation_axis=new QGlue::OrientationAxis( this);
     m_orientation_axis->setPosition( ScreenBase::width() -(size + 10),10);
     m_orientation_axis->setBoxType( QGlue::OrientationAxis::SolidBox );
     m_orientation_axis->setSize(size);
     m_orientation_axis->show();
+
     // Setup Legend bar
     g_legend= new QGlue::LegendBar( this, *extCommand );
     g_legend->setOrientation( QGlue::LegendBar::Horizontal );
@@ -78,7 +83,7 @@ RenderArea::RenderArea( QWidget* parent_surface):
 
     g_legend->screenResizedAfterSelectTransferFunction( 1 );
     g_legend->show();
-//    m_scene = new kvs::Scene(this);
+
 }
 
 
@@ -104,10 +109,11 @@ void RenderArea::updateCommandInfo(ExtCommand* extCommand)
     {
         kvsMessageError( "Cannot create a point m_renderer." );
     }
+    m_pbr = m_renderer;
     extCommand->m_renderer=m_renderer;
 
     // Setup FPS Label
-    m_fpsLabel  =new QGlue::FPSLabel(this,*m_renderer);
+    m_fpsLabel  =new QGlue::FPSLabel(this,*m_pbr);
     m_fpsLabel->setPosition(50*pixelRatio,50);
     m_labels.append(m_fpsLabel);
 
@@ -119,91 +125,42 @@ void RenderArea::updateCommandInfo(ExtCommand* extCommand)
 /**
  * @brief RenderArea::initializeGL
  */
-void RenderArea::initializeGL( void )
+void RenderArea::onInitializeGL( void )
 {
     qInfo("KVSRenderArea::initializeGL( void )");
-    if (! isValid())
-     {
-         qWarning("Screen::initalizeGL while surface still not valid ");
-         return;
-     }
-     GLenum result = glewInit();
-     if ( result != GLEW_OK )
-     {
-         const GLubyte* message = glewGetErrorString( result );
-         qFatal("GLEW initialization failed. ");
-     }
-    initializeOpenGLFunctions();
     m_orientation_axis->initializeOpenGLFunctions();
     g_legend->initializeOpenGLFunctions();
-    GLInitComplete=true;
+    m_glInit_complete=true;
     this->setAutoFillBackground(false);
-    //    this->initializeEvent();
-    //    connect( m_idle_mouse_timer,&QTimer::timeout, this,&Screen::idleMouseEvent );
-    //    m_idle_mouse_timer->start( kvs::Mouse::SpinTime );
-    //KVS2.7.0
-    //MOD BY)T.Osaki 2020.06.04
-//    kvs::Scene::light()->on();
-//    kvs::Scene::mouse()->attachCamera(this->kvs::Scene::camera());
+
     m_scene->light()->on();
     m_scene->mouse()->attachCamera(m_scene->camera());
-    //    kvs::Mouse::attachCamera(this->kvs::Scene::camera());
-    //m_light->on();
-    //m_mouse->attachCamera( m_camera );
-    m_gl_initialized=true;
-
 }
 /**
  * @brief RenderArea::resizeGL, GL Surface resized handler
  * @param w int width
  * @param h int height
  */
-void RenderArea::resizeGL(int w, int h)
+void RenderArea::onResizeGL(int w, int h)
 {
     //    MOD BY)T.Osaki 2020.04.28
-    if (!m_gl_initialized)
-        return;
     float scale= QApplication::desktop()->devicePixelRatioF();
     int h_scaled = h * scale;
     int w_scaled = w  * scale;
 
     m_stepLabel->setPosition(150*scale,50);
     if (m_fpsLabel)
-    m_fpsLabel->setPosition(50*scale,50);
+        m_fpsLabel->setPosition(50*scale,50);
     int size=90*scale;
     m_orientation_axis->setPosition( w_scaled -(size + 10),10);
     g_legend->setPosition( 10, h_scaled -10 );
-    kvs::FrameBufferObject::m_unbind_id=QOpenGLWidget::defaultFramebufferObject();
+
 }
-/**
- * @brief RenderArea::paintGL
- */
-void RenderArea::paintGL(void)
+///**
+// * @brief RenderArea::onPaintGL
+// */
+void RenderArea::onPaintGL(void)
 {
-    if (!m_gl_initialized)
-        return;
-    if(!kvs::FrameBufferObject::m_unbind_id)
-        return;
-    if (QThread::currentThread() != this->thread()) {
-         qWarning("Screen::paintGL was not called from main thread, skipping frame");
-         return;
-     }
-    kvs::FrameBufferObject::m_unbind_id=QOpenGLWidget::defaultFramebufferObject();
-
-    QElapsedTimer timer;
-
-    glPushAttrib( GL_ALL_ATTRIB_BITS );
-    glMatrixMode( GL_MODELVIEW );
-    glLoadIdentity();
-    glPushMatrix();
-    //KVS2.7.0
-    //MOD BY)T.Osaki 2020.07.20
-    timer.start();
-    this->m_scene->paintFunction();
-    m_fps = 1.0 / ((double)timer.elapsed()/1000.0);
-    //ScreenBase::paintFunction();
-    glPopMatrix();
-    glPopAttrib();
     if (m_orientation_axis){
         glPushMatrix();
         m_orientation_axis->paintEvent();
@@ -237,7 +194,7 @@ void RenderArea::setupEventHandlers()
     // Timer
 
     qt_timer = new QGlue::Timer( msec ,extCommand);
-    qt_timer->setRenderer(this->m_renderer);
+    //    qt_timer->setRenderer(this->m_renderer);
 
     extCommand->m_glut_timer = qt_timer;
 
@@ -252,7 +209,9 @@ void RenderArea::setupEventHandlers()
     g_timer_event->setObject( id_pair.first );
     g_timer_event->setRenderer( extCommand->m_renderer );
 #else
-    this->attachPointObject( m_control_object );
+    //    this->registerObject( m_control_object, extCommand->renderer );
+    //    this->m_scene->registerObject( m_control_object, extCommand->m_renderer );
+
 #endif
     //KVS2.7.0
     //ADD BY)T.Osaki  2020.06.19
@@ -261,7 +220,6 @@ void RenderArea::setupEventHandlers()
     qt_timer->setEventListener( g_timer_event );
     qt_timer->start();
 }
-
 /**
  * @brief RenderArea::attachPointObject
  *        Attaches a new point to the scene, using the apropriate registerObject, or
@@ -271,12 +229,12 @@ void RenderArea::setupEventHandlers()
 void RenderArea::attachPointObject(kvs::PointObject* point)
 {
     std::cout<<"attachPointObject"<<std::endl;
-    if (m_obj_id_pair.first ==-1 && m_obj_id_pair.second == -1){
-        m_obj_id_pair=this->m_scene->registerObject(point,m_renderer);
+    if (obj_id_pair.first ==-1 && obj_id_pair.second == -1){
+        obj_id_pair=this->m_scene->registerObject(point,m_pbr);
     }
     else {
-        this->m_scene->replaceObject(m_obj_id_pair.first,point,false);
-//        objectReplaced=true;
+        this->m_scene->replaceObject(obj_id_pair.first,point,false);
+        objectReplaced=true;
     }
     this->update();
     std::cout<<"attachPointObject end"<<std::endl;
@@ -292,8 +250,11 @@ void RenderArea::setCoordinateBoundaries(float  crd[6])
     kvs::Vector3f max_t( crd[3], crd[4], crd[5] );
     //KVS2.7.0
     //MOD BY)T.Osaki 2020.07.20
-    this->m_scene->objectManager()->object()->setMinMaxObjectCoords( min_t, max_t );
-    this->m_scene->objectManager()->object()->setMinMaxExternalCoords( min_t, max_t );
+//    this->m_scene->objectManager()->object()->setMinMaxObjectCoords( min_t, max_t );
+//    this->m_scene->objectManager()->object()->setMinMaxExternalCoords( min_t, max_t );
+    this->m_control_object->setMinMaxObjectCoords(min_t,max_t);
+    this->m_control_object->setMinMaxExternalCoords(min_t,max_t);
+
     this->m_scene->objectManager()->updateExternalCoords();
     if(m_reset_count == 0){
         m_reset_count++;
@@ -354,50 +315,50 @@ void RenderArea::setLabelFont(const QFont& f)
 void RenderArea::setShaderParams( )
 {
     // For shading.
-    m_renderer->disableShading();
+    m_pbr->disableShading();
     // APPEND START BY)M.Tanaka 2015.03.11
     float sd_ka, sd_kd, sd_ks, sd_n;
     if ( strcmp( shadinglevel, "L" ) == 0 )
     {
         printf( "***** shading : L\n" );
-        m_renderer->enableShading();
-        m_renderer->setShader( kvs::Shader::Lambert() );
+        m_pbr->enableShading();
+        m_pbr->setShader( kvs::Shader::Lambert() );
     }
     else if ( strcmp( shadinglevel, "P" ) == 0 )
     {
         printf( "***** shading : P\n" );
-        m_renderer->enableShading();
-        m_renderer->setShader( kvs::Shader::Phong() );
+        m_pbr->enableShading();
+        m_pbr->setShader( kvs::Shader::Phong() );
     }
     else if ( strcmp( shadinglevel, "B" ) == 0 )
     {
         printf( "***** shading : B\n" );
-        m_renderer->enableShading();
-        m_renderer->setShader( kvs::Shader::BlinnPhong() );
+        m_pbr->enableShading();
+        m_pbr->setShader( kvs::Shader::BlinnPhong() );
     }
     else if ( strncmp( shadinglevel, "L,", 2 ) == 0 )
     {
-        m_renderer->enableShading();
+        m_pbr->enableShading();
         sscanf( &shadinglevel[2], "%f,%f", &sd_ka, &sd_kd );
         printf( "***** shading : L %f %f\n", sd_ka, sd_kd );
-        m_renderer->setShader( kvs::Shader::Lambert( sd_ka, sd_kd ) );
+        m_pbr->setShader( kvs::Shader::Lambert( sd_ka, sd_kd ) );
     }
     else if ( strncmp( shadinglevel, "P,", 2 ) == 0 )
     {
-        m_renderer->enableShading();
+        m_pbr->enableShading();
         sscanf( &shadinglevel[2], "%f,%f,%f,%f", &sd_ka, &sd_kd, &sd_ks, &sd_n );
         printf( "***** shading : P %f %f %f %f\n", sd_ka, sd_kd, sd_ks, sd_n );
-        m_renderer->setShader( kvs::Shader::Phong( sd_ka, sd_kd, sd_ks, sd_n ) );
+        m_pbr->setShader( kvs::Shader::Phong( sd_ka, sd_kd, sd_ks, sd_n ) );
     }
     else if ( strncmp( shadinglevel, "B,", 2 ) == 0 )
     {
-        m_renderer->enableShading();
+        m_pbr->enableShading();
         sscanf( &shadinglevel[2], "%f,%f,%f,%f", &sd_ka, &sd_kd, &sd_ks, &sd_n );
         printf( "***** shading : B %f %f %f %f\n", sd_ka, sd_kd, sd_ks, sd_n );
-        m_renderer->setShader( kvs::Shader::BlinnPhong( sd_ka, sd_kd, sd_ks, sd_n ) );
+        m_pbr->setShader( kvs::Shader::BlinnPhong( sd_ka, sd_kd, sd_ks, sd_n ) );
     }
 #ifndef CPUMODE
-    this->m_renderer->disableLODControl();
+    this->m_pbr->disableLODControl();
 #endif
 }
 
@@ -567,6 +528,7 @@ void    RenderArea::ScreenShotKeyFrame( kvs::Scene* screen, const int tstep )
 */
 void RenderArea::mousePressEvent( QMouseEvent *event)
 {
+
     //    ADD BY)T.Osaki 2020.03.03
     QWidget::setFocus();
     bool MOD_Shift = event->modifiers() & Qt::SHIFT;
@@ -591,10 +553,10 @@ void RenderArea::mousePressEvent( QMouseEvent *event)
         m_scene->updateCenterOfRotation();
         //kvs::ScreenBase::updateCenterOfRotation();
     }
-
+    const int x = event->x()*pixelRatio;
+    const int y = event->y()*pixelRatio;
     if (mode >=0){
-        const int x = event->x()*pixelRatio;
-        const int y = event->y()*pixelRatio;
+
         //KVS2.7.0
         //MOD BY)T.Osaki 2020.06.04
         kvs::Mouse::OperationMode kvsMode=(kvs::Mouse::OperationMode)mode;
@@ -602,6 +564,8 @@ void RenderArea::mousePressEvent( QMouseEvent *event)
         //kvs::Mouse::TransMode kvsMode=(kvs::Mouse::TransMode)mode;
         //kvs::ScreenBase::mousePressFunction(x,y,kvsMode );
     }
+    std::cout<<"mousePressEvent::"<<mode<<" " << x<<","<<y<<std::endl;
+    update();
 }
 
 /**
@@ -610,6 +574,7 @@ void RenderArea::mousePressEvent( QMouseEvent *event)
  */
 void RenderArea::mouseMoveEvent(QMouseEvent *event)
 {
+//    std::cout<<"mouseMoveEvent"<<std::endl;
     //    BaseClass::eventHandler()->notify( event );
     //KVS2.7.0
     //MOD BY)T.Osaki 2020.06.04
@@ -634,7 +599,7 @@ void RenderArea::mouseMoveEvent(QMouseEvent *event)
     //MOD BY)T.Osaki 2020.06.04
     m_scene->mouseMoveFunction(x,y);
     //kvs::ScreenBase::mouseMoveFunction(x,y );
-    this->redraw();
+    update();
 }
 
 /**
@@ -643,6 +608,7 @@ void RenderArea::mouseMoveEvent(QMouseEvent *event)
  */
 void RenderArea::mouseReleaseEvent(QMouseEvent *event)
 {
+    std::cout<<"mouseReleaseEvent"<<std::endl;
     //    BaseClass::eventHandler()->notify( event );
     //KVS2.7.0
     //MOD BY)T.Osaki 2020.06.04
@@ -668,6 +634,7 @@ void RenderArea::setSize( const int width, const int height )
     //if ( kvs::ScreenBase::camera() ) kvs::ScreenBase::camera()->setWindowSize( w_scaled, h_scaled);
     //if ( kvs::ScreenBase::mouse()  ) kvs::ScreenBase::mouse()->setWindowSize( w_scaled, h_scaled);
     QOpenGLWidget::resize( w_scaled, h_scaled);
+    this->update();
 }
 
 /**
@@ -680,4 +647,5 @@ void RenderArea::setGeometry( QRect geom )
     this->setMinimumSize(geom.width(), geom.height());
     this->setMaximumSize(geom.width(), geom.height());
     this->setSize( geom.width(), geom.height() );
+    this->update();
 }
