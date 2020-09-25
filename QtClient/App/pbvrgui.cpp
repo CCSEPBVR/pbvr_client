@@ -24,16 +24,16 @@ ExtCommand* extCommand;
  */
 PBVRGUI::PBVRGUI(ExtCommand* command) :
     QMainWindow(Q_NULLPTR),
-    animationControls(this),
+    ui(new Ui::PBVRGUI),
+    particlePanel(this),
     filterinfoPanel(this),
     legendPanel(this),
-    particlePanel(this),
     renderoptionPanel(this),
     systemstatusPanel(this),
     timecontrolPanel(this),
     transformPanel(this),
-    vc(this),
-    ui(new Ui::PBVRGUI)
+    animationControls(this),
+    vc(this)
 {
 
     if (command== NULL){
@@ -43,9 +43,9 @@ PBVRGUI::PBVRGUI(ExtCommand* command) :
     extCommand=command;
     ui->setupUi(this);
     kvs_renderarea= ui->kvs_renderarea;
-    kvs_renderarea->m_hold_paintGL=true;
+
     showNormal();
-    restoreAllState();
+        restoreAllState();
     setWindowTitle("PBVR Viewer");
 
 #ifdef IS_MODE
@@ -111,7 +111,6 @@ PBVRGUI::PBVRGUI(ExtCommand* command) :
 
 
 
-
 PBVRGUI::~PBVRGUI()
 {
     // Closing this down, crashes mac osx
@@ -158,7 +157,6 @@ void PBVRGUI::start()
 
     extCommand->CallBackApply(0);
     showNormal();
-    kvs_renderarea->m_hold_paintGL=false;
 }
 
 
@@ -499,7 +497,7 @@ void PBVRGUI::keyPressEvent(QKeyEvent* ke)
 void PBVRGUI::setBackgroundColor(kvs::RGBColor c){
     //KVS2.7.0
     //MOD BY)T.Osaki 2020.07.20
-    extCommand->m_screen->scene()->background()->setColor(c);
+    extCommand->m_screen->m_scene->background()->setColor(c);
     extCommand->m_screen->update();
     update();
 }
@@ -508,13 +506,13 @@ void PBVRGUI::onViewer_ControlsMenuAction()
     qInfo("VIEWER CONTROLS");
     //KVS2.7.0
     //MOD BY)T.Osaki 2020.07.20
-    vc.selected_color=kvs_renderarea->scene()->background()->color();
+    vc.selected_color=kvs_renderarea->m_scene->background()->color();
     vc.setCurrentFont(kvs_renderarea->font());
     int result = vc.exec();
     if (result == QDialog::Accepted){
         //KVS2.7.0
         //MOD BY)T.Osaki 2020.07.20
-        kvs_renderarea->scene()->background()->setColor(vc.selected_color);
+        kvs_renderarea->m_scene->background()->setColor(vc.selected_color);
         kvs_renderarea->setLabelFont(vc.getFontSelection());
     }
 }
