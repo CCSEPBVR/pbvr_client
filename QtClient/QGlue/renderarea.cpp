@@ -131,7 +131,7 @@ void RenderArea::onInitializeGL( void )
     qInfo("KVSRenderArea::initializeGL( void )");
     m_orientation_axis->initializeOpenGLFunctions();
     g_legend->initializeOpenGLFunctions();
-    m_glInit_complete=true;
+    m_gl_initialized=true;
     this->setAutoFillBackground(false);
 
     m_scene->light()->on();
