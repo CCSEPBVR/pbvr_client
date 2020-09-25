@@ -62,7 +62,7 @@ public:
     static char shadinglevel[256];
     static kvs::visclient::TimerEvent* g_timer_event;
 
-    bool m_glInit_complete=false;
+    bool m_gl_initialized=false;
     size_t frame_number=0;
 //    QTimer*     m_idle_mouse_timer;
 //    QPainter    m_painter; // Shouldn't be public, but used by orientation axis
