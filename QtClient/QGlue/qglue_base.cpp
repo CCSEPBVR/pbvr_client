@@ -58,6 +58,38 @@ void QGLUEBase::end_draw( void )
     glPopAttrib();
 }
 
+void QGLUEBase::initializeOpenGLFunctions(){
+    QOpenGLFunctions::initializeOpenGLFunctions();
+    m_gl_initialized=true;
+}
+
+bool QGLUEBase::checkGLerrors()
+{
+    int e;
+    bool eflag=false;
+    while (e = glGetError()){
+        qCritical("QGLUEBase GL Context:: HAS ERROR %d",e);
+        eflag=true;
+    }
+    return eflag;
+}
+bool QGLUEBase::contextReady()
+{
+
+    if (!m_gl_initialized){
+        qCritical("QGLUEBase GL Context:: is not initialized");
+        return false;
+    }
+    if (QOpenGLContext::currentContext() == 0){
+        qCritical("QGLUEBase GL Context:: is not current");
+        return false;
+    }
+    if (QThread::currentThread() != QApplication::instance()->thread()){
+        qCritical("QGLUEBase GL Thread  is not main");
+        return false;
+    }
+    return true;
+}
 
 QGLUEBaseWidget::QGLUEBaseWidget(QWidget* parent) :
     QOpenGLWidget(parent),
@@ -73,7 +105,6 @@ void QGLUEBaseWidget::initializeGL()
     initializeOpenGLFunctions();
     QColor bg=QWidget::palette().color(QWidget::backgroundRole());
     glClearColor(bg.redF(), bg.blueF(),bg.greenF(),1.0);
-    m_gl_initialized=true;
 }
 
 
