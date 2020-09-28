@@ -75,7 +75,14 @@ void getMemoryInfoApple( size_t* rc, size_t* rt, size_t* rp)
     //fprintf( stdout, "Total MEMORY : %d\n", t );
 
     c = t - c;
-    int p = c * 100 / t;
+    int p;
+    if(t==0){
+        p=0;
+    }
+    else{
+        p = c * 100 / t;
+    }
+
     if ( p > 100 ) p = 100;
 
     sprintf( buf, "CPU MEMORY %d/%d %d%%", c, t, p );
