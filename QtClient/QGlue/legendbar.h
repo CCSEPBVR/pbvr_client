@@ -110,7 +110,7 @@ public:
 private:
     const Command* m_command;
     int m_selected_transfer_function;
-       DeferredTexture2D  m_texture;      ///< texture data
+    DeferredTexture2D  m_texture;      ///< texture data
 
     kvs::ColorMap   m_colormap;     ///< color map
     double          m_min_value;    ///< min. value
