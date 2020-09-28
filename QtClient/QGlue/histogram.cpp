@@ -24,6 +24,7 @@ namespace QGlue
 /*===========================================================================*/
 Histogram::Histogram( QWidget* parent ):
     QGLUEBaseWidget( parent ),
+    m_texture(this ,4*sizeof( kvs::UInt8 ),"Histogram m_texture"),
     m_graph_color( kvs::RGBAColor( 0, 0, 0, 1.0f ) ),
     m_bias_parameter( 0.5f )
 {
@@ -251,25 +252,15 @@ void Histogram::draw_palette( void )
     glColor3ub( 240, 240, 240 );
     BaseClass::drawQuad(x0,y0,x1,y1);
 
-    // Draw checkerboard texture.
-    glDisable( GL_TEXTURE_1D );
-    glEnable( GL_TEXTURE_2D );
-#if defined( GL_TEXTURE_3D )
-    glDisable( GL_TEXTURE_3D );
-#endif
-
-    glEnable( GL_BLEND );
-    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-
-    if ( m_texture.isValid() )
-    {
-        m_texture.bind();
+    // Draw histogram texture.
+    if(m_texture.bind()){
+        glEnable( GL_BLEND );
+        glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
         BaseClass::drawUVQuad(0.0,1.0,1.0,0.0,x0,y0,x1,y1);
         m_texture.unbind();
-
+        glDisable( GL_BLEND );
     }
 
-    glDisable( GL_BLEND );
     glPopAttrib();
 
     // Draw border.
@@ -329,17 +320,10 @@ void Histogram::create_texture( void )
     const size_t width = m_table.nbins();
     const size_t height = width;
 
-//    m_texture.release();
     m_texture.setPixelFormat( nchannels, sizeof( kvs::UInt8 ) );
-    //    m_texture.setMinFilter( GL_NEAREST );
-    //    m_texture.setMagFilter( GL_NEAREST );
     m_texture.setMinFilter( GL_LINEAR );
     m_texture.setMagFilter( GL_LINEAR );
-    //KVS2.7.0
-    //MOD BY)T.Osaki 2020.07.20
-//    m_texture.create( width, height, this->get_histogram_image().data() );
-    m_texture.load( width, height, this->get_histogram_image().pointer() );
-//    m_texture.unbind();
+    m_texture.load( width, height, this->get_histogram_image().data() );
 }
 
 /*===========================================================================*/
