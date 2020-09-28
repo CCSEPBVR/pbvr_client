@@ -23,6 +23,11 @@ void Screen::paintGL(){
         qWarning("Screen either not initialized or on hold, skipping this frame");
         return;
     }
+    int e;
+    // Check and clear GL errors
+    while (e = glGetError()){
+        qCritical("Screen::paintGL GL HAS ERROR BEFORE %d",e);
+    }
     kvs::FrameBufferObject::m_unbind_id=QOpenGLWidget::defaultFramebufferObject();
     QElapsedTimer timer;
     glPushAttrib( GL_ALL_ATTRIB_BITS );
@@ -35,6 +40,11 @@ void Screen::paintGL(){
     }
     glPopAttrib();
     onPaintGL();
+
+    // Check and clear GL errors
+    while (e = glGetError()){
+        qCritical("Screen::paintGL GL HAS ERROR AFTER %d",e);
+    }
 //    std::cout<<"End Screen::paintGL"<<std::endl;
 }
 
