@@ -35,8 +35,6 @@
 #include <kvs/CellByCellMetropolisSampling>
 #include <kvs/RayCastingRenderer>
 
-#include <random>
-
 #ifdef PBVR_DEBUG
 int     timestep = 0;
 #endif
@@ -156,9 +154,9 @@ void RenderArea::onResizeGL(int w, int h)
     g_legend->setPosition( 10, h_scaled -10 );
 
 }
-///**
-// * @brief RenderArea::onPaintGL
-// */
+/**
+ * @brief RenderArea::onPaintGL
+ */
 void RenderArea::onPaintGL(void)
 {
     if (m_orientation_axis){
