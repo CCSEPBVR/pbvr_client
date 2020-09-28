@@ -290,7 +290,7 @@ void ColorMapPalette::resizeGL(int w, int h)
 /*===========================================================================*/
 void ColorMapPalette::paintGL( void )
 {
-    return;
+    std::cout<<"ColorMapPalette::paintGL:"<<isVisible()<<std::endl;
     if ( !isVisible() ) return;
 
     if ( m_texture_downloaded)
@@ -352,9 +352,7 @@ void ColorMapPalette::mousePressEvent( QMouseEvent* event )
         pdata[2] = static_cast<kvs::UInt8>( drawing_color.b() * ratio + pdata[2] * ( 1 - ratio ) );
 
         const size_t width = m_color_map.resolution();
-//        m_texture.bind();
-        m_texture.load( width, data ,m_gl_initialized);
-//        m_texture.unbind();
+        m_texture.load( width, m_color_map.table().pointer()  );
     }
 
     update();
@@ -411,9 +409,7 @@ void ColorMapPalette::mouseMoveEvent( QMouseEvent* event )
         }
 
         const size_t width = m_color_map.resolution();
-//        m_texture.bind();
-        m_texture.load( width, data,m_gl_initialized);
-//        m_texture.unbind();
+        m_texture.load( width, data);
     }
 
     update();
@@ -446,20 +442,15 @@ void ColorMapPalette::mouseReleaseEvent( QMouseEvent* event )
 /*===========================================================================*/
 void ColorMapPalette::initialize_texture( const kvs::ColorMap& color_map )
 {
-    return;
-    const size_t nchannels  = 3; // rgb
-    const size_t width = color_map.resolution();
-    const kvs::UInt8* data = color_map.table().pointer();
-//    m_texture.release();
-    m_texture.setPixelFormat( nchannels, sizeof( kvs::UInt8 ) );
-    m_texture.setMinFilter( GL_LINEAR );
-    m_texture.setMagFilter( GL_LINEAR );
-    //KVS2.7.0
-    //MOD BY)T.Osaki 2020.07.20
-//    m_texture.create( width, data );
-    m_texture.load( width, data , m_gl_initialized);
-    m_texture_downloaded=false;
-    update();
+        const size_t nchannels  = 3; // rgb
+        const size_t width = color_map.resolution();
+        const kvs::UInt8* data = color_map.table().data();
+//        m_texture.release();
+        m_texture.setPixelFormat( nchannels, sizeof( kvs::UInt8 ) );
+        m_texture.setMinFilter( GL_LINEAR );
+        m_texture.setMagFilter( GL_LINEAR );
+        m_texture.create( width, data);
+        m_texture_downloaded=false;
 }
 
 /*===========================================================================*/
