@@ -6,6 +6,10 @@
 #include <QPainter>
 #include <QTime>
 #include <QGlue/labelbase.h>
+#include "deferredtexture.h"
+
+#include <QThread>
+#include <QApplication>
 #define DEFAULT_MARGIN  (size_t)10
 #define DEFAULT_WIDTH   (size_t)350
 #define DEFAULT_HEIGHT  (size_t) 50
@@ -14,6 +18,7 @@
 #define DEFAULT_BORDER_DARK  QColor( 138, 138, 138 )
 
 namespace  QGlue {
+
 
 class QGLUEBase: public QOpenGLFunctions
 {
@@ -48,6 +53,7 @@ protected:
 
     bool        m_texture_downloaded=false;
 
+
     void    begin_draw( void );
     void    end_draw( void );
 
@@ -75,7 +81,7 @@ protected:
     size_t      m_frameCount=0;
     float       m_fps;
     bool        m_editable;
-    bool        m_gl_initialized=false;
+
     int         m_margin;
 
 
