@@ -21,7 +21,8 @@
 
 #include <string>
 #include <kvs/ClassName>
-#include "deferredtexture.h"
+#include <kvs/Texture1D>
+#include <kvs/Texture2D>
 #include <kvs/OpacityMap>
 
 //ADD BY)T.Osaki 2020.02.28
@@ -53,8 +54,8 @@ protected:
     //ADD BY)T.Osaki 2020.02.28
     kvs::OpacityMap      m_fromOpacityMap;
 
-    DeferredTexture1D      m_texture;          ///< opacity map texture
-    DeferredTexture2D      m_checkerboard;     ///< checkerboard texture
+    DeferredTexture1D    m_texture;          ///< opacity map texture
+    DeferredTexture2D    m_checkerboard;     ///< checkerboard texture
     QRect                m_palette;          ///< palette
     QColor               m_upper_edge_color; ///< upper edge color
     QColor               m_lower_edge_color; ///< lower edge color

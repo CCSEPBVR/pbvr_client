@@ -18,7 +18,10 @@ namespace QGlue
 
 OpacityMapPalette::OpacityMapPalette(QWidget *parent ):
     QGLUEBaseWidget( parent ),
-    m_resolution(256)
+    m_resolution(256),
+    m_texture(this, sizeof(GLfloat),"OpacityMP m_texture"),
+    m_checkerboard(this,3*sizeof(GLubyte),"OpacityMP m_checkerboard")
+
 {
 //    this->setCaption( "Opacity map palette " + kvs::String( OpacityMapPalette::InstanceCounter++ ).toStdString() );
     //    MOD BY)T.Osaki 2020.04.28
@@ -151,7 +154,6 @@ void OpacityMapPalette::setCaption( const std::string& caption )
 void OpacityMapPalette::setOpacityMap( const kvs::OpacityMap& opacity_map )
 {
     // Deep copy.
-    return;
     kvs::OpacityMap::Table opacity_map_table( opacity_map.table().pointer(), opacity_map.table().size() );
     m_opacity_map = kvs::OpacityMap( opacity_map_table );
     this->initialize_texture( m_opacity_map );
@@ -166,7 +168,6 @@ void OpacityMapPalette::setOpacityMap( const kvs::OpacityMap& opacity_map )
 /*===========================================================================*/
 void OpacityMapPalette::resizeGL(int w, int h)
 {
-    return;
     int h_scaled = h * pixelRatio;
     int w_scaled = w  * pixelRatio;
     const int x = m_margin;
@@ -183,32 +184,19 @@ void OpacityMapPalette::resizeGL(int w, int h)
 /*===========================================================================*/
 void OpacityMapPalette::paintGL( void )
 {
-    return;
-    if (QThread::currentThread() != this->thread()) {
-       // Called from different thread do nothing
-        return;
-    }
-    if (!m_gl_initialized){
-        return;
-    }
-    this->screenUpdated();
-
-    this->makeCurrent();
+//    this->screenUpdated();
+//    this->makeCurrent();
+    std::cout<<" OpacityMapPalette::paintGL"<<std::endl;
     BaseClass::begin_draw();
 
-    m_texture.bind();
-    if ( !m_texture.isValid() ) this->initialize_texture( m_opacity_map );
-    m_texture.unbind();
-    m_checkerboard.bind();
-    if ( !m_checkerboard.isValid() ) this->initialize_checkerboard();
-    m_checkerboard.unbind();
+    if ( !m_texture.isTexture() ) this->initialize_texture( m_opacity_map );
+    if ( !m_checkerboard.isTexture() )  this->initialize_checkerboard();
 
     const int x = m_margin;
     const int y = m_margin;
     BaseClass::drawText( x, y + CharacterHeight, m_caption );
 
     this->draw_palette();
-    this->doneCurrent();
     BaseClass::end_draw();
 }
 
@@ -246,16 +234,14 @@ void OpacityMapPalette::mousePressEvent( QMouseEvent* event )
             const float opacity = static_cast<float>( y1 - y ) / ( y1 - y0 );
 
             // Update the opacity map.
-            kvs::Real32* data = const_cast<kvs::Real32*>( m_opacity_map.table().pointer() );
+            kvs::Real32* data = const_cast<kvs::Real32*>( m_opacity_map.table().data() );
             kvs::Real32* pdata = data;
             pdata = data + index;
             pdata[0] = opacity;
 
             // Download to GPU.
             const size_t width = m_opacity_map.resolution();
-//            m_texture.bind();
-            m_texture.load( width, data ,m_gl_initialized);
-//            m_texture.unbind();
+            m_texture.load( width, data );
         }
         update();
     }
@@ -316,15 +302,15 @@ void OpacityMapPalette::mouseReleaseEvent( QMouseEvent* event )
 /*===========================================================================*/
 void OpacityMapPalette::initialize_texture( const kvs::OpacityMap& opacity_map )
 {
+    std::cout<<"OpacityMapPalette::initialize_texture"<<std::endl;
     const size_t width = opacity_map.resolution();
-    const kvs::Real32* data = opacity_map.table().pointer();
+    const kvs::Real32* data = opacity_map.table().data();
 
-    // We need to make sure GL has been initialized
-    m_texture.load(width,data,m_gl_initialized);
+    m_texture.setPixelFormat( GL_ALPHA, GL_ALPHA, GL_FLOAT );
     m_texture.setMinFilter( GL_LINEAR );
     m_texture.setMagFilter( GL_LINEAR );
-    m_texture.setPixelFormat( GL_ALPHA, GL_ALPHA, GL_FLOAT );
-//    }
+    m_texture.load( width, data );
+
 }
 
 /*===========================================================================*/
@@ -334,6 +320,7 @@ void OpacityMapPalette::initialize_texture( const kvs::OpacityMap& opacity_map )
 /*===========================================================================*/
 void OpacityMapPalette::initialize_checkerboard( void )
 {
+    std::cout<<"OpacityMapPalette::initialize_checkerboar"<<std::endl;
     const size_t nchannels = 3;
     const int width = 32;
     const int height = 32;
@@ -360,7 +347,6 @@ void OpacityMapPalette::initialize_checkerboard( void )
         }
     }
 
-//    m_checkerboard.release();
     m_checkerboard.setPixelFormat( nchannels, sizeof( kvs::UInt8 ) );
     m_checkerboard.setMinFilter( GL_NEAREST );
     m_checkerboard.setMagFilter( GL_NEAREST );
@@ -368,10 +354,7 @@ void OpacityMapPalette::initialize_checkerboard( void )
     m_checkerboard.setWrapT( GL_REPEAT );
     //KVS2.7.0
     //MOD BY)T.Osaki 2020.07.20
-//    m_checkerboard.create( width, height, data );
-//    m_checkerboard.download( width, height, data );
-//    m_checkerboard.unbind();
-    m_checkerboard.load(width,height,data);
+    m_checkerboard.load( width, height, data );
     delete [] data;
 }
 /*===========================================================================*/
@@ -389,27 +372,20 @@ void OpacityMapPalette::draw_palette( void )
     const int y1 = m_palette.y()+ m_palette.height();
 
     // Draw checkerboard texture.
-    glDisable( GL_TEXTURE_1D );
-    glEnable( GL_TEXTURE_2D );
-#if defined( GL_TEXTURE_3D )
-    glDisable( GL_TEXTURE_3D );
-#endif
-
     const float w = ( m_palette.width() / 32.0f );
     const float h = ( m_palette.height() / 32.0f );
-    m_checkerboard.bind();
-    QGLUEBaseWidget::drawUVQuad(0.0,0.0,w,h,x0,y0,x1,y1);
-    m_checkerboard.unbind();
-
-    glEnable( GL_BLEND );
-    glEnable( GL_TEXTURE_1D );
-    glDisable( GL_TEXTURE_2D );
-
+    if( m_checkerboard.bind()){
+        QGLUEBaseWidget::drawUVQuad(0.0,0.0,w,h,x0,y0,x1,y1);
+        m_checkerboard.unbind();
+    }
     // Draw opacity map.
-    glBlendFunc( GL_ZERO, GL_ONE_MINUS_SRC_ALPHA );
-    m_texture.bind();
-    QGLUEBaseWidget::drawUVQuad(0.0,0.0,1.0,1.0,x0,y0,x1,y1);
-    m_texture.unbind();
+    if(m_texture.bind()){
+        glEnable( GL_BLEND );
+        glBlendFunc( GL_ZERO, GL_ONE_MINUS_SRC_ALPHA );
+        QGLUEBaseWidget::drawUVQuad(0.0,0.0,1.0,1.0,x0,y0,x1,y1);
+        m_texture.unbind();
+        glDisable(GL_BLEND );
+    }
 
     // Draw lines.
     const int width = m_palette.width();
@@ -474,7 +450,7 @@ void OpacityMapPalette::draw_free_hand_line( QMouseEvent* event )
     // Update the opacity map.
     const int begin_index = kvs::Math::Min( old_index, new_index );
     const int end_index = kvs::Math::Max( old_index, new_index );
-    kvs::Real32* data = const_cast<kvs::Real32*>( m_opacity_map.table().pointer() );
+    kvs::Real32* data = const_cast<kvs::Real32*>( m_opacity_map.table().data() );
     kvs::Real32* pdata = data + begin_index;
     for ( int i = begin_index; i < end_index; i++ )
     {
@@ -484,10 +460,7 @@ void OpacityMapPalette::draw_free_hand_line( QMouseEvent* event )
 
     // Download to GPU.
     const size_t width = m_opacity_map.resolution();
-//    m_texture.bind();
-    m_texture.load( width, data ,m_gl_initialized);
-//    m_texture.unbind();
-
+    m_texture.load( width, data );
     // Update the previous mouse position.
     m_previous_position.set( x, y );
 }
@@ -566,7 +539,7 @@ void OpacityMapPalette::draw_straight_line(QMouseEvent *event )
 
             const int begin_index = kvs::Math::Min( old_index, new_index );
             const int end_index = kvs::Math::Max( old_index, new_index );
-            kvs::Real32* data = const_cast<kvs::Real32*>( m_opacity_map.table().pointer() );
+            kvs::Real32* data = const_cast<kvs::Real32*>( m_opacity_map.table().data() );
             kvs::Real32* pdata = data + begin_index;
             for ( int i = begin_index; i < end_index; i++ )
             {
@@ -578,10 +551,7 @@ void OpacityMapPalette::draw_straight_line(QMouseEvent *event )
 
     // Download to GPU.
     const size_t width = m_opacity_map.resolution();
-//    m_texture.bind();
-    m_texture.load( width, data ,m_gl_initialized);
-//    m_texture.unbind();
-
+    m_texture.download( width, data );
     // Update the previous mouse position.
     m_previous_position.set( x, y );
 }
