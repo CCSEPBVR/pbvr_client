@@ -71,8 +71,8 @@ void Label::updateBitmap(QColor textColor)
     int newSize = oldSize* pixelRatio;
     f.setPointSize(newSize );
     QFontMetrics fm(f);
-    bitmap_w=nextPower2(fm.width(lbl_text));
-    bitmap_h=nextPower2(fm.height());
+    bitmap_w=nextPower2(fm.boundingRect(lbl_text).width());
+    bitmap_h=nextPower2(fm.boundingRect(lbl_text).height());
 
     bitmap_w=std::max(bitmap_w,4u);
     bitmap_h=std::max(bitmap_h,4u);
