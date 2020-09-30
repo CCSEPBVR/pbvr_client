@@ -2,10 +2,9 @@
 #define KVSQScreen_H
 
 #include "screen.h"
-//#include "Client/ExtendedParticleVolumeRenderer.h"
+
 #include "Client/TimerEvent.h"
 #include <QGlue/labelbase.h>
-//#include <QGlue/extCommand.h>
 #include <QGlue/legendbar.h>
 #include <QGlue/timer.h>
 #include <QGlue/orientationaxis.h>
@@ -51,6 +50,8 @@ public:
     void setShaderParams( );
     void setupEventHandlers( );
 
+    kvs::PointObject pobj;
+
     //KVS2.7.0
     //MOD BY)T.Osaki 2020.05.28
     //DEL BY)T.Osaki 2020.06.15
@@ -62,7 +63,6 @@ public:
     static char shadinglevel[256];
     static kvs::visclient::TimerEvent* g_timer_event;
 
-    bool m_gl_initialized=false;
     size_t frame_number=0;
 //    QTimer*     m_idle_mouse_timer;
 //    QPainter    m_painter; // Shouldn't be public, but used by orientation axis
@@ -73,19 +73,15 @@ public:
     QGlue::OrientationAxis* m_orientation_axis=NULL;
     QGlue::Timer*           qt_timer;
 
-//    kvs::glsl::ParticleBasedRenderer* m_pbr;
-
     kvs::PointObject*  m_control_object;
-//    kvs::EventHandler* m_initialize_event_handler;
 
-//    std::list<QGlue::Timer*> m_timer_event_handler;
     QList<QGlue::Label*>     m_labels;
     //KVS2.7.0
     //MOD BY)T.Osaki 2020.07.20
 //    kvs::Scene* m_scene;
 
     std::pair<int, int> obj_id_pair;
-    void attachPointObject(kvs::PointObject* point);
+    void attachPointObject(const kvs::PointObject *point);
     void toggleTimer(bool state){
         if (state)
             qt_timer->start();
@@ -101,9 +97,8 @@ private:
     float pixelRatio=1;
     ExtendedParticleVolumeRenderer* m_renderer;
 
-    kvs::glsl::ParticleBasedRenderer* m_pbr;
     int m_reset_count = 0;
-    bool objectReplaced=false;
+
 protected:
 
     void mouseReleaseEvent(QMouseEvent *event);
