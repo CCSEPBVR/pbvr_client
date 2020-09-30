@@ -10,6 +10,15 @@ DeferredTexture2D::DeferredTexture2D(QGLUEBase* surface, size_t bytes, std::stri
     this->nbytes=bytes;
 
 }
+
+/**
+ * @brief DeferredTexture2D::cacheData
+ * @param w width in pixels
+ * @param h height in pixels
+ * @param data texture data
+ * @param xo xoffset
+ * @param yo yoffset
+ */
 void DeferredTexture2D::cacheData(size_t w, size_t h , const void* data, size_t xo, size_t yo)
 {
     std::cout<<name<<"::prepareCache : "<< w<<"*"<<h<<"*"<<nbytes<<std::endl;
@@ -24,6 +33,13 @@ void DeferredTexture2D::cacheData(size_t w, size_t h , const void* data, size_t 
     memcpy(cache,data,w*h*nbytes);
 }
 
+/**
+ * @brief DeferredTexture2D::create creates the texture and loads data if context available
+ *                                  caches the data for later restore  (in case context was not available)
+ * @param width,  width in pixels
+ * @param height, height in pixels
+ * @param data,   texture data
+ */
 void DeferredTexture2D::create(size_t width, size_t height, const void* data)
 {
     std::cout<<name<<"::create : "<< width<<","<<height<<std::endl;
@@ -33,6 +49,15 @@ void DeferredTexture2D::create(size_t width, size_t height, const void* data)
     }
 }
 
+/**
+ * @brief DeferredTexture2D::load , loads the texture data into GPU if context available.
+ *                                  caches the data for later restore  (in case context was not available)
+ * @param width width in pixels
+ * @param height height in pixels
+ * @param data   texture data
+ * @param xoffset x-offset
+ * @param yoffset y-offset
+ */
 void  DeferredTexture2D::load( const size_t width, const size_t height,
                                const void* data, const size_t xoffset, const size_t yoffset)
 {
@@ -49,7 +74,12 @@ void  DeferredTexture2D::load( const size_t width, const size_t height,
         }
     }
 }
-
+/**
+ * @brief DeferredTexture2D::bind  binds the texture data for drawing if context is available and ready.
+ *                                 Tries to restore the texture from cache if earlier creation/load failed.
+ *                                 Sets the correct GL_TEXTURE state
+ * @return bool isBound()
+ */
 bool  DeferredTexture2D::bind()
 {
 
@@ -94,7 +124,9 @@ bool  DeferredTexture2D::bind()
         return isBound();
     }
 }
-
+/**
+ * @brief DeferredTexture2D::unbind , unbinds the texture if context is available and ready.
+ */
 void DeferredTexture2D::unbind()
 {
     std::cout<<name<<"::unbind " <<std::endl;
