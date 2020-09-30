@@ -39,9 +39,6 @@ DEFINES += USING_PCH
 
 #PBVR INCLUDE PATHS
 INCLUDEPATH += ../
-#INCLUDEPATH += ../KVS/Source
-#INCLUDEPATH += /Users/osakitsukasa/OsakiWork/pbvr_client_v1.12_KVS270/resouce/KVS-2.7.0/Source
-#INCLUDEPATH += /Users/osakitsukasa/OsakiWork/pbvr_client_v1.12_KVS270/resouce/KVS-release-v2.9.0/Source
 INCLUDEPATH += $(KVS_DIR)/include
 INCLUDEPATH += ../Common/$${PBVR_MODE}
 INCLUDEPATH += $${PBVR_PATH}/FunctionParser
