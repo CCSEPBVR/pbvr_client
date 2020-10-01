@@ -1,5 +1,5 @@
 #include "QGlue/colormappalette.h"
-#include "function_parser.h"
+#include "FunctionParser/function_parser.h"
 #include <QMouseEvent>
 #include <QDebug>
 #include <QApplication>
