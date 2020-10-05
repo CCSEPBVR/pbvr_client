@@ -238,22 +238,21 @@ void RenderArea::attachPointObject(const kvs::PointObject* point)
           QThread::sleep(2);
           return;
     }
-    pobj.clear();
-    pobj.add(*point);
+    pobj= new kvs::PointObject();
+    pobj->clear();
+    pobj->add(*point);
 
     makeCurrent();
     if (obj_id_pair.first ==-1 && obj_id_pair.second == -1){
-        obj_id_pair=this->m_scene->registerObject(&pobj,m_renderer);
+        obj_id_pair=this->m_scene->registerObject(pobj,m_renderer);
     }
     else {
-
-        this->m_scene->replaceObject(obj_id_pair.first,&pobj,false);
-
+        this->m_scene->replaceObject(obj_id_pair.first,pobj,true);
         objectReplaced=true;
     }
     doneCurrent();
     this->update();
-    std::cout<<"attachPointObject end"<<std::endl;
+//    std::cout<<"attachPointObject end"<<std::endl;
 }
 
 /**

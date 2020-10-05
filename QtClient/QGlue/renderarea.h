@@ -50,7 +50,7 @@ public:
     void setShaderParams( );
     void setupEventHandlers( );
 
-    kvs::PointObject pobj;
+    kvs::PointObject* pobj;
 
     //KVS2.7.0
     //MOD BY)T.Osaki 2020.05.28
