@@ -1,3 +1,6 @@
+## VERSION
+GIT_HASH = $$system("git log -1 --pretty=format:%h")
+DEFINES += PBVR_VERSION="1.14.PRERELEASE_BUILD.$${GIT_HASH}"
 ## DETERMINE PLATFORM  ##
 win32:PLATFORM=WIN
 unix:!macx:PLATFORM=UNX
@@ -5,7 +8,6 @@ macx:PLATFORM=MAC
 ## DETERMINE RELEASE TYPE ##
 CONFIG(debug, debug|release) :RELTYPE=debug
 CONFIG(release, debug|release) :RELTYPE=release
-
 
 ## INCLUDE PLATFORM SETTINGS ##
 include(SETTINGS_$${PLATFORM}.pri)
@@ -24,7 +26,6 @@ DEFINES += CPUMODE
 !contains(DEFINES, CPUMODE) {
     DEFINES += KVS_SUPPORT_GLEW
 }
-
 
 ## WARN ON DEPRECEATED QT FUNC ##
 DEFINES += QT_DEPRECATED_WARNINGS
