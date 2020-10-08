@@ -388,23 +388,26 @@ void PBVRGUI::onDisconnect_From_ServerMenuAction()
 {
     showStatusMessage( "Disconnecting from server....\nNot implemented\n");
 }
+//#define PBVR_VERSION "OST"
+#define QUOTE(name) #name
+#define STR(macro) QUOTE(macro)
 
 #define QUOTE(name) #name
 #define STR(macro) QUOTE(macro)
 
 void PBVRGUI::onAbout_PBVR_ClientMenuAction()
 {
-//#ifdef CPUMODE
-//    const char* graphics_mode="CPU";
-//#else
-//    const char* graphics_mode="GPU";
-//#endif
-#ifdef CS_MODE
-    const char* server_mode="CS";
+#ifdef CPUMODE
+    const char* graphics_mode="CPU";
 #else
-    const char* server_mode="IS";
+    const char* graphics_mode="GPU";
 #endif
-    QString message=QString("\n\n\nPBVR QtClient \n\nServer mode:%2 \n\nVersion: %4").arg( server_mode ,STR(PBVR_VERSION));
+#ifdef CS_MODE
+    const char* render_mode="CS";
+#else
+    const char* render_mode="IS";
+#endif
+    QString message=QString("\n\n\nPBVR QtClient \n\nRender mode:%1 \nServer mode:%2 \n\nVersion: %4").arg(graphics_mode, render_mode ,STR(PBVR_VERSION));
     QMessageBox::aboutQt(this,  tr("About Qt"));
     QMessageBox::about(this,tr("About PBVR"), tr(message.toStdString().c_str()));
 }
