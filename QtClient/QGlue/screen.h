@@ -65,6 +65,10 @@ public:
         QOpenGLWidget::update();
     }
 
+    void redraw()
+    {
+        this->update();
+    }
 
 };
 
