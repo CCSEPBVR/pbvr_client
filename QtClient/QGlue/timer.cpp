@@ -8,7 +8,6 @@
 #include <QDebug>
 
 #include <Client/KeyFrameAnimation.h>
-#include <Client/ExtendedParticleVolumeRenderer.h>
 #include "Panels/animationcontrols.h"
 #include "Panels/particlepanel.h"
 #include "Panels/coordinatepanel.h"
@@ -16,7 +15,7 @@
 #include "Panels/systemstatuspanel.h"
 
 #include "QGlue/renderarea.h"
-
+#include "Client/ExtendedParticleVolumeRenderer.h"
 //KVS2.7.0
 //MOD BY)T.Osaki 2020.06.04
 #include <kvs/Quaternion>
@@ -175,7 +174,7 @@ void Timer::setInterval( int msec )
  *  @param  listener [in] pointer to the event listener
  */
 /*===========================================================================*/
-void Timer::setEventListener( kvs::EventListener* listener )
+void Timer::setEventListener( kvs::visclient::TimerEvent* listener )
 {
     m_event_listener = listener;
 }
@@ -320,27 +319,27 @@ void Timer::comThreadExitEvent()
         }
         if ( m_command->m_parameter.m_transfer_type == VisualizationParameter::Detailed )
         {
-#ifndef CPUMODE
-            if ( m_command->m_parameter.m_repeat_level == m_command->m_parameter.m_detailed_repeat_level )
-            {
-#endif
+//#ifndef CPUMODE
+//            if ( m_command->m_parameter.m_repeat_level == m_command->m_parameter.m_detailed_repeat_level )
+//            {
+//#endif
                 TimecontrolPanel::g_curStep = m_command->m_parameter.m_time_step;
                 m_command->m_parameter.m_time_step++;
-#ifndef CPUMODE
-            }
-#endif
+//#ifndef CPUMODE
+//            }
+//#endif
         }
         else if ( m_command->m_parameter.m_transfer_type == VisualizationParameter::Abstract )
         {
-#ifndef CPUMODE
-            if ( m_command->m_parameter.m_repeat_level == m_command->m_parameter.m_abstract_repeat_level )
-            {
-#endif
+//#ifndef CPUMODE
+//            if ( m_command->m_parameter.m_repeat_level == m_command->m_parameter.m_abstract_repeat_level )
+//            {
+//#endif
                 TimecontrolPanel::g_curStep = m_command->m_parameter.m_time_step;
                 m_command->m_parameter.m_time_step++;
-#ifndef CPUMODE
-            }
-#endif
+//#ifndef CPUMODE
+//            }
+//#endif
         }
     }
     if ( m_command->m_parameter.m_time_step > m_command->m_timectrl_panel->maxValue() ) //99) {
@@ -461,11 +460,13 @@ void Timer::timerEvent( QTimerEvent* event )
         switch (comstatus){
         case ComThread::Idle:
             //comThreadIdleEvent();
-            m_event_listener->onEvent( m_time_event );
+//            m_event_listener->onEvent( m_time_event );
+            m_event_listener->update(m_time_event);
             break;
         case ComThread::Exit:
             //            comThreadExitEvent();
-            m_event_listener->onEvent( m_time_event );
+//            m_event_listener->onEvent( m_time_event );
+            m_event_listener->update(m_time_event);
             if(oneShot){stop(); oneShot=false; qInfo("ENDING SINGLESHOT");}
             break;
         case ComThread::Running:

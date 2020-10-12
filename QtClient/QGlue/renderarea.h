@@ -3,6 +3,7 @@
 
 #include "screen.h"
 
+#include "Client/ExtendedParticleVolumeRenderer.h"
 #include "Client/TimerEvent.h"
 #include <QGlue/labelbase.h>
 #include <QGlue/legendbar.h>
@@ -50,6 +51,21 @@ public:
     void setShaderParams( );
     void setupEventHandlers( );
 
+    void enableRendererShading(){
+        m_renderer->enableShading();
+    }
+    void setRenderSubPixelLevel(int level){
+        m_renderer->setSubpixelLevel( level );
+    }
+    void setRenderRepetionlLevel(int level){
+#ifndef CPUMODE
+        m_renderer->setRepetitionLevel( level );
+#endif
+    }
+    void recreateRenderImageBuffer()
+    {
+        m_renderer->recreateImageBuffer();
+    }
     kvs::PointObject* pobj;
 
     //KVS2.7.0
@@ -88,6 +104,8 @@ public:
         else
             qt_timer->stop();
     }
+
+    ExtendedParticleVolumeRenderer* renderer(){return m_renderer;}
 private:
     int i_w=0;
     int i_h=0;

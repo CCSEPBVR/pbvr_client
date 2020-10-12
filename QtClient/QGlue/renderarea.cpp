@@ -102,7 +102,7 @@ void RenderArea::updateCommandInfo(ExtCommand* extCommand)
         kvsMessageError( "Cannot create a point m_renderer." );
     }
 
-    extCommand->m_renderer=m_renderer;
+//    extCommand->m_renderer=m_renderer;
 
     // Setup FPS Label
     m_fpsLabel  =new QGlue::FPSLabel(this,*m_renderer);
@@ -199,10 +199,10 @@ void RenderArea::setupEventHandlers()
     //KVS2.7.0
     //MOD BY)T.Osaki 2020.07.20
     //    id_pair = this->registerObject( m_control_object, extCommand->m_renderer );
-    id_pair = this->m_scene->registerObject( m_control_object, extCommand->m_renderer );
+    id_pair = this->m_scene->registerObject( m_control_object, m_renderer );
     std::cout << *m_scene->objectManager() << std::endl;
     g_timer_event->setObject( id_pair.first );
-    g_timer_event->setRenderer( extCommand->m_renderer );
+    g_timer_event->setRenderer(m_renderer);
 #else
     //    this->registerObject( m_control_object, extCommand->renderer );
     //    this->m_scene->registerObject( m_control_object, extCommand->m_renderer );
@@ -210,7 +210,7 @@ void RenderArea::setupEventHandlers()
 #endif
     //KVS2.7.0
     //ADD BY)T.Osaki  2020.06.19
-    g_timer_event->setScene( m_scene );
+//    g_timer_event->setScene( m_scene );
     g_timer_event->setScreen( this );
     qt_timer->setEventListener( g_timer_event );
     qt_timer->start();

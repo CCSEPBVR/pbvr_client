@@ -5,7 +5,8 @@
 
 #include <kvs/EventListener>
 #include <kvs/EventHandler>
-#include <kvs/TimeEvent>
+//#include <kvs/TimeEvent>
+#include "Client/TimerEvent.h"
 #include <kvs/ClassName>
 #include "kvs/PointObject"
 
@@ -39,7 +40,7 @@ protected:
     int                 m_interval;       ///< interval time in millisecond
     bool                m_is_stopped;     ///< checl flag whether the time is stopped
     kvs::TimeEvent*     m_time_event;     ///< time event
-    kvs::EventListener* m_event_listener; ///< event listener
+    kvs::visclient::TimerEvent* m_event_listener; ///< event listener
     kvs::EventHandler*  m_event_handler;  ///< event handler
 private:
     Command* m_command;
@@ -97,7 +98,7 @@ public:
     void onTimerUpdate( );
     void setInterval( int msec );
 
-    void setEventListener( kvs::EventListener* listener );
+    void setEventListener(kvs::visclient::TimerEvent *listener );
 
     void setEventHandler( kvs::EventHandler* handler );
 

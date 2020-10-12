@@ -770,8 +770,8 @@ void Command::postUpdate()
         m_parameter.m_detailed_subpixel_level = m_local_subpixel_level;
     }
 #ifdef CPUMODE
-    m_renderer->setSubpixelLevel( m_parameter.m_detailed_subpixel_level );
-    m_renderer->recreateImageBuffer();
+    m_screen->renderer()->setSubpixelLevel( m_parameter.m_detailed_subpixel_level );
+    m_screen->renderer()->recreateImageBuffer();
 #endif
     PBVR_TIMER_STA( 150 );
 
@@ -779,9 +779,9 @@ void Command::postUpdate()
     if ( m_parameter.m_transfer_type == VisualizationParameter::Abstract )
     {
 #ifndef CPUMODE
-        m_renderer->setRepetitionLevel( m_parameter.m_abstract_repeat_level );
+        m_screen->renderer()->setRepetitionLevel( m_parameter.m_abstract_repeat_level );
 #endif
-        m_renderer->setSubpixelLevel( m_parameter.m_abstract_subpixel_level );
+        m_screen->renderer()->setSubpixelLevel( m_parameter.m_abstract_subpixel_level );
         PointObject* object = m_abstract_particles[m_parameter.m_time_step];
         m_screen->attachPointObject(object );
 //        m_renderer->changePointObject( cpobj );
@@ -791,7 +791,7 @@ void Command::postUpdate()
 #ifndef CPUMODE
 //        m_renderer->setRepetitionLevel( m_parameter.m_repeat_level );
 #endif
-        m_renderer->setSubpixelLevel( m_parameter.m_detailed_subpixel_level );
+        m_screen->renderer()->setSubpixelLevel( m_parameter.m_detailed_subpixel_level );
         PointObject* object = m_detailed_particles[m_parameter.m_time_step];
         m_screen->attachPointObject(object );
     }
