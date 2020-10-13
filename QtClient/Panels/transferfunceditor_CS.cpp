@@ -59,6 +59,25 @@ TransferFuncEditor::~TransferFuncEditor()
  */
 void TransferFuncEditor::apply()
 {
+   std::cout<<"---\n m_color_transfer_function_synthesis:"<< m_doc.m_color_transfer_function_synthesis.c_str()<<std::endl;
+
+    for (size_t i=0; i < m_doc.m_color_transfer_function.size(); i++){
+        std::cout<<"  m_color_transfer_function["<<i<<"] "
+                 <<m_doc.m_color_transfer_function.at(i).m_name <<": "
+                 <<m_doc.m_color_transfer_function.at(i).m_color_variable.c_str() <<   "    [ "
+                 <<m_doc.m_color_transfer_function.at(i).m_color_variable_min <<": "
+                 <<m_doc.m_color_transfer_function.at(i).m_color_variable_max <<   " ]"<<std::endl;
+    }
+    std::cout<<"\nm_opacity_transfer_function_synthesis:"<< m_doc.m_opacity_transfer_function_synthesis.c_str()<<std::endl;
+    for (size_t i=0; i < m_doc.m_opacity_transfer_function.size(); i++){
+        std::cout<<"m_opacity_transfer_function["<<i<<"] "
+                 <<m_doc.m_opacity_transfer_function.at(i).m_name <<": "
+                 <<m_doc.m_opacity_transfer_function.at(i).m_opacity_variable.c_str() <<   "    [ "
+                 <<m_doc.m_opacity_transfer_function.at(i).m_opacity_variable_min <<": "
+                 <<m_doc.m_opacity_transfer_function.at(i).m_opacity_variable_max <<   " ]"<<std::endl;
+    }
+    std::cout<<"   "<<std::endl;
+
     extCommand->m_parameter.m_parameter_extend_transfer_function = m_doc;
     extCommand->m_screen->update();
 }
@@ -355,6 +374,8 @@ bool TransferFuncEditor::selectTransferFunctionEditorOpacityFunction(int num)
         return false;
     }
     ui->opacitymapFunction->setCurrentIndex(num);
+    //Martin added
+    onOpacityMapFunctionChanged(num);
     return true;
 }
 
@@ -370,6 +391,8 @@ bool TransferFuncEditor::selectTransferFunctionEditorColorFunction(int num)
         return false;
     }
     ui->colormapFunction->setCurrentIndex(num);
+    //Martin added
+    onColorMapFunctionChanged(num);
     return true;
 }
 
@@ -524,7 +547,11 @@ const kvs::visclient::ExtendedTransferFunctionMessage& TransferFuncEditor::doc()
 void TransferFuncEditor::onCfuncClicked()
 {
     cFuncEditor.initalize( FunctionListEditor::COLOR_FUNCTION_DIALOG, this->m_doc, ui->colormapFunction->currentIndex());
-    cFuncEditor.show();
+//    cFuncEditor.show();
+    // Martin changed - show dialog as modal - then update
+    cFuncEditor.exec();
+    int index= cFuncEditor.getSelectedFunctionIndex();
+    selectTransferFunctionEditorColorFunction(index);
 }
 
 /**
@@ -680,7 +707,13 @@ void TransferFuncEditor::onNumTransferChanged(int val)
 void TransferFuncEditor::onOfuncClicked()
 {
     oFuncEditor.initalize( FunctionListEditor::OPACITY_FUNCTION_DIALOG, this->m_doc, ui->opacitymapFunction->currentIndex());
-    oFuncEditor.show();
+//    oFuncEditor.show();
+    // Martin changed - show dialog as modal - then update
+    oFuncEditor.exec();
+    int index= oFuncEditor.getSelectedFunctionIndex();
+    selectTransferFunctionEditorOpacityFunction(index);
+
+
 }
 
 
