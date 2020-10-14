@@ -8,7 +8,7 @@
 //#include <QApplication>
 #include <QDesktopWidget>
 
-#include "Client/ExtendedParticleVolumeRenderer.h"
+
 //#include "Client/VizParameterFile.h"
 #include "Client/KeyFrameAnimation.h"
 #include "Panels/animationcontrols.h"
@@ -38,6 +38,7 @@ char RenderArea::shadinglevel[256] = "";
 kvs::visclient::TimerEvent* RenderArea::g_timer_event=0;
 
 
+RenderArea::PointObjectProxy RenderArea::m_point_object;
 RenderArea::RenderArea( QWidget* parent_surface):
     obj_id_pair (-1,-1)
 {
@@ -101,8 +102,6 @@ void RenderArea::updateCommandInfo(ExtCommand* extCommand)
     {
         kvsMessageError( "Cannot create a point m_renderer." );
     }
-
-//    extCommand->m_renderer=m_renderer;
 
     // Setup FPS Label
     m_fpsLabel  =new QGlue::FPSLabel(this,*m_renderer);
@@ -192,6 +191,7 @@ void RenderArea::setupEventHandlers()
     //    qt_timer->setRenderer(this->m_renderer);
 
     extCommand->m_glut_timer = qt_timer;
+//    qt_timer->setScreen(this);
 
     g_timer_event=new kvs::visclient::TimerEvent( extCommand,&extCommand->comthread );
 #ifdef CPUMODE
@@ -202,7 +202,7 @@ void RenderArea::setupEventHandlers()
     id_pair = this->m_scene->registerObject( m_control_object, m_renderer );
     std::cout << *m_scene->objectManager() << std::endl;
     g_timer_event->setObject( id_pair.first );
-    g_timer_event->setRenderer(m_renderer);
+//    g_timer_event->setRenderer(m_renderer);
 #else
     //    this->registerObject( m_control_object, extCommand->renderer );
     //    this->m_scene->registerObject( m_control_object, extCommand->m_renderer );
@@ -227,30 +227,34 @@ void RenderArea::setupEventHandlers()
  */
 void RenderArea::attachPointObject(const kvs::PointObject* point)
 {
-    std::cout<<"attachPointObject"<<std::endl;
+
+//    std::cout<<"attachPointObject"<<std::endl;
     if (QThread::currentThread() != this->thread()) {
         qWarning("RenderArea::attachPointObject was not called from main thread, ignoring point object");
         return;
     }
     if (point->coords().size() <= 3){
         // The cause of this condition should be found
+        // This is probably reduntant , after adding CurrentThread() check.
           qCritical("RenderArea::attachPointObject ignoring point object with zero or single point\n" );
-          QThread::sleep(2);
-          return;
+          assert(false);
     }
-    pobj= new kvs::PointObject();
-    pobj->clear();
-    pobj->add(*point);
-
+    m_point_object.swap();
+    m_point_object->clear();
+    m_point_object->add(*point);
+    // Make sure context is current
     makeCurrent();
     if (obj_id_pair.first ==-1 && obj_id_pair.second == -1){
-        obj_id_pair=this->m_scene->registerObject(pobj,m_renderer);
+        obj_id_pair=this->m_scene->registerObject(m_point_object,m_renderer);
     }
     else {
-        this->m_scene->replaceObject(obj_id_pair.first,pobj,true);
+        this->m_scene->replaceObject(obj_id_pair.first,m_point_object,false);
         objectReplaced=true;
     }
+    m_orientation_axis->setObject( m_point_object);
+    // Let Qt know we are done using the context.
     doneCurrent();
+    // Trigger a paint event
     this->update();
 //    std::cout<<"attachPointObject end"<<std::endl;
 }
@@ -442,7 +446,7 @@ void RenderArea::keyPressEvent(QKeyEvent *kbEvent){
         //MOD BY)T.Osaki 2020.06.29
         m_scene->reset();
         //kvs::ScreenBase::reset();
-        this->redraw();
+        this->update();
     }
 }
 

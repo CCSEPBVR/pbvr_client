@@ -770,8 +770,8 @@ void Command::postUpdate()
         m_parameter.m_detailed_subpixel_level = m_local_subpixel_level;
     }
 #ifdef CPUMODE
-    m_screen->renderer()->setSubpixelLevel( m_parameter.m_detailed_subpixel_level );
-    m_screen->renderer()->recreateImageBuffer();
+    m_screen->setRenderSubPixelLevel(m_parameter.m_detailed_subpixel_level);
+    m_screen->recreateRenderImageBuffer();
 #endif
     PBVR_TIMER_STA( 150 );
 

@@ -58,10 +58,10 @@ void TimerEvent::setObject( const int& id )
     m_object_id = id;
 }
 
-void TimerEvent::setRenderer( kvs::ParticleVolumeRenderer* renderer )
-{
-    m_renderer = renderer;
-}
+//void TimerEvent::setRenderer( kvs::ParticleVolumeRenderer* renderer )
+//{
+//    m_renderer = renderer;
+//}
 TimerEvent::~TimerEvent()
 {
     if ( m_back_object  != NULL ) delete m_back_object;
@@ -95,13 +95,13 @@ void TimerEvent::update( kvs::TimeEvent* event )
             {
                 std::cout << "Abstract" << std::endl;
                 *m_front_object = *( m_command->m_abstract_particles[m_command->m_parameter.m_time_step] );
-                m_renderer->setSubpixelLevel( m_command->m_parameter.m_abstract_subpixel_level );
+                m_screen->setRenderSubPixelLevel( m_command->m_parameter.m_abstract_subpixel_level );
             }
             else if ( m_command->m_parameter.m_transfer_type == VisualizationParameter::Detailed )
             {
                 std::cout << "Detailed" << std::endl;
                 *m_front_object = *( m_command->m_detailed_particles[m_command->m_parameter.m_time_step] );
-                m_renderer->setSubpixelLevel( m_command->m_parameter.m_detailed_subpixel_level );
+                m_screen->setRenderSubPixelLevel( m_command->m_parameter.m_detailed_subpixel_level );
             }
             else
             {
@@ -109,8 +109,8 @@ void TimerEvent::update( kvs::TimeEvent* event )
                 assert( false );
             }
             if ( m_command->m_parameter.m_shading_type_flag )
-                m_renderer->enableShading();
-            m_renderer->attachPointObject( m_front_object );
+                m_screen->enableRendererShading();
+            m_screen->rendererAttachPointObject( m_front_object );
             m_back_object = m_front_object;
             //KVS2.7.0
             //MOD BY)T.Osaki 2020.06.04
@@ -126,6 +126,13 @@ void TimerEvent::update( kvs::TimeEvent* event )
             view_flag = true;
             m_command->m_particle_assign_flag = false;
         }
+#else
+        if ( m_command->m_is_under_animation && m_command->m_particle_assign_flag )
+        {
+            view_flag=true;
+            m_command->m_particle_assign_flag=false;
+        }
+
 #endif
         if ( m_command->m_parameter.m_time_step == m_command->m_parameter.m_time_step_key_frame )
         {
@@ -153,8 +160,17 @@ void TimerEvent::update( kvs::TimeEvent* event )
                 int max_time_step = static_cast<int>( m_command->m_timectrl_panel->maxValue() );
                 float ratio = float( m_command->m_parameter.m_time_step - min_time_step + 1.0 ) / float( max_time_step - min_time_step + 1.0 ) * 100;
 #ifdef CS_MODE
+                // Unlocking the paint_mutex here , as m_timectrl_panel->setProgress triggers an update event.
+                // And if the timecntrl_panel is docked in the same window as the render area, this
+                // will lead to a chain of events where finally Screen::paintGL() is called. As Screen::paintGL tries
+                // to get the paint_mutex.lock this will cause a hang if we don't unlock here first.
+                //
+                // In fact - maybe paint_mutex is not needed here any more at all.
+
+                paint_mutex.unlock();
                 m_command->m_timectrl_panel->setProgress(ratio);
                 m_command->m_timectrl_panel->setStepValue(m_command->m_parameter.m_time_step);
+                paint_mutex.lock();
 #endif
             }
         }
@@ -171,31 +187,31 @@ void TimerEvent::update( kvs::TimeEvent* event )
             }
             if ( m_command->m_parameter.m_transfer_type == VisualizationParameter::Detailed )
             {
-#ifndef CPUMODE
+//#ifndef CPUMODE
                 if (m_command->m_parameter.m_repeat_level ==m_command->m_parameter.m_detailed_repeat_level)
                 {
-#endif
+//#endif
                     TimecontrolPanel::g_curStep = m_command->m_parameter.m_time_step;
 					#ifdef CS_MODE
                     m_command->m_parameter.m_time_step++;
 					#endif
-#ifndef CPUMODE
+//#ifndef CPUMODE
                 }
-#endif
+//#endif
             }
             else if ( m_command->m_parameter.m_transfer_type == VisualizationParameter::Abstract )
             {
-#ifndef CPUMODE
+//#ifndef CPUMODE
                 if (m_command->m_parameter.m_repeat_level ==m_command->m_parameter.m_abstract_repeat_level )
                 {
-#endif
+//#endif
                     TimecontrolPanel::g_curStep = m_command->m_parameter.m_time_step;
 					#ifdef CS_MODE
                     m_command->m_parameter.m_time_step++;
 					#endif
-#ifndef CPUMODE
+//#ifndef CPUMODE
                 }
-#endif
+//#endif
             }
         }
         if ( m_command->m_parameter.m_time_step > m_command->m_timectrl_panel->maxValue() ) //99) {
@@ -317,7 +333,7 @@ void TimerEvent::update( kvs::TimeEvent* event )
     }
 
 #ifdef CPUMODE
-    screen()->redraw();
+    m_screen->update();
 #endif
     m_command->reDraw();
 

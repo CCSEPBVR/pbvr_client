@@ -371,7 +371,6 @@ void ExtCommand::CallBackApply( const int i )
     //m_screen->kvs::ScreenBase::reset();
     //m_screen->reset(); //camera()->resetXform();
 //    m_screen->Scene::reset();
-//    m_screen->m_scene->reset();
     /*
     m_screen->objectManager()->translate( kvs::Vector3f(
                                             TransformPanel::param.translateX,
@@ -386,6 +385,7 @@ void ExtCommand::CallBackApply( const int i )
     */
     //KVS2.7.0
     //MOD BY)T.Osaki 2020.07.20
+    m_screen->scene()->reset();
     m_screen->scene()->objectManager()->translate( kvs::Vector3f(
                                             TransformPanel::param.translateX,
                                             TransformPanel::param.translateY,

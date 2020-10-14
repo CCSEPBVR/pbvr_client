@@ -4,12 +4,11 @@
 #include "screen.h"
 
 #include "Client/ExtendedParticleVolumeRenderer.h"
-#include "Client/TimerEvent.h"
 #include <QGlue/labelbase.h>
 #include <QGlue/legendbar.h>
 #include <QGlue/timer.h>
 #include <QGlue/orientationaxis.h>
-
+#include "Client/TimerEvent.h"
 //KVS2.7.0
 //MOD BY)T.Osaki 2020.06.04
 #include <kvs/Scene>
@@ -29,6 +28,41 @@ class PBVRGUI;
 //MOD BY)T.Osaki 2020.06.04
 class RenderArea : public Screen
 {
+private:
+    /**
+     * @brief The PointObjectProxy class, Swappable kvsPointObject
+     *        This class will act as a kvs::PointObject when interacting with kvs.
+     *
+     *        However it is a proxy, backed by two different kvs::PointObjects
+     *        This allows swaping of the active point object to overcome kvs limitation
+     *        where it doesn't detect that a single point object is modified and then re-added to the scene.
+     *
+     *        This is intended to replace the getObject() method of TimerEvent, but
+     *        is safer as the returned point object is guarantueed to be non-null.
+     */
+    class PointObjectProxy: public kvs::PointObject
+    {
+
+    private:
+        kvs::PointObject list[2];
+        int index=0;
+        kvs::PointObject* active(){
+            return &list[index];
+        }
+    public:
+
+        kvs::PointObject* swap(){
+            index=!index;
+        }
+        kvs::PointObject *operator->()
+        {
+            return active();
+        }
+        operator kvs::PointObject*(){
+            return active();
+        }
+    };
+    static PointObjectProxy m_point_object;
 public:
 
     explicit RenderArea( QWidget* parent_surface);
@@ -66,7 +100,26 @@ public:
     {
         m_renderer->recreateImageBuffer();
     }
-    kvs::PointObject* pobj;
+
+    static kvs::Xform getPointObjectXform()
+    {
+
+        if (m_point_object){
+            m_point_object->xform();
+        }
+    }
+
+    static void setPointObjectXform(kvs::Xform xf)
+    {
+        if(m_point_object){
+            m_point_object->setXform(xf);
+        }
+    }
+
+    void rendererAttachPointObject(const kvs::PointObject *point){
+        m_renderer->attachPointObject(point);
+    }
+
 
     //KVS2.7.0
     //MOD BY)T.Osaki 2020.05.28
@@ -104,8 +157,6 @@ public:
         else
             qt_timer->stop();
     }
-
-    ExtendedParticleVolumeRenderer* renderer(){return m_renderer;}
 private:
     int i_w=0;
     int i_h=0;

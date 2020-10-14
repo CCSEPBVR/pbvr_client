@@ -41,8 +41,14 @@ void Screen::paintGL()
     if (objectReplaced){
         objectReplaced=false;
     }
+    // Try to get paint_mutex lock.
+    // This is probably not needed any more
+    if (!paint_mutex.try_lock()){
+        qWarning("Screen could not get paint_mutex lock, skipping this frame");
+        update(); // Schedule new update
+        return;
+    }
     // Check and clear GL errors
-    paint_mutex.lock();
     while (e = glGetError()){
         qCritical("Screen::paintGL GL HAS ERROR BEFORE %d",e);
     }

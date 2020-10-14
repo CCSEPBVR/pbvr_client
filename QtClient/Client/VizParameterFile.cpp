@@ -392,9 +392,9 @@ int VizParameterFile::WriteParamFile( const char* fname )
 
 void VizParameterFile::ConversionFloatToClass()
 {
-#ifndef CPUMODE
-        exit(1);
-#else
+//#ifndef CPUMODE
+//        exit(1);
+//#else
     printf( "r :%f,%f,%f,%f,%f,%f,%f,%f,%f\n",
             g_ro[0][0], g_ro[0][1], g_ro[0][2],
             g_ro[1][0], g_ro[1][1], g_ro[1][2],
@@ -411,25 +411,29 @@ void VizParameterFile::ConversionFloatToClass()
     kvs::Matrix33f rotation_in( rr );
     kvs::Xform readxform( translation_in, scaling_in, rotation_in );
 
-    kvs::PointObject* object = RenderArea::g_timer_event->getPointObject();
-    if ( object )
-    {
-        object->setXform( readxform );
-    }
-#endif
+    RenderArea::setPointObjectXform(readxform);
+//    kvs::PointObject* object = RenderArea::g_timer_event->getPointObject();
+//    if ( object )
+//    {
+//        object->setXform( readxform );
+//    }
+//#endif
 }
 
 
 void VizParameterFile::ConversionClassToFloat()
 {
-#ifndef CPUMODE
-        exit(1);
-#else
-    kvs::PointObject* object = NULL;
-    object = RenderArea::g_timer_event->getPointObject();
-    if ( object )
-    {
-        kvs::Xform outxform = object->xform();
+//#ifndef CPUMODE
+//        exit(1);
+//#else
+//    kvs::PointObject* active_obj = NULL;
+//    object = RenderArea::g_timer_event->getPointObject();
+
+//    RenderArea::getPointObjectXform();
+//    if ( object )
+//    {
+//        kvs::Xform outxform = object->xform();
+        kvs::Xform outxform = RenderArea::getPointObjectXform();
         kvs::Matrix33f rotation_out( outxform.rotation() );
         kvs::Vector3f translation_out( outxform.translation() );
         kvs::Vector3f scaling_out( outxform.scaling() );
@@ -451,26 +455,26 @@ void VizParameterFile::ConversionClassToFloat()
         g_sc[0] = scaling_out[0];
         g_sc[1] = scaling_out[1];
         g_sc[2] = scaling_out[2];
-    }
-    else
-    {
-        g_ro[0][0] = 1.0;
-        g_ro[0][1] = 0.0;
-        g_ro[0][2] = 0.0;
-        g_ro[1][0] = 0.0;
-        g_ro[1][1] = 1.0;
-        g_ro[1][2] = 0.0;
-        g_ro[2][0] = 0.0;
-        g_ro[2][1] = 0.0;
-        g_ro[2][2] = 1.0;
+//    }
+//    else
+//    {
+//        g_ro[0][0] = 1.0;
+//        g_ro[0][1] = 0.0;
+//        g_ro[0][2] = 0.0;
+//        g_ro[1][0] = 0.0;
+//        g_ro[1][1] = 1.0;
+//        g_ro[1][2] = 0.0;
+//        g_ro[2][0] = 0.0;
+//        g_ro[2][1] = 0.0;
+//        g_ro[2][2] = 1.0;
 
-        g_tr[0] = 0.0;
-        g_tr[1] = 0.0;
-        g_tr[2] = 0.0;
+//        g_tr[0] = 0.0;
+//        g_tr[1] = 0.0;
+//        g_tr[2] = 0.0;
 
-        g_sc[0] = 1.0;
-        g_sc[1] = 1.0;
-        g_sc[2] = 1.0;
-    }
-#endif
+//        g_sc[0] = 1.0;
+//        g_sc[1] = 1.0;
+//        g_sc[2] = 1.0;
+//    }
+//#endif
 }
