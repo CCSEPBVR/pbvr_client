@@ -78,6 +78,15 @@ void TransferFuncEditor::apply()
     }
     std::cout<<"   "<<std::endl;
 
+
+    int n_select_color = ui->colormapFunction->currentIndex();
+    int n_select_opacity =ui->opacitymapFunction->currentIndex();
+
+     requested_opacity_min=m_doc.m_opacity_transfer_function.at(n_select_opacity).m_opacity_variable_min;
+     requested_opacity_max=m_doc.m_opacity_transfer_function.at(n_select_opacity).m_opacity_variable_max;
+     requested_color_min=m_doc.m_color_transfer_function.at(n_select_color).m_color_variable_min;
+     requested_color_max=m_doc.m_color_transfer_function.at(n_select_color).m_color_variable_max;
+
     extCommand->m_parameter.m_parameter_extend_transfer_function = m_doc;
     extCommand->m_screen->update();
 }
@@ -98,6 +107,10 @@ void TransferFuncEditor::connectSignalsToSlots()
     connect_T(ui->transfer_function_max_color,    QDoubleSpinBox,  valueChanged,double, &TransferFuncEditor::onTFmaxColorChanged);
     connect_T(ui->transfer_function_min_opacity,  QDoubleSpinBox,  valueChanged,double, &TransferFuncEditor::onTFminOpacityChanged);
     connect_T(ui->transfer_function_max_opacity,  QDoubleSpinBox,  valueChanged,double, &TransferFuncEditor::onTFmaxOpacityChanged);
+    connect_T(ui->transfer_function_min_opacity,  QDoubleSpinBox,  valueChanged,double, &TransferFuncEditor::onTFminOpacityChanged);
+    connect_T(ui->lock_color_range,               QToolButton,     clicked ,bool, &TransferFuncEditor::onLockColorRange);
+    connect_T(ui->lock_opacity_range,               QToolButton,     clicked ,bool, &TransferFuncEditor::onLockOpacityRange);
+
 
     connect_T(ui->colormapFunction,  QComboBox, currentIndexChanged, int, &TransferFuncEditor::onColorMapFunctionChanged);
     connect_T(ui->opacitymapFunction,QComboBox, currentIndexChanged, int, &TransferFuncEditor::onOpacityMapFunctionChanged);
@@ -119,8 +132,28 @@ void TransferFuncEditor::connectSignalsToSlots()
     //ADD BY)T.Osaki 2020.02.05
     //connect(ui->resolutionChange, &QPushButton::clicked,this,&TransferFuncEditor::onResolutionChangeButtonClicked);
 }
-
-
+void TransferFuncEditor::onLockOpacityRange(bool locked)
+{
+    std::cout<<"TransferFuncEditor::onLockOpacityRange  "<<locked<<std::endl;
+    ui->transfer_function_max_opacity->setDisabled(locked);
+    ui->transfer_function_min_opacity->setDisabled(locked);
+    if (locked){
+        ui->transfer_function_max_opacity->setValue(ui->range_max_opacity->text().toDouble());
+        ui->transfer_function_min_opacity->setValue(ui->range_min_opacity->text().toDouble());
+//        this->apply();
+    }
+}
+void TransferFuncEditor::onLockColorRange(bool locked)
+{
+    std::cout<<"TransferFuncEditor::onLockColorRange  "<<locked<<std::endl;
+    ui->transfer_function_max_color->setDisabled(locked);
+    ui->transfer_function_min_color->setDisabled(locked);
+    if (locked){
+        ui->transfer_function_max_color->setValue(ui->range_max_color->text().toDouble());
+        ui->transfer_function_min_color->setValue(ui->range_min_color->text().toDouble());
+//        this->apply();
+    }
+}
 /**
  * @brief TransferFuncEditor::exportFile, export the transfer function file
  * @param fname file name
@@ -437,8 +470,15 @@ void TransferFuncEditor::clearTransferFunction()
 
     ft=kvs::visclient::FrequencyTable( 0.0, 1.0, table.size(), table.data() );
     m_color_histogram->setTable( ft );
+    ui->color_hist_min->setNum(0.0);
+    ui->color_hist_max->setNum(1.0);
+
     ft= kvs::visclient::FrequencyTable( 0.0, 1.0, table.size(), table.data() );
     m_opacity_histogram->setTable( ft );
+    ui->opacity_hist_min->setNum(0.0);
+    ui->opacity_hist_max->setNum(1.0);
+
+
 
     ui->transfer_function_var_color->clear();
     ui->transfer_function_min_color->setValue(0.0);
@@ -480,8 +520,12 @@ void TransferFuncEditor::updateRangeView(){
         const kvs::visclient::FrequencyTable* freq_table = extCommand->m_result.findColorFrequencyTable(std::string(color_function_name));
         if ( freq_table != NULL ) {
             m_color_histogram->setTable( *freq_table );
-            m_color_histogram->setRange(ui->transfer_function_min_color->value(), ui->transfer_function_max_color->value());
+            m_color_histogram->setRange(ui->transfer_function_min_color->value(),ui->transfer_function_max_color->value() );
+            ui->color_hist_min->setNum(requested_color_min);
+            ui->color_hist_max->setNum(requested_color_max);
+
         }
+
     }
 
     if (trans_opacity != NULL) {
@@ -495,6 +539,8 @@ void TransferFuncEditor::updateRangeView(){
             m_opacity_histogram->setTable( *freq_table );
             // MODIFIED BY)T.Osaki 2019.12.20
             m_opacity_histogram->setRange(ui->transfer_function_min_opacity->value(), ui->transfer_function_max_opacity->value());
+            ui->opacity_hist_min->setNum(requested_opacity_min );
+            ui->opacity_hist_max->setNum(requested_opacity_max );
         }
     }
 
@@ -503,6 +549,21 @@ void TransferFuncEditor::updateRangeView(){
     ui->range_min_opacity->setText(QString::number( extCommand->m_result.m_var_range.min( tag_o )));
     ui->range_max_opacity->setText(QString::number( extCommand->m_result.m_var_range.max( tag_o )));
 
+    if(ui->lock_opacity_range->isChecked()){
+        ui->transfer_function_max_opacity->setValue(ui->range_max_opacity->text().toDouble());
+        ui->transfer_function_min_opacity->setValue(ui->range_min_opacity->text().toDouble());
+        requested_opacity_max=ui->range_max_opacity->text().toDouble();
+                 requested_opacity_min=ui->range_min_opacity->text().toDouble();
+    }
+    if (ui->lock_color_range->isChecked()){
+        ui->transfer_function_max_color->setValue(ui->range_max_color->text().toDouble());
+        ui->transfer_function_min_color->setValue(ui->range_min_color->text().toDouble());
+        requested_color_max=ui->range_max_color->text().toDouble();
+        requested_color_min=ui->range_min_color->text().toDouble();
+        extCommand->m_parameter.m_parameter_extend_transfer_function.m_color_transfer_function.at(n_select_color-1).m_color_variable_min =requested_color_min;
+        extCommand->m_parameter.m_parameter_extend_transfer_function.m_color_transfer_function.at(n_select_color-1).m_color_variable_max=requested_color_max;
+        extCommand->m_screen->update();
+    }
     m_color_histogram->update();
     m_opacity_histogram->update();
 
@@ -608,7 +669,10 @@ void TransferFuncEditor::onColorMapFunctionChanged(int index)
         const kvs::visclient::FrequencyTable* freq_table = extCommand->m_result.findColorFrequencyTable(trans_color->m_name);
         if ( freq_table != NULL ) {
             m_color_histogram->setTable( *freq_table );
+            ui->color_hist_min->setNum(requested_color_min);
+            ui->color_hist_max->setNum(requested_color_max);
         }
+
         ui->transfer_function_var_color->blockSignals(true);
         ui->transfer_function_min_color->blockSignals(true);
         ui->transfer_function_max_color->blockSignals(true);
@@ -769,6 +833,8 @@ void TransferFuncEditor::onOpacityMapFunctionChanged(int index)
         const kvs::visclient::FrequencyTable* freq_table = extCommand->m_result.findOpacityFrequencyTable(trans_opacity->m_name);
         if ( freq_table != NULL ) {
             m_opacity_histogram->setTable( *freq_table );
+            ui->opacity_hist_min->setNum(requested_opacity_min );
+            ui->opacity_hist_max->setNum(requested_opacity_max );
         }
 
         ui->transfer_function_var_opacity->blockSignals(true);
