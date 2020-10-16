@@ -19,12 +19,7 @@ class TimerEvent //: public kvs::TimerEventListener
 private:
     Command* m_command;
     ComThread* m_comthread;
-#ifdef CPUMODE
-    int m_object_id;
-    kvs::PointObject* m_front_object;
-    kvs::PointObject* m_back_object;
-    //kvs::ParticleVolumeRenderer* m_renderer;
-#endif
+
     RenderArea* m_screen;
     int m_interpolation_counter;
     int m_ninterpolation;
@@ -38,15 +33,7 @@ public:
     TimerEvent( Command* command, ComThread* comthread );
     void update( kvs::TimeEvent* event );
     void setScreen(RenderArea* screen){m_screen=screen;}
-#ifdef CPUMODE
-    ~TimerEvent();
-    void setObject( const int& id );
-    //	void setRenderer( kvs::ParticleVolumeRenderer* renderer );
-    kvs::PointObject* getPointObject()
-    {
-        return m_front_object;
-    }
-#endif
+
     void enableKeyFrameAnimation()
     {
         m_is_key_frame_animation = 1;
