@@ -21,8 +21,9 @@ QMAKE_CXXFLAGS_RELEASE += /MT
 QMAKE_CFLAGS_RELEASE -= -MD
 QMAKE_CXXFLAGS_RELEASE -= -MD
 }
+
 include(../SETTINGS.pri)
-message (Building PBVR:$${TARGET} -  Mode:$${PBVR_MODE}  - Platform: $${PLATFORM}  - ReleaseType: $${RELTYPE})
+message (Building PBVR:$${TARGET} - RenderMode:$${RENDER_MODE} Mode:$${PBVR_MODE}  - Platform: $${PLATFORM}  - ReleaseType: $${RELTYPE})
 
 #LINK EXTERNAL LIBS
 #LIBS += kvsCore.lib
@@ -73,12 +74,8 @@ FORMS += \
 RESOURCES += \
     resources.qrc
 
-
 PRE_TARGETDEPS += ../Client/$${LIB_PREFIX}Client$${LIB_SUFFIX}
 PRE_TARGETDEPS += ../QGlue/$${LIB_PREFIX}QGlue$${LIB_SUFFIX}
 PRE_TARGETDEPS += ../Panels/$${LIB_PREFIX}Panels$${LIB_SUFFIX}
 PRE_TARGETDEPS += ../Common/$${LIB_PREFIX}Common$${LIB_SUFFIX}
 PRE_TARGETDEPS += ../FunctionParser/$${LIB_PREFIX}pbvrFunc$${LIB_SUFFIX}
-
-
-
