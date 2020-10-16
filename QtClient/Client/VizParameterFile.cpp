@@ -390,7 +390,7 @@ int VizParameterFile::WriteParamFile( const char* fname )
     return 0;
 }
 
-void VizParameterFile::ConversionFloatToClass()
+kvs::Xform VizParameterFile::ConversionFloatToClass( )
 {
 //#ifndef CPUMODE
 //        exit(1);
@@ -411,7 +411,7 @@ void VizParameterFile::ConversionFloatToClass()
     kvs::Matrix33f rotation_in( rr );
     kvs::Xform readxform( translation_in, scaling_in, rotation_in );
 
-    RenderArea::setPointObjectXform(readxform);
+    return readxform;
 //    kvs::PointObject* object = RenderArea::g_timer_event->getPointObject();
 //    if ( object )
 //    {
@@ -421,7 +421,7 @@ void VizParameterFile::ConversionFloatToClass()
 }
 
 
-void VizParameterFile::ConversionClassToFloat()
+void VizParameterFile::ConversionClassToFloat(kvs::Xform outxform)
 {
 //#ifndef CPUMODE
 //        exit(1);
@@ -433,7 +433,7 @@ void VizParameterFile::ConversionClassToFloat()
 //    if ( object )
 //    {
 //        kvs::Xform outxform = object->xform();
-        kvs::Xform outxform = RenderArea::getPointObjectXform();
+//        kvs::Xform outxform = RenderArea::getPointObjectXform();
         kvs::Matrix33f rotation_out( outxform.rotation() );
         kvs::Vector3f translation_out( outxform.translation() );
         kvs::Vector3f scaling_out( outxform.scaling() );

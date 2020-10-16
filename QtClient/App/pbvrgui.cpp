@@ -395,13 +395,14 @@ void PBVRGUI::onImportMenuAction()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Import Parameter File"), ".", tr("Parameter Files (*.ini *.INI *.*)"));
     if (!fileName.isEmpty()){
-        VizParameterFile::ConversionClassToFloat();
+        VizParameterFile::ConversionClassToFloat(kvs_renderarea->getPointObjectXform());
         VizParameterFile::ReadParamFile( fileName.toStdString().c_str());
         tf_editor.importFile( fileName.toStdString());
         coordinatePanel.setUISynthesizer();
         legendPanel.importFile(fileName.toStdString().c_str());
         legendPanel.set2UI();
-        VizParameterFile::ConversionFloatToClass();
+        kvs::Xform xf = VizParameterFile::ConversionFloatToClass();
+        kvs_renderarea->setPointObjectXform(xf);
         kvs_renderarea->redraw();
     }
 }
@@ -413,7 +414,7 @@ void PBVRGUI::onExportMenuAction()
         fileName += ".ini";
     }
     if (!fileName.isEmpty()){
-        VizParameterFile::ConversionClassToFloat();
+        VizParameterFile::ConversionClassToFloat(kvs_renderarea->getPointObjectXform());
         VizParameterFile::WriteParamFile( fileName.toStdString().c_str() ); // APPEND BY)M.Tanaka 2015.03.03
         tf_editor.exportFile( fileName.toStdString(), true ); // APPEND Fj 2015.03.05
         legendPanel.exportFile( fileName.toStdString() );
