@@ -48,14 +48,11 @@ public:
     }
     void toggleKeyFrameAnimation()
     {
-        m_is_key_frame_animation = ( m_is_key_frame_animation ) ? 0 : 1;
-        if ( m_is_key_frame_animation )
-        {
-            m_command->m_is_key_frame_animation = true;
+        if (m_is_key_frame_animation){
+            disableKeyFrameAnimation();
         }
-        else
-        {
-            m_command->m_is_key_frame_animation = false;
+        else{
+            enableKeyFrameAnimation();
         }
     }
     int getTimeStep()
