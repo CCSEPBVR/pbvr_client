@@ -80,10 +80,35 @@ int FunctionListEditor::save()
         this->setMessage("[Error] Invalid transfer function.");
         return -1;
     }
-    std::vector<NamedTransferFunctionParameter>::iterator edit_itr;
-    std::vector<NamedTransferFunctionParameter>::iterator save_itr;
 
-    *m_original_transfer_function = m_edit_transfer_function;
+
+//    *m_original_transfer_function = m_edit_transfer_function
+
+    // Changed by Martin - oct 13 2020
+    //
+    //  FunctionListEditor::setTransferFunctionParameterList only copies in m_opacity_variable,
+    //  and m_color_variable from  *m_original_transfer_function.  This means m_edit_transfer_function
+    //  is incomplete - and can m_original_transfer_function can not be restored by simple
+    //  *m_original_transfer_function = m_edit_transfer_function
+    //
+    //  (In the current status, it wont help to add a fix to setTransferFunctionParameterList to copy
+    //  range variables, as m_doc may still be incomplete when TransferFunctionEditor sets up this dialog)
+
+    NamedTransferFunctionParameter edit_ntfp;
+
+    for (size_t i=0; i< m_edit_transfer_function.size(); i++){
+        edit_ntfp=m_edit_transfer_function[i];
+        if (edit_ntfp.m_name.substr(0, 1) == "O" && this->m_dialogtype == OPACITY_FUNCTION_DIALOG) {
+            m_original_transfer_function->at(i).m_opacity_variable = edit_ntfp.m_opacity_variable;
+        }
+        if (edit_ntfp.m_name.substr(0, 1) == "C" && this->m_dialogtype == COLOR_FUNCTION_DIALOG) {
+            m_original_transfer_function->at(i).m_color_variable = edit_ntfp.m_color_variable;
+        }
+    }
+
+
+    //    std::vector<NamedTransferFunctionParameter>::iterator edit_itr;
+    //    std::vector<NamedTransferFunctionParameter>::iterator save_itr;
     //    for (edit_itr = this->m_edit_transfer_function.begin(); edit_itr != this->m_edit_transfer_function.end(); edit_itr++) {
     //        NamedTransferFunctionParameter edit_trans = (*edit_itr);
     //        bool exists = false;
@@ -302,10 +327,12 @@ void FunctionListEditor::onSelectButtonClicked()
     //    }
     //    this->hide();
     this->setMessage("");
-    if (m_dialogtype ==COLOR_FUNCTION_DIALOG )
-        this->m_parent->selectTransferFunctionEditorColorFunction(curr_line);
-    if (m_dialogtype==OPACITY_FUNCTION_DIALOG)
-        this->m_parent->selectTransferFunctionEditorOpacityFunction(curr_line);
+
+    // Martin changed - caller will show dialog as modal and handle update.
+//    if (m_dialogtype ==COLOR_FUNCTION_DIALOG )
+//        this->m_parent->selectTransferFunctionEditorColorFunction(curr_line);
+//    if (m_dialogtype==OPACITY_FUNCTION_DIALOG)
+//        this->m_parent->selectTransferFunctionEditorOpacityFunction(curr_line);
     this->accept();
 }
 
