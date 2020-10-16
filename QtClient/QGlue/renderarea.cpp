@@ -1,26 +1,14 @@
-//KVS2.7.0
-//ADD BY)T.Osaki 2020.06.08
-//#include <GL/glew.h>
-//#include <QOpenGLContext>
 #include "screen.h"
 #include "QGlue/renderarea.h"
 
-//#include <QApplication>
 #include <QDesktopWidget>
 
-
-//#include "Client/VizParameterFile.h"
 #include "Client/KeyFrameAnimation.h"
 #include "Panels/animationcontrols.h"
 
 #include <Client/timer_simple.h>
-//#include <QElapsedTimer>
-//#include <QMutex>
-//#include <QThread>
 #include <QDebug>
 #include <QKeyEvent>
-//#include <QGlue/extCommand.h>
-//#include <QGlue/timer.h>
 
 #include <Client/v3defines.h>
 
@@ -45,17 +33,10 @@ RenderArea::RenderArea( QWidget* parent_surface):
     pixelRatio= QApplication::desktop()->devicePixelRatioF();
 
     this->m_scene->background()->setColor( kvs::RGBAColor(0,0,22,1.0f) );
-
-//    m_renderer= new kvs::glsl::ParticleBasedRenderer();
     this->i_w= 620;//Qthis->width();
     this->i_h= 620;//Qthis->height();
     this->setSize(i_w,i_h);
     std::cout<< "RenderArea::RenderArea"<<std::endl;
-    kvs::ValueArray<kvs::Real32> coords( 3 );
-    kvs::RGBColor color( 0, 0, 0 );
-    kvs::ValueArray<kvs::Real32> normals( 3 );
-    m_control_object = new kvs::PointObject( coords, color, normals, 1.0 );
-//    this->attachPointObject(m_control_object);
     m_stepLabel =new QGlue::StepLabel(this,extCommand);
     m_stepLabel->setPosition(150*pixelRatio,50);
     m_labels.append(m_stepLabel);
@@ -93,8 +74,8 @@ void RenderArea::updateCommandInfo(ExtCommand* extCommand)
     kvs::PointObject* object1 = extCommand->m_abstract_particles[0];
     const kvs::Vector3f& min = object1->minObjectCoord();
     const kvs::Vector3f& max = object1->maxObjectCoord();
-    m_control_object->setMinMaxObjectCoords( min, max );
-    m_control_object->setMinMaxExternalCoords( min, max );
+    m_point_object->setMinMaxObjectCoords( min, max );
+    m_point_object->setMinMaxExternalCoords( min, max );
 
     // Setup Extended Particle Volume Renderer
     m_renderer = new kvs::visclient::ExtendedParticleVolumeRenderer( *object1, extCommand->m_parameter.m_detailed_subpixel_level, extCommand->m_parameter.m_detailed_repeat_level );
@@ -109,7 +90,7 @@ void RenderArea::updateCommandInfo(ExtCommand* extCommand)
     m_labels.append(m_fpsLabel);
 
     this->setShaderParams();
-    this->redraw();
+    Screen::update();
     this->setFocus();
 }
 
@@ -194,23 +175,6 @@ void RenderArea::setupEventHandlers()
 //    qt_timer->setScreen(this);
 
     g_timer_event=new kvs::visclient::TimerEvent( extCommand,&extCommand->comthread );
-#ifdef CPUMODE
-    std::pair<int, int> id_pair;
-    //KVS2.7.0
-    //MOD BY)T.Osaki 2020.07.20
-    //    id_pair = this->registerObject( m_control_object, extCommand->m_renderer );
-    id_pair = this->m_scene->registerObject( m_control_object, m_renderer );
-    std::cout << *m_scene->objectManager() << std::endl;
-    g_timer_event->setObject( id_pair.first );
-//    g_timer_event->setRenderer(m_renderer);
-#else
-    //    this->registerObject( m_control_object, extCommand->renderer );
-    //    this->m_scene->registerObject( m_control_object, extCommand->m_renderer );
-
-#endif
-    //KVS2.7.0
-    //ADD BY)T.Osaki  2020.06.19
-//    g_timer_event->setScene( m_scene );
     g_timer_event->setScreen( this );
     qt_timer->setEventListener( g_timer_event );
     qt_timer->start();
@@ -234,10 +198,8 @@ void RenderArea::attachPointObject(const kvs::PointObject* point)
         return;
     }
     if (point->coords().size() <= 3){
-        // The cause of this condition should be found
-        // This is probably reduntant , after adding CurrentThread() check.
-          qCritical("RenderArea::attachPointObject ignoring point object with zero or single point\n" );
-          assert(false);
+        qCritical("RenderArea::attachPointObject.  PointObject with single point attached t\n" );
+
     }
     m_point_object.swap();
     m_point_object->clear();
@@ -271,8 +233,8 @@ void RenderArea::setCoordinateBoundaries(float  crd[6])
     //MOD BY)T.Osaki 2020.07.20
 //    this->m_scene->objectManager()->object()->setMinMaxObjectCoords( min_t, max_t );
 //    this->m_scene->objectManager()->object()->setMinMaxExternalCoords( min_t, max_t );
-    this->m_control_object->setMinMaxObjectCoords(min_t,max_t);
-    this->m_control_object->setMinMaxExternalCoords(min_t,max_t);
+    m_point_object->setMinMaxObjectCoords(min_t,max_t);
+    m_point_object->setMinMaxExternalCoords(min_t,max_t);
 
     this->m_scene->objectManager()->updateExternalCoords();
     if(m_reset_count == 0){
@@ -387,7 +349,7 @@ void RenderArea::setShaderParams( )
  */
 void RenderArea::keyPressEvent(QKeyEvent *kbEvent){
 
-    //unicode() returns const QChar*. QChar::unicode returns ushort
+    // unicode() returns const QChar*. QChar::unicode returns ushort
     ushort ucode=kbEvent->text().unicode()->unicode();
     qInfo()<<"@@@ KVSRenderArea::keyPressEvent :"<<ucode;
 
@@ -411,7 +373,7 @@ void RenderArea::keyPressEvent(QKeyEvent *kbEvent){
 
     case kvs::Key::x:
         qInfo(" [debug] 'x' pressed. (add Xform)");
-        KeyFrameAnimationAdd();
+        KeyFrameAnimationAdd(this->getPointObjectXform());
         break;
     case kvs::Key::d:
         qInfo(" [debug] 'd' pressed. (delete last Xform)");
@@ -458,7 +420,7 @@ void RenderArea::keyPressEvent(QKeyEvent *kbEvent){
  */
 //MOD BY)T.Osaki 2020.06.29
 //void    RenderArea::ScreenShot( kvs::ScreenBase* screen, const int tstep )
-void    RenderArea::ScreenShot( kvs::Scene* screen, const int tstep )
+void    RenderArea::ScreenShot( kvs::Scene* scene, const int tstep )
 {
 
     std::stringstream step;
@@ -472,7 +434,7 @@ void    RenderArea::ScreenShot( kvs::Scene* screen, const int tstep )
 
         //KVS2.7.0
         //MOD BY)T.Osaki 2020.07.20
-        screen->screen()->redraw();
+        scene->screen()->redraw();
 
         step << '.' << std::setw( 5 ) << std::setfill( '0' ) << tstep;
 
@@ -506,7 +468,7 @@ void    RenderArea::ScreenShot( kvs::Scene* screen, const int tstep )
  */
 //MOD BY)T.Osaki 2020.06.29
 //void    RenderArea::ScreenShotKeyFrame( kvs::ScreenBase* screen, const int tstep )
-void    RenderArea::ScreenShotKeyFrame( kvs::Scene* screen, const int tstep )
+void    RenderArea::ScreenShotKeyFrame( kvs::Scene* scene, const int tstep )
 {
 
     std::stringstream step;
@@ -520,7 +482,7 @@ void    RenderArea::ScreenShotKeyFrame( kvs::Scene* screen, const int tstep )
 
         //KVS2.7.0
         //MOD BY)T.Osaki 2020.07.20
-        screen->screen()->redraw();
+        scene->screen()->redraw();
 
         step << '.' << std::setw( 6 ) << std::setfill( '0' ) << tstep;
 
@@ -530,8 +492,6 @@ void    RenderArea::ScreenShotKeyFrame( kvs::Scene* screen, const int tstep )
         std::string filename = ac_params.m_image_file + "_k" + step.str() + ".bmp";
 #endif
 
-        //        kvs::ColorImage image( screen->camera()->snapshot() );
-        //        image.write( filename.c_str() );
         QImage image= extCommand->m_screen->grabFramebuffer();
         image.save(QString(filename.c_str()));
 

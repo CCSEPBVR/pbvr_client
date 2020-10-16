@@ -70,12 +70,12 @@ public:
     //MOD BY)T.Osaki 2020.06.29
     //static void ScreenShot( kvs::ScreenBase* screen, const int tstep );
     //static void ScreenShotKeyFrame( kvs::ScreenBase* screen, const int tstep );
-    static void ScreenShot( kvs::Scene* screen, const int tstep );
-    static void ScreenShotKeyFrame( kvs::Scene* screen, const int tstep );
+    static void ScreenShot( kvs::Scene* scene, const int tstep );
+    static void ScreenShotKeyFrame( kvs::Scene* scene, const int tstep );
 
     void drawLabelList( QList<QGlue::Label*> list,QColor fontColor);
     void keyPressEvent(QKeyEvent *kbEvent);
-//    void redraw( void ){ this->update();}
+    //    void redraw( void ){ this->update();}
 
     void setCoordinateBoundaries(float  crd[6]);
     void setGeometry( QRect geom );
@@ -101,31 +101,22 @@ public:
         m_renderer->recreateImageBuffer();
     }
 
-    static kvs::Xform getPointObjectXform()
+    kvs::Xform getPointObjectXform()
     {
-
-        if (m_point_object){
-            m_point_object->xform();
-        }
+        return  m_point_object->xform();
     }
 
-    static void setPointObjectXform(kvs::Xform xf)
+    void setPointObjectXform(kvs::Xform xf)
     {
-        if(m_point_object){
-            m_point_object->setXform(xf);
-        }
-    }
-
-    void rendererAttachPointObject(const kvs::PointObject *point){
-        m_renderer->attachPointObject(point);
+        m_point_object->setXform(xf);
     }
 
 
     //KVS2.7.0
     //MOD BY)T.Osaki 2020.05.28
     //DEL BY)T.Osaki 2020.06.15
-//    int show( void ){QOpenGLWidget::show(); return 1;}
-//    void show( void ){QOpenGLWidget::show();}
+    //    int show( void ){QOpenGLWidget::show(); return 1;}
+    //    void show( void ){QOpenGLWidget::show();}
     void updateCommandInfo(ExtCommand* command_q);
 
 public:
@@ -133,8 +124,6 @@ public:
     static kvs::visclient::TimerEvent* g_timer_event;
 
     size_t frame_number=0;
-//    QTimer*     m_idle_mouse_timer;
-//    QPainter    m_painter; // Shouldn't be public, but used by orientation axis
 
     QGlue::StepLabel*       m_stepLabel=NULL;
     QGlue::FPSLabel*        m_fpsLabel=NULL;
@@ -142,12 +131,10 @@ public:
     QGlue::OrientationAxis* m_orientation_axis=NULL;
     QGlue::Timer*           qt_timer;
 
-    kvs::PointObject*  m_control_object;
-
     QList<QGlue::Label*>     m_labels;
     //KVS2.7.0
     //MOD BY)T.Osaki 2020.07.20
-//    kvs::Scene* m_scene;
+    //    kvs::Scene* m_scene;
 
     std::pair<int, int> obj_id_pair;
     void attachPointObject(const kvs::PointObject *point);
