@@ -33,7 +33,6 @@
 #include "v3defines.h"
 using namespace kvs::visclient;
 
-#define CPUMODE
 // APPEND START fp)m.tanaka 2013.09.01
 int subpixellevela = PBVR_SUB_PIXEL_LEVEL_ABSTRACT;
 int subpixelleveld = PBVR_SUB_PIXEL_LEVEL_DETAILED;
@@ -254,11 +253,6 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
                 if ( param->m_detailed_transfer_type == VisualizationParameter::Divided )
                 {
                     std::cout << "*** param->m_detailed_transfer_type == PBVRParam::Divided" << std::endl;
-//#ifndef CPUMODE
-////                    std::cout << "param->m_repeat_level=" << param->m_repeat_level << " param->abstractRepeatLevel =" << param->m_abstract_repeat_level << std::endl;
-////                    if ( param->m_repeat_level == param->m_abstract_repeat_level )
-////                    {
-//#endif
                         // サーバにないステップは対象としない 2018.12.19 start
                         int stepno;
                         if ((stepno = getServerStep(param)) >= 0){
@@ -276,32 +270,6 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
                         else if (param->m_client_server_mode == 0  ){
                             if (m_abstract_particles[param->m_time_step]) delete m_abstract_particles[param->m_time_step];
                         }
-//#ifndef CPUMODE
-//                    }
-//                    else if (param->m_repeat_level < param->m_abstract_repeat_level  )
-//                    {
-
-//                        kvs::visclient::VisualizationParameter& pref=*param;
-//                        const kvs::visclient::VisualizationParameter cpref=
-//                                const_cast< const kvs::visclient::VisualizationParameter&>(pref);
-//                        PointObject* m_dividedObject = m_server->getPointObjectFromServer( pref, result, numvol, getServerStep(param) );
-//                        // ADD START FEAST 2016.01.07
-//                        if ( m_dividedObject == NULL )
-//                        {
-//                            m_timectrl_panel->toggleStop(true);
-//                        }
-//                        else
-//                        {
-//                            m_abstract_particles[param->m_time_step]->add( *m_dividedObject );
-//                            delete m_dividedObject;
-//                        }
-//                        // ADD END FEAST 2016.01.07
-//                    }
-//                    else
-//                    {
-//                        assert( false );
-//                    }
-//#endif
                 }
                 else if ( param->m_detailed_transfer_type == VisualizationParameter::Summalized )
                 {
@@ -332,10 +300,6 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
                 if ( param->m_detailed_transfer_type == VisualizationParameter::Divided )
                 {
                     qInfo(" *** Command::update::2::abstract::Divided starts *** %d",QThread::currentThreadId() );
-//#ifndef CPUMODE
-//                    if (param->m_repeat_level == param->m_detailed_repeat_level )
-//                    {
-//#endif
                         // サーバにないステップは対象としない 2018.12.19 start
                         int stepno;
                         if ((stepno = getServerStep(param)) >= 0 ){
@@ -352,32 +316,6 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
                         else if (param->m_client_server_mode == 0  ){
                             if (m_detailed_particles[param->m_time_step]) delete m_detailed_particles[param->m_time_step];
                         }
-//#ifndef CPUMODE
-//                    }
-//                    else if (param->m_repeat_level == param->m_detailed_repeat_level )
-//                    {
-
-//                        kvs::visclient::VisualizationParameter& pref=*param;
-//                        const kvs::visclient::VisualizationParameter cpref=
-//                                const_cast< const kvs::visclient::VisualizationParameter&>(pref);
-//                        PointObject* m_dividedObject = m_server->getPointObjectFromServer( pref, result, numvol ,getServerStep(param));
-//                        // ADD START FEAST 2016.01.07
-//                        if ( m_dividedObject == NULL )
-//                        {
-//                            m_timectrl_panel->toggleStop(true);
-//                        }
-//                        else
-//                        {
-//                            m_detailed_particles[param->m_time_step]->add( *m_dividedObject );
-//                            delete m_dividedObject;
-//                        }
-//                        // ADD END FEAST 2016.01.07
-//                    }
-//                    else
-//                    {
-//                        assert( false );
-//                    }
-//#endif
                 }
                 else if ( param->m_detailed_transfer_type == VisualizationParameter::Summalized )
                 {
@@ -502,9 +440,6 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
         {
             m_local_subpixel_level = object->size( 0 );
         }
-
-
-
 
         size_t m_time_step = std::max( param->m_min_time_step, std::min( param->m_max_time_step, param->m_time_step ) );
         param->m_time_step = m_time_step;
@@ -770,37 +705,12 @@ void Command::postUpdate()
     }else{
         m_parameter.m_detailed_subpixel_level = m_local_subpixel_level;
     }
-//#ifdef CPUMODE
+
     m_screen->setRenderSubPixelLevel(m_parameter.m_detailed_subpixel_level);
     m_screen->recreateRenderImageBuffer();
-//#endif
+
     PBVR_TIMER_STA( 150 );
 
-//#ifndef CPUMODE
-//    if ( m_parameter.m_transfer_type == VisualizationParameter::Abstract )
-//    {
-//#ifndef CPUMODE
-//        m_screen->setRenderRepetionlLevel( m_parameter.m_abstract_repeat_level );
-//#endif
-//        m_screen->setRenderSubPixelLevel( m_parameter.m_abstract_subpixel_level );
-//        PointObject* object = m_abstract_particles[m_parameter.m_time_step];
-//        m_screen->attachPointObject(object );
-////        m_renderer->changePointObject( cpobj );
-//    }
-//    else if ( m_parameter.m_transfer_type == VisualizationParameter::Detailed )
-//    {
-//#ifndef CPUMODE
-////        m_renderer->setRepetitionLevel( m_parameter.m_repeat_level );
-//#endif
-//        m_screen->setRenderSubPixelLevel( m_parameter.m_detailed_subpixel_level );
-//        PointObject* object = m_detailed_particles[m_parameter.m_time_step];
-//        m_screen->attachPointObject(object );
-//    }
-//    else
-//    {
-//        assert( false );
-//    }
-//#endif
 
     if ( pretimestep != TimecontrolPanel::g_curStep )
     {

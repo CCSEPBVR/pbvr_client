@@ -57,11 +57,6 @@ Timer::Timer( int msec , ExtCommand* command ):
     m_comthread( &command->comthread ),
     m_screen(command->m_screen)
 {
-//#ifdef CPUMODE
-////    m_front_object = NULL;
-////    m_back_object=NULL;
-//#endif
-
     m_is_key_frame_animation = 0;
     m_is_ready = 0;
     m_interpolation_counter = 0;
@@ -237,7 +232,6 @@ void Timer::comThreadExitEvent()
     m_command->postUpdate();
 
     bool view_flag = false;
-#ifdef CPUMODE
 
     if ( m_command->m_is_under_animation && m_command->m_particle_assign_flag )
     {
@@ -245,12 +239,12 @@ void Timer::comThreadExitEvent()
         if ( m_command->m_parameter.m_transfer_type == VisualizationParameter::Abstract )
         {
             *m_front_object = *( m_command->m_abstract_particles[m_command->m_parameter.m_time_step] );
-            m_renderer->setSubpixelLevel( m_command->m_parameter.m_abstract_subpixel_level );
+            m_screen->setRenderSubPixelLevel(m_command->m_parameter.m_abstract_subpixel_level );
         }
         else if ( m_command->m_parameter.m_transfer_type == VisualizationParameter::Detailed )
         {
             *m_front_object = *( m_command->m_detailed_particles[m_command->m_parameter.m_time_step] );
-            m_renderer->setSubpixelLevel( m_command->m_parameter.m_detailed_subpixel_level );
+            m_screen->setRenderSubPixelLevel( m_command->m_parameter.m_detailed_subpixel_level );
         }
         else
         {
@@ -258,8 +252,8 @@ void Timer::comThreadExitEvent()
         }
 
         if ( m_command->m_parameter.m_shading_type_flag )
-            m_renderer->enableShading();
-        m_renderer->attachPointObject( m_front_object );
+            m_screen->enableRendererShading();
+        m_screen->attachPointObject( m_front_object );
 
         delete m_front_object;
         //KVS2.7.0
@@ -273,7 +267,6 @@ void Timer::comThreadExitEvent()
 
         m_command->m_particle_assign_flag = false;
     }
-#endif
 
     if ( m_command->m_parameter.m_time_step == m_command->m_parameter.m_time_step_key_frame )
     {
@@ -319,27 +312,13 @@ void Timer::comThreadExitEvent()
         }
         if ( m_command->m_parameter.m_transfer_type == VisualizationParameter::Detailed )
         {
-//#ifndef CPUMODE
-//            if ( m_command->m_parameter.m_repeat_level == m_command->m_parameter.m_detailed_repeat_level )
-//            {
-//#endif
                 TimecontrolPanel::g_curStep = m_command->m_parameter.m_time_step;
                 m_command->m_parameter.m_time_step++;
-//#ifndef CPUMODE
-//            }
-//#endif
         }
         else if ( m_command->m_parameter.m_transfer_type == VisualizationParameter::Abstract )
         {
-//#ifndef CPUMODE
-//            if ( m_command->m_parameter.m_repeat_level == m_command->m_parameter.m_abstract_repeat_level )
-//            {
-//#endif
                 TimecontrolPanel::g_curStep = m_command->m_parameter.m_time_step;
                 m_command->m_parameter.m_time_step++;
-//#ifndef CPUMODE
-//            }
-//#endif
         }
     }
     if ( m_command->m_parameter.m_time_step > m_command->m_timectrl_panel->maxValue() ) //99) {
@@ -399,7 +378,6 @@ void Timer::animate()
             {
                 m_is_ready = 0;
             }
-//#ifdef CPUMODE
             if ( m_is_ready )
             {
                 if ( m_interpolation_counter < m_ninterpolation )
@@ -411,7 +389,6 @@ void Timer::animate()
                     m_interpolation_counter = t;
                 }
             }
-//#endif
         }
         else
         {
@@ -419,20 +396,17 @@ void Timer::animate()
             {
                 m_is_ready = 0;
             }
-//#ifdef CPUMODE
             if ( m_is_ready )
             {
                 if ( m_interpolation_counter < m_ninterpolation )
                 {
                     kvs::Xform Xform_new = InterpolateXform( t, m_ninterpolation, m_xforms->at( i ), m_xforms->at( i + 1 ) );
-//                    m_front_object->setXform( Xform_new );
                     m_screen->setPointObjectXform(Xform_new);
                     m_command->m_step_key_frame++;
                     t++;
                     m_interpolation_counter = t;
                 }
             }
-//#endif
         }
     }
     else

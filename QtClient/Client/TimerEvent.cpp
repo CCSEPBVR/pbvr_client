@@ -234,7 +234,6 @@ void TimerEvent::update( kvs::TimeEvent* event )
                 {
                     m_is_ready = 0;
                 }
-//#ifdef CPUMODE
                 if ( m_is_ready )
                 {
                     if ( m_interpolation_counter < m_ninterpolation )
@@ -247,7 +246,6 @@ void TimerEvent::update( kvs::TimeEvent* event )
                         m_interpolation_counter = t;
                     }
                 }
-//#endif
             }
             else
             {
@@ -255,7 +253,6 @@ void TimerEvent::update( kvs::TimeEvent* event )
                 {
                     m_is_ready = 0;
                 }
-//#ifdef CPUMODE
                 if ( m_is_ready )
                 {
                     if ( m_interpolation_counter < m_ninterpolation )
@@ -268,7 +265,7 @@ void TimerEvent::update( kvs::TimeEvent* event )
                         m_interpolation_counter = t;
                     }
                 }
-//#endif
+
             }
         }
         else
@@ -282,10 +279,7 @@ void TimerEvent::update( kvs::TimeEvent* event )
         }
     }
 
-//#ifdef CPUMODE
     m_screen->update();
-//#endif
-//    m_command->reDraw();
 
     if ( m_is_key_frame_animation && m_command->m_previous_key_frame != m_command->m_step_key_frame )
     {

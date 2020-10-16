@@ -392,9 +392,6 @@ int VizParameterFile::WriteParamFile( const char* fname )
 
 kvs::Xform VizParameterFile::ConversionFloatToClass( )
 {
-//#ifndef CPUMODE
-//        exit(1);
-//#else
     printf( "r :%f,%f,%f,%f,%f,%f,%f,%f,%f\n",
             g_ro[0][0], g_ro[0][1], g_ro[0][2],
             g_ro[1][0], g_ro[1][1], g_ro[1][2],
@@ -423,17 +420,6 @@ kvs::Xform VizParameterFile::ConversionFloatToClass( )
 
 void VizParameterFile::ConversionClassToFloat(kvs::Xform outxform)
 {
-//#ifndef CPUMODE
-//        exit(1);
-//#else
-//    kvs::PointObject* active_obj = NULL;
-//    object = RenderArea::g_timer_event->getPointObject();
-
-//    RenderArea::getPointObjectXform();
-//    if ( object )
-//    {
-//        kvs::Xform outxform = object->xform();
-//        kvs::Xform outxform = RenderArea::getPointObjectXform();
         kvs::Matrix33f rotation_out( outxform.rotation() );
         kvs::Vector3f translation_out( outxform.translation() );
         kvs::Vector3f scaling_out( outxform.scaling() );
