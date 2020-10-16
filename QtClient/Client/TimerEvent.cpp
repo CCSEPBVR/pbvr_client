@@ -149,31 +149,17 @@ void TimerEvent::update( kvs::TimeEvent* event )
             }
             if ( m_command->m_parameter.m_transfer_type == VisualizationParameter::Detailed )
             {
-//#ifndef CPUMODE
-//                if (m_command->m_parameter.m_repeat_level ==m_command->m_parameter.m_detailed_repeat_level)
-//                {
-//#endif
                     TimecontrolPanel::g_curStep = m_command->m_parameter.m_time_step;
 					#ifdef CS_MODE
                     m_command->m_parameter.m_time_step++;
 					#endif
-//#ifndef CPUMODE
-//                }
-//#endif
             }
             else if ( m_command->m_parameter.m_transfer_type == VisualizationParameter::Abstract )
             {
-//#ifndef CPUMODE
-//                if (m_command->m_parameter.m_repeat_level ==m_command->m_parameter.m_abstract_repeat_level )
-//                {
-//#endif
                     TimecontrolPanel::g_curStep = m_command->m_parameter.m_time_step;
 					#ifdef CS_MODE
                     m_command->m_parameter.m_time_step++;
 					#endif
-//#ifndef CPUMODE
-//                }
-//#endif
             }
         }
         if ( m_command->m_parameter.m_time_step > m_command->m_timectrl_panel->maxValue() ) //99) {

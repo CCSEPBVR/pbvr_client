@@ -13,12 +13,6 @@
 #include "Client/ComThread.h"
 #include "extCommand.h"
 
-//#ifdef CPUMODE
-
-//#else
-//#include "kvs/ParticleVolumeRenderer"
-//#endif
-
 class RenderArea;
 using namespace kvs::visclient;
 namespace QGlue
@@ -46,15 +40,9 @@ private:
     Command* m_command;
     ComThread* m_comthread;
     bool oneShot=true;
-//#ifdef CPUMODE
-////    int m_object_id;
-////    kvs::PointObject* m_front_object;
-////    kvs::PointObject* m_back_object;
-////    kvs::ParticleVolumeRenderer* m_renderer;
-//#endif
-//#else
+
     kvs::visclient::ExtendedParticleVolumeRenderer* m_renderer;
-//#endif
+
     int m_interpolation_counter;
     int m_ninterpolation;
     int m_is_key_frame_animation;
