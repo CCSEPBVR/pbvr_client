@@ -2,7 +2,7 @@
 #define PBVR__KEY_FRAME_ANIMATION_H_INCLUDE
 
 extern void KeyFrameAnimationInit();
-extern int  KeyFrameAnimationAdd();
+extern int  KeyFrameAnimationAdd( kvs::Xform xform);
 extern void KeyFrameAnimationStart();
 extern void KeyFrameAnimationStop();
 extern void KeyFrameAnimationToggle();

@@ -42,21 +42,21 @@ void KeyFrameAnimationInit()
 
 
 // Add Xform
-int KeyFrameAnimationAdd()
+int KeyFrameAnimationAdd(kvs::Xform xform)
 {
     qInfo(" $$$$ KeyFrameAnimationAdd()");
     RenderArea::g_timer_event->disableKeyFrameAnimation();
-#ifdef CPUMODE
-    kvs::PointObject* object = RenderArea::g_timer_event->getPointObject();
-    if ( object )
-    {
+//#ifdef CPUMODE
+//    kvs::PointObject* object = RenderArea::g_timer_event->getPointObject();
+//    if ( object )
+//    {
 
-        kvs::Xform xform = object->xform();
+//        kvs::Xform xform = object->xform();
         m_xforms.push_back( xform );
         m_time_steps.push_back( RenderArea::g_timer_event->getTimeStep() );
         qInfo("   $ has object, num frames: %d", m_xforms.size());
-    }
-#endif
+//    }
+//#endif
     int ValueNumKeyFrames = m_xforms.size();
     AnimationControls::RedrawAnimationControl(ValueNumKeyFrames);
     return m_xforms.size();
