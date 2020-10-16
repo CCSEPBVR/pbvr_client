@@ -8,7 +8,6 @@
 #include <kvs/ScreenBase>
 #include <kvs/Scene>
 
-class SimpleKVS_UI;
 
 /**
  * @brief The Screen class, this class is designed as a combined and simplified version
@@ -68,6 +67,7 @@ public:
     void redraw()
     {
         this->update();
+        //assert(false);
     }
 
 };
