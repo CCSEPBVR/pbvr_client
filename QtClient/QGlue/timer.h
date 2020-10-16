@@ -13,11 +13,11 @@
 #include "Client/ComThread.h"
 #include "extCommand.h"
 
-#ifdef CPUMODE
+//#ifdef CPUMODE
 
-#else
-#include "kvs/ParticleVolumeRenderer"
-#endif
+//#else
+//#include "kvs/ParticleVolumeRenderer"
+//#endif
 
 class RenderArea;
 using namespace kvs::visclient;
@@ -46,12 +46,12 @@ private:
     Command* m_command;
     ComThread* m_comthread;
     bool oneShot=true;
-#ifdef CPUMODE
-    int m_object_id;
-    kvs::PointObject* m_front_object;
-    kvs::PointObject* m_back_object;
-//    kvs::ParticleVolumeRenderer* m_renderer;
-#endif
+//#ifdef CPUMODE
+////    int m_object_id;
+////    kvs::PointObject* m_front_object;
+////    kvs::PointObject* m_back_object;
+////    kvs::ParticleVolumeRenderer* m_renderer;
+//#endif
 //#else
     kvs::visclient::ExtendedParticleVolumeRenderer* m_renderer;
 //#endif

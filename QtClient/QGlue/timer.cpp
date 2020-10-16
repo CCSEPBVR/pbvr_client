@@ -57,10 +57,10 @@ Timer::Timer( int msec , ExtCommand* command ):
     m_comthread( &command->comthread ),
     m_screen(command->m_screen)
 {
-#ifdef CPUMODE
-    m_front_object = NULL;
-    m_back_object=NULL;
-#endif
+//#ifdef CPUMODE
+////    m_front_object = NULL;
+////    m_back_object=NULL;
+//#endif
 
     m_is_key_frame_animation = 0;
     m_is_ready = 0;
@@ -241,7 +241,7 @@ void Timer::comThreadExitEvent()
 
     if ( m_command->m_is_under_animation && m_command->m_particle_assign_flag )
     {
-        m_front_object = new kvs::PointObject();
+        kvs::PointObject* m_front_object = new kvs::PointObject();
         if ( m_command->m_parameter.m_transfer_type == VisualizationParameter::Abstract )
         {
             *m_front_object = *( m_command->m_abstract_particles[m_command->m_parameter.m_time_step] );
@@ -261,10 +261,10 @@ void Timer::comThreadExitEvent()
             m_renderer->enableShading();
         m_renderer->attachPointObject( m_front_object );
 
-        m_back_object = m_front_object;
+        delete m_front_object;
         //KVS2.7.0
         //MOD BY)T.Osaki 2020.07.20
-        m_screen->scene()->objectManager()->change( m_object_id, m_front_object );
+//        m_screen->scene()->objectManager()->change( m_object_id, m_front_object );
 
         //        qInfo("Timer::comThreadExitEvent not updating m_orientation_axis");
         //        m_command->m_screen->m_orientation_axis->setObject( m_front_object );
@@ -399,19 +399,19 @@ void Timer::animate()
             {
                 m_is_ready = 0;
             }
-#ifdef CPUMODE
-            if ( m_front_object && m_is_ready )
+//#ifdef CPUMODE
+            if ( m_is_ready )
             {
                 if ( m_interpolation_counter < m_ninterpolation )
                 {
                     kvs::Xform Xform_new = InterpolateXform( t, m_ninterpolation, m_xforms->at( i ), m_xforms->at( i + 1 ) );
-                    m_front_object->setXform( Xform_new );
+                    m_screen->setPointObjectXform(Xform_new);
                     m_command->m_step_key_frame++;
                     t++;
                     m_interpolation_counter = t;
                 }
             }
-#endif
+//#endif
         }
         else
         {
@@ -419,19 +419,20 @@ void Timer::animate()
             {
                 m_is_ready = 0;
             }
-#ifdef CPUMODE
-            if ( m_front_object && m_is_ready )
+//#ifdef CPUMODE
+            if ( m_is_ready )
             {
                 if ( m_interpolation_counter < m_ninterpolation )
                 {
                     kvs::Xform Xform_new = InterpolateXform( t, m_ninterpolation, m_xforms->at( i ), m_xforms->at( i + 1 ) );
-                    m_front_object->setXform( Xform_new );
+//                    m_front_object->setXform( Xform_new );
+                    m_screen->setPointObjectXform(Xform_new);
                     m_command->m_step_key_frame++;
                     t++;
                     m_interpolation_counter = t;
                 }
             }
-#endif
+//#endif
         }
     }
     else
