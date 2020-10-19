@@ -352,7 +352,9 @@ void ColorMapPalette::mousePressEvent( QMouseEvent* event )
         pdata[2] = static_cast<kvs::UInt8>( drawing_color.b() * ratio + pdata[2] * ( 1 - ratio ) );
 
         const size_t width = m_color_map.resolution();
+        makeCurrent();
         m_texture.load( width, m_color_map.table().pointer()  );
+        doneCurrent();
     }
 
     update();
@@ -409,7 +411,9 @@ void ColorMapPalette::mouseMoveEvent( QMouseEvent* event )
         }
 
         const size_t width = m_color_map.resolution();
+        makeCurrent();
         m_texture.load( width, data);
+        doneCurrent();
     }
 
     update();

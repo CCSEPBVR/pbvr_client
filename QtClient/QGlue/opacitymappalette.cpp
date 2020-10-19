@@ -156,8 +156,10 @@ void OpacityMapPalette::setOpacityMap( const kvs::OpacityMap& opacity_map )
     // Deep copy.
     kvs::OpacityMap::Table opacity_map_table( opacity_map.table().pointer(), opacity_map.table().size() );
     m_opacity_map = kvs::OpacityMap( opacity_map_table );
+    makeCurrent();
     this->initialize_texture( m_opacity_map );
     this->update();
+    doneCurrent();
 }
 /*===========================================================================*/
 /**
@@ -241,7 +243,9 @@ void OpacityMapPalette::mousePressEvent( QMouseEvent* event )
 
             // Download to GPU.
             const size_t width = m_opacity_map.resolution();
+            makeCurrent();
             m_texture.load( width, data );
+            doneCurrent();
         }
         update();
     }
@@ -460,7 +464,9 @@ void OpacityMapPalette::draw_free_hand_line( QMouseEvent* event )
 
     // Download to GPU.
     const size_t width = m_opacity_map.resolution();
+    makeCurrent();
     m_texture.load( width, data );
+    doneCurrent();
     // Update the previous mouse position.
     m_previous_position.set( x, y );
 }
