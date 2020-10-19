@@ -6,7 +6,6 @@
 #include <QPainter>
 #include <QTime>
 #include <QGlue/labelbase.h>
-#include "deferredtexture.h"
 
 #include <QThread>
 #include <QApplication>

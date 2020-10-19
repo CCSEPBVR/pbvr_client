@@ -49,7 +49,7 @@ void Screen::paintGL()
         return;
     }
     // Check and clear GL errors
-    while (e = glGetError()){
+    while ((e = glGetError())){
         qCritical("Screen::paintGL GL HAS ERROR BEFORE %d",e);
     }
     // This allows KVS to work with QOpenGLWidgets
@@ -70,7 +70,7 @@ void Screen::paintGL()
     onPaintGL();
 
     // Check and clear GL errors
-    while (e = glGetError()){
+    while ((e = glGetError())){
         qCritical("Screen::paintGL GL GOT GL ERROR %d",e);
     }
     paint_mutex.unlock();
@@ -119,7 +119,7 @@ void Screen::initializeGL()
     if ( result != GLEW_OK )
     {
         const GLubyte* message = glewGetErrorString( result );
-        qFatal("GLEW initialization failed. ");
+        qFatal("GLEW initialization failed.");
     }
     initializeOpenGLFunctions();
     onInitializeGL();

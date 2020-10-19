@@ -16,7 +16,7 @@
 //ADD BY)T.Osaki 2020.06.04
 #include <kvs/Background>
 #include <kvs/ObjectManager>
-
+#include <QMutex>
 #ifdef PBVR_DEBUG
 int     timestep = 0;
 #endif
@@ -30,6 +30,8 @@ RenderArea::PointObjectProxy RenderArea::m_point_object;
 RenderArea::RenderArea( QWidget* parent_surface):
     obj_id_pair (-1,-1)
 {
+
+    Q_UNUSED( parent_surface);
     pixelRatio= QApplication::desktop()->devicePixelRatioF();
 
     this->m_scene->background()->setColor( kvs::RGBAColor(0,0,22,1.0f) );
@@ -105,7 +107,7 @@ void RenderArea::onInitializeGL( void )
     this->setAutoFillBackground(false);
 
     m_scene->light()->on();
-    m_scene->mouse()->attachCamera(m_scene->camera());
+//    m_scene->mouse()->attachCamera(m_scene->camera());
 }
 /**
  * @brief RenderArea::resizeGL, GL Surface resized handler
@@ -519,17 +521,19 @@ void RenderArea::mousePressEvent( QMouseEvent *event)
 
     int mode =-1;
 
-    if    (   BTN_LEFT && MOD_Ctrl  || BTN_RIGHT){
+    if    (   (BTN_LEFT && MOD_Ctrl ) || BTN_RIGHT){
         mode=kvs::Mouse::Translation;
     }
-    else if ( BTN_LEFT && MOD_Shift || BTN_MID  ){
+    else if ( (BTN_LEFT && MOD_Shift) || BTN_MID  ){
         mode= kvs::Mouse::Scaling ;
     }
     else if ( BTN_LEFT ){
         mode = kvs::Mouse::Rotation;
         //KVS2.7.0
         //MOD BY)T.Osaki 2020.06.04
+        makeCurrent();
         m_scene->updateCenterOfRotation();
+        doneCurrent();
         //kvs::ScreenBase::updateCenterOfRotation();
     }
     const int x = event->x()*pixelRatio;
@@ -558,7 +562,7 @@ void RenderArea::mouseMoveEvent(QMouseEvent *event)
     //KVS2.7.0
     //MOD BY)T.Osaki 2020.06.04
     //if( kvs::ScreenBase::controlTarget() == kvs::ScreenBase::TargetObject )
-    if( m_scene->controlTarget() == m_scene->TargetObject );
+    if( m_scene->controlTarget() == m_scene->TargetObject )
     {
         //if( !kvs::ScreenBase::objectManager()->isEnableAllMove() )
         if( !m_scene->isEnabledObjectOperation())
