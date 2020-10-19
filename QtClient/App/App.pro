@@ -40,9 +40,10 @@ win32{
 LIBS += -L$$(GLEW_DIR)/lib -lglew32
 }
 else {
-LIBS += -L$$(GLEW_DIR)/lib -lglew
+LIBS += -L$$(GLEW_DIR)/lib
 }
-unix:!macx:LIBS += -lGLU
+unix:macx:LIBS +=  -lglew
+unix:!macx:LIBS += -lGLEW -lGLU
 #QT += opengl
 #QT += core gui opengl widgets
 #QMAKE_CXXFLAGS += -DQT_NO_OPENGL_ES_2
