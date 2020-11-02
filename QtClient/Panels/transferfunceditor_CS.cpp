@@ -504,8 +504,12 @@ void TransferFuncEditor::updateRangeView(){
     sprintf(opacity_function_name, "O%d", n_select_opacity);
     char tag_c[16] = {0x00};
     char tag_o[16] = {0x00};
-    sprintf(tag_c, "%s_var_c", ui->colormapFunction->currentText().toStdString().c_str());
-    sprintf(tag_o, "%s_var_o", ui->opacitymapFunction->currentText().toStdString().c_str());
+    // Temporary string just to prevent crash in Windows debug mode
+    std::string tmp_cmf=ui->colormapFunction->currentText().toStdString();
+    std::string tmp_omf=ui->opacitymapFunction->currentText().toStdString();
+
+    sprintf(tag_c, "%s_var_c", tmp_cmf.c_str());
+    sprintf(tag_o, "%s_var_o", tmp_omf.c_str());
 
     const NamedTransferFunctionParameter *trans_color = this->m_doc.getColorTransferFunction(n_select_color);
     const NamedTransferFunctionParameter *trans_opacity = this->m_doc.getOpacityTransferFunction(n_select_opacity);

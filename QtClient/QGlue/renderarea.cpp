@@ -21,7 +21,7 @@
 int     timestep = 0;
 #endif
 
-extern QMutex paint_mutex;
+//extern QMutex paint_mutex;
 char RenderArea::shadinglevel[256] = "";
 kvs::visclient::TimerEvent* RenderArea::g_timer_event=0;
 
