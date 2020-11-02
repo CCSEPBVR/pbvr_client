@@ -464,9 +464,9 @@ void OpacityMapPalette::draw_free_hand_line( QMouseEvent* event )
 
     // Download to GPU.
     const size_t width = m_opacity_map.resolution();
-    makeCurrent();
+    QOpenGLWidget::makeCurrent();
     m_texture.load( width, data );
-    doneCurrent();
+    QOpenGLWidget::doneCurrent();
     // Update the previous mouse position.
     m_previous_position.set( x, y );
 }

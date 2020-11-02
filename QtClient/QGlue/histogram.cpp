@@ -319,12 +319,12 @@ void Histogram::create_texture( void )
     const size_t nchannels = 4;
     const size_t width = m_table.nbins();
     const size_t height = width;
-    makeCurrent();
+    QOpenGLWidget::makeCurrent();
     m_texture.setPixelFormat( nchannels, sizeof( kvs::UInt8 ) );
     m_texture.setMinFilter( GL_LINEAR );
     m_texture.setMagFilter( GL_LINEAR );
     m_texture.load( width, height, this->get_histogram_image().data() );
-    doneCurrent();
+    QOpenGLWidget::doneCurrent();
 }
 
 /*===========================================================================*/

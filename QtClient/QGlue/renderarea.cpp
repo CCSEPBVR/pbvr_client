@@ -107,7 +107,7 @@ void RenderArea::onInitializeGL( void )
     this->setAutoFillBackground(false);
 
     m_scene->light()->on();
-//    m_scene->mouse()->attachCamera(m_scene->camera());
+    m_scene->mouse()->attachCamera(m_scene->camera());
 }
 /**
  * @brief RenderArea::resizeGL, GL Surface resized handler
