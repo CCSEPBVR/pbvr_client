@@ -1,6 +1,8 @@
 ## VERSION
-GIT_HASH = $$system("git log -1 --pretty=format:%h")
-DEFINES += PBVR_VERSION="1.14.PRERELEASE_BUILD.$${GIT_HASH}"
+#GIT_HASH = $$system("git log -1 --pretty=format:%h")
+#DEFINES += PBVR_VERSION="1.14.PRERELEASE_BUILD.$${GIT_HASH}"
+DEFINES += PBVR_VERSION="1.14.0"
+
 ## DETERMINE PLATFORM  ##
 win32:PLATFORM=WIN
 unix:!macx:PLATFORM=UNX
