@@ -1,14 +1,14 @@
 #ifndef KVSQScreen_H
 #define KVSQScreen_H
 
-#include "Client/ExtendedParticleVolumeRenderer.h"
-#include "Client/TimerEvent.h"
+#include "screen.h"
 
-#include <QGlue/extCommand.h>
+#include "Client/ExtendedParticleVolumeRenderer.h"
+#include <QGlue/labelbase.h>
 #include <QGlue/legendbar.h>
 #include <QGlue/timer.h>
 #include <QGlue/orientationaxis.h>
-
+#include "Client/TimerEvent.h"
 //KVS2.7.0
 //MOD BY)T.Osaki 2020.06.04
 #include <kvs/Scene>
@@ -21,13 +21,75 @@
 class PBVRGUI;
 
 /**
- * @brief
+ * @brief The RenderArea class extends the PBVR Screen class with functionality
+ *        for rendering additional components, such as orientation axis, and legend.
+ *
+ *        The RenderArea class is also responsible for all passing all interaction with the scene,
+ *        point object, and renderer from other classes in PBVR.
+ *
+ *        It is also responsible for handling mouse and keyboard events.
  *
  */
 //KVS2.7.0
 //MOD BY)T.Osaki 2020.06.04
-class RenderArea : public QOpenGLWidget, public kvs::ScreenBase, protected QOpenGLFunctions
+class RenderArea : public Screen
 {
+private:
+    /**
+     * @brief The PointObjectProxy class, Swappable kvsPointObject
+     *        This class will act as a kvs::PointObject when interacting with kvs.
+     *
+     *        However it is a proxy, backed by two different kvs::PointObjects
+     *        This allows swaping of the active point object to overcome kvs limitation
+     *        where it doesn't detect that a single point object is modified and then re-added to the scene.
+     *
+     *        This is intended to replace the getObject() method of TimerEvent, but
+     *        is safer as the returned point object is guarantueed to be non-null.
+     */
+    class PointObjectProxy: public kvs::PointObject
+    {
+
+    private:
+        kvs::PointObject list[2]; // object list
+        int index=0;
+
+        /**
+         * @brief active , active returns the currently active object from the object list
+         * @return The currently active point object
+         */
+        kvs::PointObject* active(){
+            return &list[index];
+        }
+
+    public:
+        /**
+         * @brief swap, swaps front object and back object
+         * @return
+         */
+        kvs::PointObject* swap(){
+            index=!index;
+            return active();
+        }
+        /**
+         * @brief operator ->  Dereference operator. Allows PointObjectProxy methods and members
+         *                     of the active object to be accessed as if interacting with a standard kvs::PointObject.
+         * @return kvs::PointObject* to currently active object
+         */
+        kvs::PointObject *operator->()
+        {
+            return active();
+        }
+        /**
+         * @brief operator kvs::PointObject *  When try to cast to or pass this object as kvs::PointObject,
+         *                 use the currently active object
+         */
+        operator kvs::PointObject*(){
+            return active();
+        }
+    };
+    static PointObjectProxy m_point_object;
+
+
 public:
 
     explicit RenderArea( QWidget* parent_surface);
@@ -35,12 +97,13 @@ public:
     //MOD BY)T.Osaki 2020.06.29
     //static void ScreenShot( kvs::ScreenBase* screen, const int tstep );
     //static void ScreenShotKeyFrame( kvs::ScreenBase* screen, const int tstep );
-    static void ScreenShot( kvs::Scene* screen, const int tstep );
-    static void ScreenShotKeyFrame( kvs::Scene* screen, const int tstep );
+
+    static void ScreenShot( kvs::Scene* scene, const int tstep );
+    static void ScreenShotKeyFrame( kvs::Scene* scene, const int tstep );
 
     void drawLabelList( QList<QGlue::Label*> list,QColor fontColor);
     void keyPressEvent(QKeyEvent *kbEvent);
-    void redraw( void ){ this->update();}
+    //    void redraw( void ){ this->update();}
 
     void setCoordinateBoundaries(float  crd[6]);
     void setGeometry( QRect geom );
@@ -49,22 +112,24 @@ public:
 
     void setShaderParams( );
     void setupEventHandlers( );
-
-    //KVS2.7.0
-    //MOD BY)T.Osaki 2020.05.28
-    //DEL BY)T.Osaki 2020.06.15
-//    int show( void ){QOpenGLWidget::show(); return 1;}
-    void show( void ){QOpenGLWidget::show();}
     void updateCommandInfo(ExtCommand* command_q);
+
+    // Public access methods for interacting with private renderer.
+    void enableRendererShading();
+    void setRenderSubPixelLevel(int level);
+    void setRenderRepetionlLevel(int level);
+    void recreateRenderImageBuffer();
+
+    // Public access methods for interacting with private point object.
+    kvs::Xform getPointObjectXform();
+    void setPointObjectXform(kvs::Xform xf);
+    void attachPointObject(const kvs::PointObject *point);
 
 public:
     static char shadinglevel[256];
     static kvs::visclient::TimerEvent* g_timer_event;
 
-    bool GLInitComplete=false;
-
-    QTimer*     m_idle_mouse_timer;
-    QPainter    m_painter; // Shouldn't be public, but used by orientation axis
+    size_t frame_number=0;
 
     QGlue::StepLabel*       m_stepLabel=NULL;
     QGlue::FPSLabel*        m_fpsLabel=NULL;
@@ -72,16 +137,7 @@ public:
     QGlue::OrientationAxis* m_orientation_axis=NULL;
     QGlue::Timer*           qt_timer;
 
-    kvs::PointObject*  m_control_object;
-    kvs::EventHandler* m_initialize_event_handler;
-
-    std::list<QGlue::Timer*> m_timer_event_handler;
     QList<QGlue::Label*>     m_labels;
-    double m_fps = 0.0;
-    //KVS2.7.0
-    //MOD BY)T.Osaki 2020.07.20
-    kvs::Scene* m_scene;
-
 
     void toggleTimer(bool state){
         if (state)
@@ -90,22 +146,26 @@ public:
             qt_timer->stop();
     }
 private:
+    std::pair<int, int> m_obj_id_pair;
     int i_w=0;
     int i_h=0;
-    int yl0=0;
+    //    int yl0=0;
     int msec = DEFAULT_MSEC;
     //    MOD BY)T.Osaki 2020.04.28
     float pixelRatio=1;
-    kvs::visclient::ExtendedParticleVolumeRenderer* m_renderer;
+    ExtendedParticleVolumeRenderer* m_renderer;
+
     int m_reset_count = 0;
+
 protected:
-    void initializeGL( void );
-    void resizeGL(int w, int h);
+
     void mouseReleaseEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     void mousePressEvent(QMouseEvent *event);
 
-    void paintGL();
+    void onInitializeGL(  );
+    void onResizeGL(int w, int h);
+    void onPaintGL();
 
 
 };

@@ -6,9 +6,7 @@
 
 #include "Command.h"
 #include "ComThread.h"
-#ifdef CPUMODE
-#include "kvs/ParticleVolumeRenderer"
-#endif
+
 
 namespace kvs
 {
@@ -16,17 +14,13 @@ namespace visclient
 {
 class Command;
 
-class TimerEvent : public kvs::TimerEventListener
+class TimerEvent //: public kvs::TimerEventListener
 {
 private:
     Command* m_command;
     ComThread* m_comthread;
-#ifdef CPUMODE
-    int m_object_id;
-    kvs::PointObject* m_front_object;
-    kvs::PointObject* m_back_object;
-    kvs::ParticleVolumeRenderer* m_renderer;
-#endif
+
+    RenderArea* m_screen;
     int m_interpolation_counter;
     int m_ninterpolation;
     int m_is_key_frame_animation;
@@ -38,15 +32,8 @@ private:
 public:
     TimerEvent( Command* command, ComThread* comthread );
     void update( kvs::TimeEvent* event );
-#ifdef CPUMODE
-    ~TimerEvent();
-    void setObject( const int& id );
-    void setRenderer( kvs::ParticleVolumeRenderer* renderer );
-    kvs::PointObject* getPointObject()
-    {
-        return m_front_object;
-    }
-#endif
+    void setScreen(RenderArea* screen){m_screen=screen;}
+
     void enableKeyFrameAnimation()
     {
         m_is_key_frame_animation = 1;
@@ -61,14 +48,11 @@ public:
     }
     void toggleKeyFrameAnimation()
     {
-        m_is_key_frame_animation = ( m_is_key_frame_animation ) ? 0 : 1;
-        if ( m_is_key_frame_animation )
-        {
-            m_command->m_is_key_frame_animation = true;
+        if (m_is_key_frame_animation){
+            disableKeyFrameAnimation();
         }
-        else
-        {
-            m_command->m_is_key_frame_animation = false;
+        else{
+            enableKeyFrameAnimation();
         }
     }
     int getTimeStep()

@@ -22,6 +22,7 @@ namespace  QGlue {
 ColorMapPalette::ColorMapPalette( QWidget* parent ):
     QGLUEBaseWidget( parent ),
     m_color_palette( NULL ),
+    m_texture(this, 3*sizeof( kvs::UInt8 ),"ColorMP m_texture"),
     m_resolution(256)
 {
     //    MOD BY)T.Osaki 2020.04.28
@@ -289,6 +290,7 @@ void ColorMapPalette::resizeGL(int w, int h)
 /*===========================================================================*/
 void ColorMapPalette::paintGL( void )
 {
+    std::cout<<"ColorMapPalette::paintGL:"<<isVisible()<<std::endl;
     if ( !isVisible() ) return;
 
     if ( m_texture_downloaded)
@@ -350,9 +352,9 @@ void ColorMapPalette::mousePressEvent( QMouseEvent* event )
         pdata[2] = static_cast<kvs::UInt8>( drawing_color.b() * ratio + pdata[2] * ( 1 - ratio ) );
 
         const size_t width = m_color_map.resolution();
-        m_texture.bind();
-        m_texture.download( width, data );
-        m_texture.unbind();
+        QOpenGLWidget::makeCurrent();
+        m_texture.load( width, m_color_map.table().pointer()  );
+        QOpenGLWidget::doneCurrent();
     }
 
     update();
@@ -409,9 +411,9 @@ void ColorMapPalette::mouseMoveEvent( QMouseEvent* event )
         }
 
         const size_t width = m_color_map.resolution();
-        m_texture.bind();
-        m_texture.download( width, data );
-        m_texture.unbind();
+        QOpenGLWidget::makeCurrent();
+        m_texture.load( width, data);
+        QOpenGLWidget::doneCurrent();
     }
 
     update();
@@ -444,19 +446,15 @@ void ColorMapPalette::mouseReleaseEvent( QMouseEvent* event )
 /*===========================================================================*/
 void ColorMapPalette::initialize_texture( const kvs::ColorMap& color_map )
 {
-    const size_t nchannels  = 3; // rgb
-    const size_t width = color_map.resolution();
-    const kvs::UInt8* data = color_map.table().pointer();
-    m_texture.release();
-    m_texture.setPixelFormat( nchannels, sizeof( kvs::UInt8 ) );
-    m_texture.setMinFilter( GL_LINEAR );
-    m_texture.setMagFilter( GL_LINEAR );
-    //KVS2.7.0
-    //MOD BY)T.Osaki 2020.07.20
-    m_texture.create( width, data );
-    m_texture.download( width, data );
-    m_texture_downloaded=false;
-    update();
+        const size_t nchannels  = 3; // rgb
+        const size_t width = color_map.resolution();
+        const kvs::UInt8* data = color_map.table().data();
+//        m_texture.release();
+        m_texture.setPixelFormat( nchannels, sizeof( kvs::UInt8 ) );
+        m_texture.setMinFilter( GL_LINEAR );
+        m_texture.setMagFilter( GL_LINEAR );
+        m_texture.create( width, data);
+        m_texture_downloaded=false;
 }
 
 /*===========================================================================*/
@@ -473,18 +471,11 @@ void ColorMapPalette::draw_palette( void )
     const int y0 = m_palette.y();
     const int y1 = m_palette.y() + m_palette.height();
 
-    glDisable( GL_BLEND );
-    glEnable( GL_TEXTURE_1D );
-    glDisable( GL_TEXTURE_2D );
-#if defined( GL_TEXTURE_3D )
-    glDisable( GL_TEXTURE_3D );
-#endif
-
     // Draw color map texture.
-    m_texture.bind();
-    BaseClass::drawUVQuad(0.0,0.0,1.0,1.0,x0,y0,x1,y1);
-    m_texture.unbind();
-
+    if ( m_texture.bind()){
+        BaseClass::drawUVQuad(0.0,0.0,1.0,1.0,x0,y0,x1,y1);
+        m_texture.unbind();
+    }
     glPopAttrib();
 
     // Draw border.

@@ -1,7 +1,7 @@
 ﻿//KVS2.7.0
 //ADD BY)T.Osaki 2020.06.08
 #include <QOpenGLContext>
-
+#include <QGlue/renderarea.h>
 #include "TimerEvent.h"
 #include "Command.h"
 //#include "sighandler.h"
@@ -15,7 +15,7 @@
 #include "Panels/coordinatepanel.h"
 #include "Panels/timecontrolpanel.h"
 #include "Panels/systemstatuspanel.h"
-#include <QGlue/renderarea.h>
+
 #include <QMutex>
 //KVS2.7.0
 //ADD BY)T.Osaki 2020.06.02
@@ -37,11 +37,6 @@ TimerEvent::TimerEvent( Command* command, ComThread* comthread ):
     m_command( command ),
     m_comthread( comthread )
 {
-#ifdef CPUMODE
-    m_front_object = NULL;
-    m_back_object=NULL;
-#endif
-
     m_is_key_frame_animation = 0;
     m_is_ready = 0;
     m_interpolation_counter = 0;
@@ -51,23 +46,6 @@ TimerEvent::TimerEvent( Command* command, ComThread* comthread ):
     m_xforms = KeyFrameAnimationGetXforms();
     m_time_steps = KeyFrameAnimationGetTimeSteps();
 }
-
-#ifdef CPUMODE
-void TimerEvent::setObject( const int& id )
-{
-    m_object_id = id;
-}
-
-void TimerEvent::setRenderer( kvs::ParticleVolumeRenderer* renderer )
-{
-    m_renderer = renderer;
-}
-TimerEvent::~TimerEvent()
-{
-    if ( m_back_object  != NULL ) delete m_back_object;
-    if ( m_front_object != NULL ) delete m_front_object;
-}
-#endif
 
 void TimerEvent::update( kvs::TimeEvent* event )
 {
@@ -86,22 +64,21 @@ void TimerEvent::update( kvs::TimeEvent* event )
         m_comthread->wait();
         m_comthread->quit();
         m_command->postUpdate();
-#ifdef CPUMODE
 
         if ( m_command->m_is_under_animation && m_command->m_particle_assign_flag )
         {
-            m_front_object = new PointObject();
+           kvs::PointObject* m_front_object = new PointObject();
             if ( m_command->m_parameter.m_transfer_type == VisualizationParameter::Abstract )
             {
                 std::cout << "Abstract" << std::endl;
                 *m_front_object = *( m_command->m_abstract_particles[m_command->m_parameter.m_time_step] );
-                m_renderer->setSubpixelLevel( m_command->m_parameter.m_abstract_subpixel_level );
+                m_screen->setRenderSubPixelLevel( m_command->m_parameter.m_abstract_subpixel_level );
             }
             else if ( m_command->m_parameter.m_transfer_type == VisualizationParameter::Detailed )
             {
                 std::cout << "Detailed" << std::endl;
                 *m_front_object = *( m_command->m_detailed_particles[m_command->m_parameter.m_time_step] );
-                m_renderer->setSubpixelLevel( m_command->m_parameter.m_detailed_subpixel_level );
+                m_screen->setRenderSubPixelLevel( m_command->m_parameter.m_detailed_subpixel_level );
             }
             else
             {
@@ -109,24 +86,16 @@ void TimerEvent::update( kvs::TimeEvent* event )
                 assert( false );
             }
             if ( m_command->m_parameter.m_shading_type_flag )
-                m_renderer->enableShading();
-            m_renderer->attachPointObject( m_front_object );
-            m_back_object = m_front_object;
-            //KVS2.7.0
-            //MOD BY)T.Osaki 2020.06.04
-            //screen()->objectManager()->change( m_object_id, m_front_object );
-//            scene()->objectManager()->change( m_object_id, m_front_object );
-//            scene()->objectManager()->change( m_object_id, m_front_object );
+                m_screen->enableRendererShading();
+
             m_front_object->setMinMaxObjectCoords(kvs::Vector3f(extCommand->PVBRmincoords),kvs::Vector3f(extCommand->PVBRmaxcoords));
             m_front_object->setMinMaxExternalCoords(kvs::Vector3f(extCommand->PVBRmincoords),kvs::Vector3f(extCommand->PVBRmaxcoords));
-            //KVS2.7.0
-            //MOD BY)T.Osaki 2020.07.20
-            m_command->m_screen->m_scene->objectManager()->change(m_object_id,m_front_object);
-            m_command->m_screen->m_orientation_axis->setObject( m_front_object );
+            m_screen->attachPointObject(m_front_object);
+            delete m_front_object;
             view_flag = true;
             m_command->m_particle_assign_flag = false;
         }
-#endif
+
         if ( m_command->m_parameter.m_time_step == m_command->m_parameter.m_time_step_key_frame )
         {
             m_is_ready = 1;
@@ -148,13 +117,22 @@ void TimerEvent::update( kvs::TimeEvent* event )
                 {
                     m_command->m_parameter.m_time_step = m_command->m_parameter.m_min_time_step;
                 }
-              //float ratio = float(m_command->param.m_time_step -m_command->param.m_min_time_step ) / float(m_command->param.m_max_time_step -m_command->param.m_min_time_step ) * 100;
+              //float ratio = float(m_command->m_parameter.m_time_step -m_command->m_parameter.m_min_time_step ) / float(m_command->m_parameter.m_max_time_step -m_command->m_parameter.m_min_time_step ) * 100;
                 int min_time_step = static_cast<int>( m_command->m_timectrl_panel->minValue() );
                 int max_time_step = static_cast<int>( m_command->m_timectrl_panel->maxValue() );
                 float ratio = float( m_command->m_parameter.m_time_step - min_time_step + 1.0 ) / float( max_time_step - min_time_step + 1.0 ) * 100;
 #ifdef CS_MODE
+                // Unlocking the paint_mutex here , as m_timectrl_panel->setProgress triggers an update event.
+                // And if the timecntrl_panel is docked in the same window as the render area, this
+                // will lead to a chain of events where finally Screen::paintGL() is called. As Screen::paintGL tries
+                // to get the paint_mutex.lock this will cause a hang if we don't unlock here first.
+                //
+                // In fact - maybe paint_mutex is not needed here any more at all.
+
+                paint_mutex.unlock();
                 m_command->m_timectrl_panel->setProgress(ratio);
                 m_command->m_timectrl_panel->setStepValue(m_command->m_parameter.m_time_step);
+                paint_mutex.lock();
 #endif
             }
         }
@@ -171,31 +149,17 @@ void TimerEvent::update( kvs::TimeEvent* event )
             }
             if ( m_command->m_parameter.m_transfer_type == VisualizationParameter::Detailed )
             {
-#ifndef CPUMODE
-                if ( m_command->param.repeatLevel ==m_command->param.detailedRepeatLevel )
-                {
-#endif
                     TimecontrolPanel::g_curStep = m_command->m_parameter.m_time_step;
 					#ifdef CS_MODE
                     m_command->m_parameter.m_time_step++;
 					#endif
-#ifndef CPUMODE
-                }
-#endif
             }
             else if ( m_command->m_parameter.m_transfer_type == VisualizationParameter::Abstract )
             {
-#ifndef CPUMODE
-                if (m_command->param.repeatLevel ==m_command->param.abstractRepeatLevel )
-                {
-#endif
                     TimecontrolPanel::g_curStep = m_command->m_parameter.m_time_step;
 					#ifdef CS_MODE
                     m_command->m_parameter.m_time_step++;
 					#endif
-#ifndef CPUMODE
-                }
-#endif
             }
         }
         if ( m_command->m_parameter.m_time_step > m_command->m_timectrl_panel->maxValue() ) //99) {
@@ -217,7 +181,7 @@ void TimerEvent::update( kvs::TimeEvent* event )
 			#ifdef CS_MODE
                 m_command->m_parameter.m_min_time_step = m_command->m_timectrl_panel->minValue();
 			#else
-				m_command->param.minTimeStep = m_command->m_timectrl_panel->minValue();
+                m_command->m_parameter.minTimeStep = m_command->m_timectrl_panel->minValue();
 			#endif
             }
             else
@@ -225,7 +189,7 @@ void TimerEvent::update( kvs::TimeEvent* event )
 			#ifdef CS_MODE
                 m_command->m_parameter.m_min_time_step = m_command->m_parameter.m_min_time_step;
 			#else
-				m_command->param.minTimeStep = m_command->param.minTimeStep;
+               m_command->m_parameter.minTimeStep =m_command->m_parameter.minTimeStep;
 			#endif
             }
         }
@@ -234,8 +198,8 @@ void TimerEvent::update( kvs::TimeEvent* event )
 #ifdef IS_MODE
         if( m_command->lastStepCheckBoxState )
         {
-            m_command->param.timeStep = m_command->param.maxTimeStep;
-//            m_command->m_timectrl_panel->setStepValue(m_command->param.timeStep);
+           m_command->m_parameter.timeStep =m_command->m_parameter.maxTimeStep;
+//            m_command->m_timectrl_panel->setStepValue(m_command->m_parameter.timeStep);
         }
 #endif
     }
@@ -270,19 +234,18 @@ void TimerEvent::update( kvs::TimeEvent* event )
                 {
                     m_is_ready = 0;
                 }
-#ifdef CPUMODE
-                if ( m_front_object && m_is_ready )
+                if ( m_is_ready )
                 {
                     if ( m_interpolation_counter < m_ninterpolation )
                     {
                         kvs::Xform Xform_new = InterpolateXform( t, m_ninterpolation, m_xforms->at( i ), m_xforms->at( i + 1 ) );
-                        m_front_object->setXform( Xform_new );
+//                        m_front_object->setXform( Xform_new );
+                        m_screen->setPointObjectXform(Xform_new);
                         m_command->m_step_key_frame++;
                         t++;
                         m_interpolation_counter = t;
                     }
                 }
-#endif
             }
             else
             {
@@ -290,19 +253,19 @@ void TimerEvent::update( kvs::TimeEvent* event )
                 {
                     m_is_ready = 0;
                 }
-#ifdef CPUMODE
-                if ( m_front_object && m_is_ready )
+                if ( m_is_ready )
                 {
                     if ( m_interpolation_counter < m_ninterpolation )
                     {
                         kvs::Xform Xform_new = InterpolateXform( t, m_ninterpolation, m_xforms->at( i ), m_xforms->at( i + 1 ) );
-                        m_front_object->setXform( Xform_new );
+//                        m_front_object->setXform( Xform_new );
+                        m_screen->setPointObjectXform(Xform_new);
                         m_command->m_step_key_frame++;
                         t++;
                         m_interpolation_counter = t;
                     }
                 }
-#endif
+
             }
         }
         else
@@ -316,22 +279,19 @@ void TimerEvent::update( kvs::TimeEvent* event )
         }
     }
 
-#ifdef CPUMODE
-    screen()->redraw();
-#endif
-    m_command->reDraw();
+    m_screen->update();
 
     if ( m_is_key_frame_animation && m_command->m_previous_key_frame != m_command->m_step_key_frame )
     {
         //KVS2.7.0
         //MOD BY)T.Osaki 2020.07.20
-        RenderArea::ScreenShotKeyFrame( m_command->m_screen->m_scene, m_command->m_step_key_frame );
+        RenderArea::ScreenShotKeyFrame( m_command->m_screen->scene(), m_command->m_step_key_frame );
         m_command->m_previous_key_frame = m_command->m_step_key_frame;
     }
 
 //    if ( IsSignal() ) // Letting Qt handle this
 //    {
-//        if (m_command->param.m_client_server_mode == 1 )
+//        if (m_command->m_parameter.m_client_server_mode == 1 )
 //        {
 //            m_command->closeServer();
 //        }

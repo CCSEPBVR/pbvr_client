@@ -253,74 +253,43 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
                 if ( param->m_detailed_transfer_type == VisualizationParameter::Divided )
                 {
                     std::cout << "*** param->m_detailed_transfer_type == PBVRParam::Divided" << std::endl;
-#ifndef CPUMODE
-                    std::cout << "param->m_repeat_level=" << param->repeatLevel << " param->abstractRepeatLevel =" << param->abstractRepeatLevel << std::endl;
-                    if ( param->repeatLevel == param->abstractRepeatLevel )
-                    {
-#endif
-						// サーバにないステップは対象としない 2018.12.19 start
-						int stepno;
-						if ((stepno = getServerStep(param)) >= 0){
-							delete m_abstract_particles[param->m_time_step];
-							m_abstract_particles[param->m_time_step] = m_server->getPointObjectFromServer(*param, result, numvol, stepno);
-							// ADD START FEAST 2016.01.07
-							// 粒子生成時にサーバー側で演算エラーが発生
-							if (m_abstract_particles[param->m_time_step] == NULL)
-							{
-//                                m_timectrl_panel->toggleStop(true);
+                        // サーバにないステップは対象としない 2018.12.19 start
+                        int stepno;
+                        if ((stepno = getServerStep(param)) >= 0){
+                            delete m_abstract_particles[param->m_time_step];
+                            m_abstract_particles[param->m_time_step] = m_server->getPointObjectFromServer(*param, result, numvol, stepno);
+                            // ADD START FEAST 2016.01.07
+                            // 粒子生成時にサーバー側で演算エラーが発生
+                            if (m_abstract_particles[param->m_time_step] == NULL)
+                            {
+                                //                                m_timectrl_panel->toggleStop(true);
                                 m_timectrl_panel->toggleActive();
-							}
-							// ADD END FEAST 2016.01.07
-						} // 2018.12.19
-						else if (param->m_client_server_mode == 0  ){
-							if (m_abstract_particles[param->m_time_step]) delete m_abstract_particles[param->m_time_step];
-						}
-#ifndef CPUMODE
-                    }
-                    else if (param->repeatLevel < param->abstractRepeatLevel  )
-                    {
-
-                        kvs::visclient::PBVRParam& pref=*param;
-                        const kvs::visclient::PBVRParam cpref=
-                                const_cast< const kvs::visclient::PBVRParam&>(pref);
-                        PointObject* m_dividedObject = server->getPointObjectFromServer( pref, result, numvol );
-                        // ADD START FEAST 2016.01.07
-                        if ( m_dividedObject == NULL )
-                        {
-                            m_timectrl_panel->toggleStop(true);
+                            }
+                            // ADD END FEAST 2016.01.07
+                        } // 2018.12.19
+                        else if (param->m_client_server_mode == 0  ){
+                            if (m_abstract_particles[param->m_time_step]) delete m_abstract_particles[param->m_time_step];
                         }
-                        else
-                        {
-                            abstractParticles[param->timeStep]->add( *m_dividedObject );
-                            delete m_dividedObject;
-                        }
-                        // ADD END FEAST 2016.01.07
-                    }
-                    else
-                    {
-                        assert( false );
-                    }
-#endif
                 }
                 else if ( param->m_detailed_transfer_type == VisualizationParameter::Summalized )
                 {
-					// サーバにないステップは対象としない 2018.12.19 start
-					int stepno;
-					if ((stepno = getServerStep(param)) >= 0 ){
-						delete m_abstract_particles[param->m_time_step];
-						m_abstract_particles[param->m_time_step] = m_server->getPointObjectFromServer(*param, result, numvol, stepno);
-						// ADD START FEAST 2016.01.07
-						if (m_abstract_particles[param->m_time_step] == NULL)
-						{
-//                            m_timectrl_panel->toggleStop(true);
+                    // サーバにないステップは対象としない 2018.12.19 start
+                    int stepno;
+                    if ((stepno = getServerStep(param)) >= 0 ){
+                        delete m_abstract_particles[param->m_time_step];
+                        m_abstract_particles[param->m_time_step] = m_server->getPointObjectFromServer(*param, result, numvol, stepno);
+                        // ADD START FEAST 2016.01.07
+                        if (m_abstract_particles[param->m_time_step] == NULL)
+                        {
+                            //                            m_timectrl_panel->toggleStop(true);
                             m_timectrl_panel->toggleActive();
-						}
-						// ADD END FEAST 2016.01.07
-					} // 2018.12.19
-					else if (param->m_client_server_mode == 0){
-						if (m_abstract_particles[param->m_time_step]) delete m_abstract_particles[param->m_time_step];
-					}
-				}
+                        }
+                        // ADD END FEAST 2016.01.07
+                    } // 2018.12.19
+                    else if (param->m_client_server_mode == 0){
+                        if (m_abstract_particles[param->m_time_step]) delete m_abstract_particles[param->m_time_step];
+                    }
+                }
                 else
                 {
                     assert( false );
@@ -331,92 +300,62 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
                 if ( param->m_detailed_transfer_type == VisualizationParameter::Divided )
                 {
                     qInfo(" *** Command::update::2::abstract::Divided starts *** %d",QThread::currentThreadId() );
-#ifndef CPUMODE
-                    if (param->repeatLevel == param->detailedRepeatLevel )
-                    {
-#endif
-						// サーバにないステップは対象としない 2018.12.19 start
-						int stepno;
-						if ((stepno = getServerStep(param)) >= 0 ){
-							delete m_detailed_particles[param->m_time_step];
-							m_detailed_particles[param->m_time_step] = m_server->getPointObjectFromServer(*param, result, numvol, stepno);
+                        // サーバにないステップは対象としない 2018.12.19 start
+                        int stepno;
+                        if ((stepno = getServerStep(param)) >= 0 ){
+                            delete m_detailed_particles[param->m_time_step];
+                            m_detailed_particles[param->m_time_step] = m_server->getPointObjectFromServer(*param, result, numvol, stepno);
                             // ADD START FEAST 2016.01.07
-							if (m_detailed_particles[param->m_time_step] == NULL)
+                            if (m_detailed_particles[param->m_time_step] == NULL)
                             {
-//                                m_timectrl_panel->toggleStop(true);
+                                //                                m_timectrl_panel->toggleStop(true);
                                 m_timectrl_panel->toggleActive();
-							}
-							// ADD END FEAST 2016.01.07
-						} // 2018.12.19 end
-						else if (param->m_client_server_mode == 0  ){
-							if (m_detailed_particles[param->m_time_step]) delete m_detailed_particles[param->m_time_step];
-						}
-#ifndef CPUMODE
-                    }
-                    else if (param->repeatLevel < param->detailedRepeatLevel )
-                    {
-
-                        kvs::visclient::PBVRParam& pref=*param;
-                        const kvs::visclient::PBVRParam cpref=
-                                const_cast< const kvs::visclient::PBVRParam&>(pref);
-                        PointObject* m_dividedObject = server->getPointObjectFromServer( pref, result, numvol );
-                        // ADD START FEAST 2016.01.07
-                        if ( m_dividedObject == NULL )
-                        {
-                            m_timectrl_panel->toggleStop(true);
+                            }
+                            // ADD END FEAST 2016.01.07
+                        } // 2018.12.19 end
+                        else if (param->m_client_server_mode == 0  ){
+                            if (m_detailed_particles[param->m_time_step]) delete m_detailed_particles[param->m_time_step];
                         }
-                        else
-                        {
-                            detailedParticles[param->timeStep]->add( *m_dividedObject );
-                            delete m_dividedObject;
-                        }
-                        // ADD END FEAST 2016.01.07
-                    }
-                    else
-                    {
-                        assert( false );
-                    }
-#endif
                 }
                 else if ( param->m_detailed_transfer_type == VisualizationParameter::Summalized )
                 {
-					// サーバにないステップは対象としない 2018.12.19 start
-					int stepno;
-					if ((stepno = getServerStep(param)) >= 0){
-						if (m_detailed_particles.size() > param->m_time_step){
-							if (m_detailed_particles[param->m_time_step])
-								delete m_detailed_particles[param->m_time_step];
-							m_detailed_particles[param->m_time_step] = m_server->getPointObjectFromServer(*param, result, numvol, stepno);
+                    // サーバにないステップは対象としない 2018.12.19 start
+                    int stepno;
+                    if ((stepno = getServerStep(param)) >= 0){
+                        if (m_detailed_particles.size() > param->m_time_step){
+                            if (m_detailed_particles[param->m_time_step])
+                                delete m_detailed_particles[param->m_time_step];
+                            m_detailed_particles[param->m_time_step] = m_server->getPointObjectFromServer(*param, result, numvol, stepno);
                         }
-						else{
-							m_detailed_particles.push_back(m_server->getPointObjectFromServer(*param, result, numvol, stepno));
-						}
-						if (m_server_particles.size() < param->m_time_step + 1){
-							m_server_particles.resize(param->m_time_step + 1, NULL);
-							// サーバー生成粒子の各stepの存在範囲を格納
-							m_server_coord_min.resize(param->m_time_step + 1);
-							m_server_coord_max.resize(param->m_time_step + 1);
-							m_server_coord_flag.resize(param->m_time_step + 1, false);
-						}
-						if (m_server_particles[param->m_time_step])
-							delete m_server_particles[param->m_time_step];
-						m_server_particles[param->m_time_step] = m_detailed_particles[param->m_time_step];
+                        else{
+                            m_detailed_particles.push_back(m_server->getPointObjectFromServer(*param, result, numvol, stepno));
+                        }
+                        if (m_server_particles.size() < param->m_time_step + 1){
+                            m_server_particles.resize(param->m_time_step + 1, NULL);
+                            // サーバー生成粒子の各stepの存在範囲を格納
+                            m_server_coord_min.resize(param->m_time_step + 1);
+                            m_server_coord_max.resize(param->m_time_step + 1);
+                            m_server_coord_flag.resize(param->m_time_step + 1, false);
+                        }
+                        if (m_server_particles[param->m_time_step])
+                            delete m_server_particles[param->m_time_step];
+                        m_server_particles[param->m_time_step] = m_detailed_particles[param->m_time_step];
 
-						m_coord_panel_ui->resetChangeFlagForStoreParticle();
+                        m_coord_panel_ui->resetChangeFlagForStoreParticle();
 
-						
-						// ADD START FEAST 2016.01.07
-						if (m_detailed_particles[param->m_time_step] == NULL)
+
+                        // ADD START FEAST 2016.01.07
+                        if (m_detailed_particles[param->m_time_step] == NULL)
                         {
-//                            m_timectrl_panel->toggleStop(true);
+                            //                            m_timectrl_panel->toggleStop(true);
                             m_timectrl_panel->toggleActive();
-						}
-						// ADD END FEAST 2016.01.07
-					}// 2018.12.19 end
-					else if (param->m_client_server_mode == 0){
+                        }
+                        // ADD END FEAST 2016.01.07
+                    }// 2018.12.19 end
+                    else if (param->m_client_server_mode == 0){
                         if (m_detailed_particles[param->m_time_step]) delete m_detailed_particles[param->m_time_step];
-					}
-				}
+                    }
+                }
                 else
                 {
                     assert( false );
@@ -436,40 +375,40 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
                 m_server_coord_flag[i] = false;
             }
         }
-		// サーバにないステップは対象としない 2018.12.19 start
-		int stepno;
-		if ((stepno = getServerStep(param)) >= 0){
-			// サーバ側の粒子の存在範囲を保存
-			if (param->m_client_server_mode == 1 && !m_server_coord_flag[param->m_time_step] && m_server_particles[param->m_time_step] != NULL)
-			{
-				// add by @hira at 2016/12/01
-				if (m_server_particles[param->m_time_step]->coords().pointer() != NULL) {
+        // サーバにないステップは対象としない 2018.12.19 start
+        int stepno;
+        if ((stepno = getServerStep(param)) >= 0){
+            // サーバ側の粒子の存在範囲を保存
+            if (param->m_client_server_mode == 1 && !m_server_coord_flag[param->m_time_step] && m_server_particles[param->m_time_step] != NULL)
+            {
+                // add by @hira at 2016/12/01
+                if (m_server_particles[param->m_time_step]->coords().pointer() != NULL) {
                     m_server_particles[param->m_time_step]->updateMinMaxCoords();
-					m_server_coord_min[param->m_time_step] = m_server_particles[param->m_time_step]->minObjectCoord();
-					m_server_coord_max[param->m_time_step] = m_server_particles[param->m_time_step]->maxObjectCoord();
-					m_server_coord_flag[param->m_time_step] = true;
-				}
-			}
-		}
+                    m_server_coord_min[param->m_time_step] = m_server_particles[param->m_time_step]->minObjectCoord();
+                    m_server_coord_max[param->m_time_step] = m_server_particles[param->m_time_step]->maxObjectCoord();
+                    m_server_coord_flag[param->m_time_step] = true;
+                }
+            }
+        }
         // Merge Point Object
         ParticleMerger merger;
 
-		// サーバにないステップは対象としない 2018.12.19 start
-		kvs::PointObject* server_object = NULL;
-		if (stepno >= 0)
-			server_object = m_server_particles[param->m_time_step];
+        // サーバにないステップは対象としない 2018.12.19 start
+        kvs::PointObject* server_object = NULL;
+        if (stepno >= 0)
+            server_object = m_server_particles[param->m_time_step];
         kvs::PointObject* object;
         merger.setParam( param->m_particle_merge_param, param->m_min_server_time_step, param->m_max_server_time_step );
         object = merger.doMerge( *server_object, param->m_time_step );
         result->m_min_merged_time_step = merger.getMergedInitialTimeStep();
         result->m_max_merged_time_step = merger.getMergedFinalTimeStep();
         // サーバにないステップは対象としない 2018.12.19 start
-		if (m_detailed_particles.size() > param->m_time_step){
-			m_detailed_particles[param->m_time_step] = object;
-		}
-		else {
-			m_detailed_particles.push_back(object);
-		}
+        if (m_detailed_particles.size() > param->m_time_step){
+            m_detailed_particles[param->m_time_step] = object;
+        }
+        else {
+            m_detailed_particles.push_back(object);
+        }
         // Change TransferFunction
         if ( param->m_client_server_mode == 1 && ( !isSamplingParamsKeeped( *param ) || m_coord_panel_ui->getChangeCoordFlagForStoreParticle() ) )
         {
@@ -502,16 +441,13 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
             m_local_subpixel_level = object->size( 0 );
         }
 
-
-
-
         size_t m_time_step = std::max( param->m_min_time_step, std::min( param->m_max_time_step, param->m_time_step ) );
         param->m_time_step = m_time_step;
         TimecontrolPanel::requestUpdate(param,result);
 
-		// 2018.12.19 不要と思われる
+        // 2018.12.19 不要と思われる
 #if 0
-		// reallocate m_abstract_particles and m_detailed_particles
+        // reallocate m_abstract_particles and m_detailed_particles
         if ( param->m_max_time_step > m_detailed_particles.size() - 1 )
         {
             generateAbstractParticles( ( VisualizationParameter* )param, result );
@@ -529,7 +465,7 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
         m_particle_assign_flag = true;
     }
 #ifdef _DEBUG
-    if (param.m_hasfin) {
+    if (param->m_hasfin) {
         printf(" [debug] current filter parameter file. %s & %s\n", pre_filter_parameter_filename, filter_parameter_filename);
     }
     else {
@@ -551,7 +487,7 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
     {
         qInfo(" *** Command::update::4 starts *** %d",QThread::currentThreadId() );
 #ifdef _DEBUG
-        if (param.m_hasfin) {
+        if (param->m_hasfin) {
             printf(" [debug] change filter parameter file. %s & %s\n", pre_filter_parameter_filename, filter_parameter_filename);
         }
         else {
@@ -769,50 +705,18 @@ void Command::postUpdate()
     }else{
         m_parameter.m_detailed_subpixel_level = m_local_subpixel_level;
     }
-#ifdef CPUMODE
-    m_renderer->setSubpixelLevel( m_parameter.m_detailed_subpixel_level );
-    m_renderer->recreateImageBuffer();
-#endif
+
+    m_screen->setRenderSubPixelLevel(m_parameter.m_detailed_subpixel_level);
+    m_screen->recreateRenderImageBuffer();
+
     PBVR_TIMER_STA( 150 );
 
-#ifndef CPUMODE
-    if ( param.transferType == PBVRParam::Abstract )
-    {
-#ifndef CPUMODE
-       renderer->setRepetitionLevel( param.abstractRepeatLevel );
-#endif
-       renderer->setSubpixelLevel( param.abstractSubpixelLevel );
-        PointObject* object = abstractParticles[param.timeStep];
-
-        kvs::PointObject& pobj=*object;
-        const kvs::PointObject& cpobj=
-                const_cast< const kvs::PointObject&>(pobj);
-       renderer->changePointObject( cpobj );
-    }
-    else if ( param.transferType == PBVRParam::Detailed )
-    {
-#ifndef CPUMODE
-       renderer->setRepetitionLevel( param.repeatLevel );
-#endif
-       renderer->setSubpixelLevel( param.detailedSubpixelLevel );
-        PointObject* object = detailedParticles[param.timeStep];
-
-        kvs::PointObject& pobj=*object;
-        const kvs::PointObject& cpobj=
-                const_cast< const kvs::PointObject&>(pobj);
-       renderer->changePointObject( cpobj );
-    }
-    else
-    {
-        assert( false );
-    }
-#endif
 
     if ( pretimestep != TimecontrolPanel::g_curStep )
     {
         //KVS2.7.0
         //MOD BY)T.Osaki 2020.07.20
-        RenderArea::ScreenShot( m_screen->m_scene, TimecontrolPanel::g_curStep );
+        RenderArea::ScreenShot( m_screen->scene(), TimecontrolPanel::g_curStep );
 
         pretimestep = TimecontrolPanel::g_curStep;
     }
@@ -835,7 +739,7 @@ void Command::postUpdate()
 #endif
     qInfo(" ### Command::postUpdate() ends ###");
 
-//        extCommand->param->paramExTransFunc.ExTransFuncParaDump();
+    //        extCommand->param->paramExTransFunc.ExTransFuncParaDump();
 }
 
 int Command::getServerParticleInfomation( VisualizationParameter* param, ReceivedMessage* result )
@@ -1051,29 +955,29 @@ void Command::generateAbstractParticles ( VisualizationParameter* param, Receive
             }
 
             // APPEND START fp)k.yajima 2015.06.26
-//            char buff[512];
-//            sprintf( buff, "All node: %d", reply.m_number_nodes );
-//            lbl_numNodes->name = buff;
-//            sprintf( buff, "All element: %d", reply.m_number_elements );
-//            lbl_numElements->name = buff;
-//            // 	sprintf(buff, "Element type: %c", reply.m_element_type);
-//            sprintf( buff, "Element type: %d", reply.m_element_type ); // MODIFY fj 2015.03.15
-//            lbl_elemType->name = buff;
-//            // 	sprintf(buff, "File type: %c", reply.m_file_type);
-//            sprintf( buff, "File type: %d", reply.m_file_type ); // MODIFY fj 2015.03.15
-//            lbl_fileType->name = buff;
-//            sprintf( buff, "Vector num: %d", reply.m_number_ingredients );
-//            lbl_numIngredients->name = buff;
-//            sprintf( buff, "Step num: %d", reply.m_number_step );
-//            lbl_numStep->name = buff;
-//            sprintf( buff, "SUB volume: %d", reply.numVolDiv );
-//            lbl_numVolDiv->name = buff;
-//            sprintf( buff, " X-Axis: min=%f, max=%f", reply.m_min_object_coord[0], reply.m_max_object_coord[0] );
-//            lbl_objectCoord0->name = buff;
-//            sprintf( buff, " Y-Axis: min=%f, max=%f", reply.m_min_object_coord[1], reply.m_max_object_coord[1] );
-//            lbl_objectCoord1->name = buff;
-//            sprintf( buff, " Z-Axis: min=%f, max=%f", reply.m_min_object_coord[2], reply.m_max_object_coord[2] );
-//            lbl_objectCoord2->name = buff;
+            //            char buff[512];
+            //            sprintf( buff, "All node: %d", reply.m_number_nodes );
+            //            lbl_numNodes->name = buff;
+            //            sprintf( buff, "All element: %d", reply.m_number_elements );
+            //            lbl_numElements->name = buff;
+            //            // 	sprintf(buff, "Element type: %c", reply.m_element_type);
+            //            sprintf( buff, "Element type: %d", reply.m_element_type ); // MODIFY fj 2015.03.15
+            //            lbl_elemType->name = buff;
+            //            // 	sprintf(buff, "File type: %c", reply.m_file_type);
+            //            sprintf( buff, "File type: %d", reply.m_file_type ); // MODIFY fj 2015.03.15
+            //            lbl_fileType->name = buff;
+            //            sprintf( buff, "Vector num: %d", reply.m_number_ingredients );
+            //            lbl_numIngredients->name = buff;
+            //            sprintf( buff, "Step num: %d", reply.m_number_step );
+            //            lbl_numStep->name = buff;
+            //            sprintf( buff, "SUB volume: %d", reply.numVolDiv );
+            //            lbl_numVolDiv->name = buff;
+            //            sprintf( buff, " X-Axis: min=%f, max=%f", reply.m_min_object_coord[0], reply.m_max_object_coord[0] );
+            //            lbl_objectCoord0->name = buff;
+            //            sprintf( buff, " Y-Axis: min=%f, max=%f", reply.m_min_object_coord[1], reply.m_max_object_coord[1] );
+            //            lbl_objectCoord1->name = buff;
+            //            sprintf( buff, " Z-Axis: min=%f, max=%f", reply.m_min_object_coord[2], reply.m_max_object_coord[2] );
+            //            lbl_objectCoord2->name = buff;
 
             FilterinfoPanel::updateFilterInfo(reply);
             // APPEND END fp)k.yajima 2015.06.26
@@ -1157,13 +1061,13 @@ size_t Command::getUsingMemoryByKiloByte()
 {
     size_t memory = 0;
 #ifndef CPUMODE
-    for ( size_t i = 0; i < abstractParticles.size(); ++i )
+    for ( size_t i = 0; i < m_abstract_particles.size(); ++i )
     {
-        memory += abstractParticles[i]->coords().size() * sizeof( kvs::Real32 ) + abstractParticles[i]->normals().size() * sizeof( kvs::Real32 ) + abstractParticles[i]->colors().size() * sizeof( kvs::UInt8 );
+        memory += m_abstract_particles[i]->coords().size() * sizeof( kvs::Real32 ) + m_abstract_particles[i]->normals().size() * sizeof( kvs::Real32 ) + m_abstract_particles[i]->colors().size() * sizeof( kvs::UInt8 );
     }
-    for ( size_t i = 0; i < detailedParticles.size(); ++i )
+    for ( size_t i = 0; i < m_detailed_particles.size(); ++i )
     {
-        memory += detailedParticles[i]->coords().size() * sizeof( kvs::Real32 ) + detailedParticles[i]->normals().size() * sizeof( kvs::Real32 ) + detailedParticles[i]->colors().size() * sizeof( kvs::UInt8 );
+        memory += m_detailed_particles[i]->coords().size() * sizeof( kvs::Real32 ) + m_detailed_particles[i]->normals().size() * sizeof( kvs::Real32 ) + m_detailed_particles[i]->colors().size() * sizeof( kvs::UInt8 );
     }
 #endif
     return memory / 1024;
@@ -1225,9 +1129,9 @@ void Command::apply_variable_range( const VariableRange& range )
             const std::string tag_c = nm + "_var_c";
             doc.m_color_transfer_function[i].m_color_variable_min   = range.min( tag_c );
             doc.m_color_transfer_function[i].m_color_variable_max   = range.max( tag_c );
-                qInfo("Command::apply_variable_range >>>>> %s %f %f" ,tag_c.c_str(),
-                      doc.m_color_transfer_function[i].m_color_variable_min,
-                      doc.m_color_transfer_function[i].m_color_variable_max );
+            qInfo("Command::apply_variable_range >>>>> %s %f %f" ,tag_c.c_str(),
+                  doc.m_color_transfer_function[i].m_color_variable_min,
+                  doc.m_color_transfer_function[i].m_color_variable_max );
             doc.m_color_transfer_function[i].m_range_initialized = true;
             f = true;
         }

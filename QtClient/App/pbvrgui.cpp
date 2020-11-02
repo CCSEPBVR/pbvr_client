@@ -395,13 +395,14 @@ void PBVRGUI::onImportMenuAction()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Import Parameter File"), ".", tr("Parameter Files (*.ini *.INI *.*)"));
     if (!fileName.isEmpty()){
-        VizParameterFile::ConversionClassToFloat();
+        VizParameterFile::ConversionClassToFloat(kvs_renderarea->getPointObjectXform());
         VizParameterFile::ReadParamFile( fileName.toStdString().c_str());
         tf_editor.importFile( fileName.toStdString());
         coordinatePanel.setUISynthesizer();
         legendPanel.importFile(fileName.toStdString().c_str());
         legendPanel.set2UI();
-        VizParameterFile::ConversionFloatToClass();
+        kvs::Xform xf = VizParameterFile::ConversionFloatToClass();
+        kvs_renderarea->setPointObjectXform(xf);
         kvs_renderarea->redraw();
     }
 }
@@ -413,7 +414,7 @@ void PBVRGUI::onExportMenuAction()
         fileName += ".ini";
     }
     if (!fileName.isEmpty()){
-        VizParameterFile::ConversionClassToFloat();
+        VizParameterFile::ConversionClassToFloat(kvs_renderarea->getPointObjectXform());
         VizParameterFile::WriteParamFile( fileName.toStdString().c_str() ); // APPEND BY)M.Tanaka 2015.03.03
         tf_editor.exportFile( fileName.toStdString(), true ); // APPEND Fj 2015.03.05
         legendPanel.exportFile( fileName.toStdString() );
@@ -511,7 +512,7 @@ void PBVRGUI::keyPressEvent(QKeyEvent* ke)
 void PBVRGUI::setBackgroundColor(kvs::RGBColor c){
     //KVS2.7.0
     //MOD BY)T.Osaki 2020.07.20
-    extCommand->m_screen->m_scene->background()->setColor(c);
+    extCommand->m_screen->scene()->background()->setColor(c);
     extCommand->m_screen->update();
     update();
 }
@@ -520,13 +521,13 @@ void PBVRGUI::onViewer_ControlsMenuAction()
     qInfo("VIEWER CONTROLS");
     //KVS2.7.0
     //MOD BY)T.Osaki 2020.07.20
-    vc.selected_color=kvs_renderarea->m_scene->background()->color();
+    vc.selected_color=kvs_renderarea->scene()->background()->color();
     vc.setCurrentFont(kvs_renderarea->font());
     int result = vc.exec();
     if (result == QDialog::Accepted){
         //KVS2.7.0
         //MOD BY)T.Osaki 2020.07.20
-        kvs_renderarea->m_scene->background()->setColor(vc.selected_color);
+        kvs_renderarea->scene()->background()->setColor(vc.selected_color);
         kvs_renderarea->setLabelFont(vc.getFontSelection());
     }
 }

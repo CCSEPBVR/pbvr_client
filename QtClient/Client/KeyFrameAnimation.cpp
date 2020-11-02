@@ -42,21 +42,15 @@ void KeyFrameAnimationInit()
 
 
 // Add Xform
-int KeyFrameAnimationAdd()
+int KeyFrameAnimationAdd(kvs::Xform xform)
 {
     qInfo(" $$$$ KeyFrameAnimationAdd()");
     RenderArea::g_timer_event->disableKeyFrameAnimation();
-#ifdef CPUMODE
-    kvs::PointObject* object = RenderArea::g_timer_event->getPointObject();
-    if ( object )
-    {
 
-        kvs::Xform xform = object->xform();
-        m_xforms.push_back( xform );
-        m_time_steps.push_back( RenderArea::g_timer_event->getTimeStep() );
-        qInfo("   $ has object, num frames: %d", m_xforms.size());
-    }
-#endif
+    m_xforms.push_back( xform );
+    m_time_steps.push_back( RenderArea::g_timer_event->getTimeStep() );
+    qInfo("   $ has object, num frames: %d", m_xforms.size());
+
     int ValueNumKeyFrames = m_xforms.size();
     AnimationControls::RedrawAnimationControl(ValueNumKeyFrames);
     return m_xforms.size();
@@ -66,26 +60,27 @@ int KeyFrameAnimationAdd()
 void KeyFrameAnimationStart()
 {
     RenderArea::g_timer_event->enableKeyFrameAnimation();
+    extCommand->m_glut_timer->start();
 }
 
 // Animation stop
 void KeyFrameAnimationStop()
 {
     RenderArea::g_timer_event->disableKeyFrameAnimation();
+    extCommand->m_glut_timer->stop();
 }
 
 // Animation switch start/stop
 void KeyFrameAnimationToggle()
 {
-    RenderArea::g_timer_event->toggleKeyFrameAnimation();
-    if (extCommand->m_is_key_frame_animation){
-        extCommand->m_glut_timer->start();
+    static bool animation_active=false;
+    animation_active=!animation_active;
+    if (animation_active){
+        KeyFrameAnimationStart();
     }
-    else
-    {
-        extCommand->m_glut_timer->stop();
+    else{
+        KeyFrameAnimationStop();
     }
-
 }
 
 // delete all Xform

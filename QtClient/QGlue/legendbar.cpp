@@ -24,6 +24,7 @@ namespace QGlue
 LegendBar::LegendBar( kvs::ScreenBase* screen, const Command& command ) :
 //LegendBar::LegendBar( kvs::Scene* screen, const Command& command ) :
     m_command( &command ),
+    m_texture(this,3*sizeof( kvs::UInt8 ),"LegendBar m_texture"),
     QGLUEBase(0)
 {
     m_ndivisions=5;
@@ -37,7 +38,11 @@ LegendBar::LegendBar( kvs::ScreenBase* screen, const Command& command ) :
     //    MOD BY)T.Osaki 2020.04.28
     pixelRatio=QApplication::desktop()->devicePixelRatioF();
 }
-
+/*===========================================================================*/
+/**
+ * @brief LegendBar::screenUpdated
+ */
+/*===========================================================================*/
 void LegendBar::screenUpdated()
 {
     kvs::visclient::ExtendedTransferFunctionMessage m_doc;
@@ -60,7 +65,12 @@ void LegendBar::screenUpdated()
     m_texture_downloaded=false;
 
 }
-
+/*===========================================================================*/
+/**
+ * @brief LegendBar::screenResizedAfterSelectTransferFunction
+ * @param i
+ */
+/*===========================================================================*/
 void LegendBar::screenResizedAfterSelectTransferFunction( const int i )
 {
     m_selected_transfer_function = i;
@@ -152,14 +162,15 @@ void LegendBar::create_texture( void )
     const size_t      height = 1;
     const kvs::UInt8* data   = m_colormap.table().pointer();
 
-    m_texture.release();
+//    m_texture.release();
     m_texture.setPixelFormat( nchannels, sizeof( kvs::UInt8 ) );
     m_texture.setMinFilter( GL_NEAREST );
     m_texture.setMagFilter( GL_NEAREST );
     //KVS2.7.0
     //MOD BY)T.Osaki 2020.07.20
     m_texture.create( width, height, data );
-    m_texture.download( width, height, data );
+//    m_texture.download( width, height, data );
+    m_texture.load(width,height,data);
 }
 
 /*===========================================================================*/
@@ -173,37 +184,35 @@ void LegendBar::create_texture( void )
 /*===========================================================================*/
 void LegendBar::draw_color_bar( const int x, const int y, const int width, const int height )
 {
-
-
-    m_texture.bind();
-
-    switch ( m_orientation )
+    if(m_texture.bind())
     {
-    case LegendBar::Horizontal:
-    {
-        glBegin( GL_QUADS );
-        glTexCoord2f( 0.0f, 1.0f ); glVertex2f( x,         y );
-        glTexCoord2f( 1.0f, 1.0f ); glVertex2f( x + width, y );
-        glTexCoord2f( 1.0f, 0.0f ); glVertex2f( x + width, y + height );
-        glTexCoord2f( 0.0f, 0.0f ); glVertex2f( x,         y + height );
-        glEnd();
-        break;
-    }
-    case LegendBar::Vertical:
-    {
-        glBegin( GL_QUADS );
-        glTexCoord2f( 0.0f, 0.0f ); glVertex2f( x,         y );
-        glTexCoord2f( 0.0f, 1.0f ); glVertex2f( x + width, y );
-        glTexCoord2f( 1.0f, 1.0f ); glVertex2f( x + width, y + height );
-        glTexCoord2f( 1.0f, 0.0f ); glVertex2f( x,         y + height );
-        glEnd();
-        break;
-    }
-    default: break;
-    }
+        switch ( m_orientation )
+        {
+        case LegendBar::Horizontal:
+        {
+            glBegin( GL_QUADS );
+            glTexCoord2f( 0.0f, 1.0f ); glVertex2f( x,         y );
+            glTexCoord2f( 1.0f, 1.0f ); glVertex2f( x + width, y );
+            glTexCoord2f( 1.0f, 0.0f ); glVertex2f( x + width, y + height );
+            glTexCoord2f( 0.0f, 0.0f ); glVertex2f( x,         y + height );
+            glEnd();
+            break;
+        }
+        case LegendBar::Vertical:
+        {
+            glBegin( GL_QUADS );
+            glTexCoord2f( 0.0f, 0.0f ); glVertex2f( x,         y );
+            glTexCoord2f( 0.0f, 1.0f ); glVertex2f( x + width, y );
+            glTexCoord2f( 1.0f, 1.0f ); glVertex2f( x + width, y + height );
+            glTexCoord2f( 1.0f, 0.0f ); glVertex2f( x,         y + height );
+            glEnd();
+            break;
+        }
+        default: break;
 
-    m_texture.unbind();
-
+        }
+        m_texture.unbind();
+    }
 }
 
 
@@ -283,6 +292,12 @@ void LegendBar::draw_border( const int x, const int y, const int width, const in
     glEnd();
 
 }
+/*===========================================================================*/
+/**
+ * @brief LegendBar::setFont
+ * @param f
+ */
+/*===========================================================================*/
 void LegendBar::setFont(const QFont& f)
 {
     maxLabel.setFont(f);

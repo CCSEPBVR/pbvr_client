@@ -24,5 +24,7 @@
         <file>Resources/images/viewclose.png</file>
         <file>Resources/images/viewgroup.png</file>
         <file>Resources/images/windowmenu.png</file>
+        <file>Resources/images/unlocked.png</file>
+        <file>Resources/images/locked.png</file>
     </qresource>
 </RCC>

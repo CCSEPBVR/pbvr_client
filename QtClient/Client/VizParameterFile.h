@@ -7,6 +7,7 @@
 #include <fstream>
 #include "Types.h"
 #include <kvs/RGBColor>
+#include <kvs/Xform>
 
 class VizParameterFile
 {
@@ -15,8 +16,8 @@ public:
 
     static int ReadParamFile( const char* fname, const int readflag = 1 );
     static int WriteParamFile( const char* fname );
-    static void ConversionFloatToClass();
-    static void ConversionClassToFloat();
+    static kvs::Xform ConversionFloatToClass();
+    static void ConversionClassToFloat( kvs::Xform);
     static kvs::RGBColor getBackgroundColor();
 
 };
