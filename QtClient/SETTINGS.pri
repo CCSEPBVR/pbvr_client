@@ -45,4 +45,4 @@ INCLUDEPATH += ../
 INCLUDEPATH += $(KVS_DIR)/include
 INCLUDEPATH += ../Common/$${PBVR_MODE}
 INCLUDEPATH += $${PBVR_PATH}/FunctionParser
-INCLUDEPATH += ../../glew-2.1.0/include
+INCLUDEPATH += $(GLEW_DIR)/include
