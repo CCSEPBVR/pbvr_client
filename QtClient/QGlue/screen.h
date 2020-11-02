@@ -28,7 +28,6 @@ public:
     typedef kvs::ScreenBase BaseClass;
     typedef kvs::Scene::ControlTarget ControlTarget;
     bool m_hold_paintGL=false;
-        bool objectReplaced=false;
     double m_fps = 0.0;
 
 private:

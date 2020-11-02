@@ -479,6 +479,13 @@ static float Norm( const float a, const float b, const float c, const float d )
 //KVS2.7.0
 //MOD BY)T.Osaki 2020.06.04
 //static kvs::Quaternion<float> RtoQ( const kvs::Matrix33f& R )
+/*===========================================================================*/
+/**
+ * @brief RtoQ  Transform-Matrix to Quaternion conversion.
+ * @param R     Transform-Matrix
+ * @return kvs::Quaternion representing transform.
+ */
+/*===========================================================================*/
 static kvs::Quaternion RtoQ( const kvs::Matrix33f& R )
 {
     float r11 = R[0][0];
@@ -546,8 +553,18 @@ static kvs::Quaternion RtoQ( const kvs::Matrix33f& R )
     //return kvs::Quaternion<float>( q1, q2, q3, q0 );
     return kvs::Quaternion( q1, q2, q3, q0 );
 }
-
-
+/*===========================================================================*/
+/**
+ * @brief InterpolateXform Interpolate Xform between start and end based on
+ *        number of frames and interpolation step.
+ *
+ * @param interp_step   Current interpolation step
+ * @param num_frame     Number of frames
+ * @param start         start XForm
+ * @param end           end XForm
+ * @return kvs::Xform   the interpolated XForm
+ */
+/*===========================================================================*/
 static kvs::Xform InterpolateXform( const int interp_step, const int num_frame, const kvs::Xform& start, const kvs::Xform& end )
 {
     // range of the interpolation parametar t = [0,1].

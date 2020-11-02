@@ -17,6 +17,8 @@ Screen::Screen( QWidget* parent_surface)
     m_scene = new kvs::Scene(this);
     Screen::setFocusPolicy(Qt::StrongFocus );
     ScreenBase::create();
+    m_scene->camera()->setWindowSize(340,340);
+    m_scene->mouse()->attachCamera( m_scene->camera());
     update();
 }
 /**
@@ -24,8 +26,11 @@ Screen::Screen( QWidget* parent_surface)
  *                         Do not call directly.
  *
  *                         Attains paint_mutex lock, checks opengl status and paints the scene.
- *                         After painting scene, the virtual method onPaintGL is called to allow
+ *
+ *                         After painting the scene, the virtual method onPaintGL is called to allow
  *                         any subclass to paint additional items on top of scene.
+ *
+ *                         Finally glGetError is called until any and all errors are cleared.
  */
 void Screen::paintGL()
 {
@@ -38,9 +43,6 @@ void Screen::paintGL()
         return;
     }
     int e;
-    if (objectReplaced){
-        objectReplaced=false;
-    }
     // Try to get paint_mutex lock.
     // This is probably not needed any more
     if (!paint_mutex.try_lock()){
@@ -49,7 +51,7 @@ void Screen::paintGL()
         return;
     }
     // Check and clear GL errors
-    while ((e = glGetError())){
+    while (e = glGetError()){
         qCritical("Screen::paintGL GL HAS ERROR BEFORE %d",e);
     }
     // This allows KVS to work with QOpenGLWidgets
@@ -70,7 +72,7 @@ void Screen::paintGL()
     onPaintGL();
 
     // Check and clear GL errors
-    while ((e = glGetError())){
+    while (e = glGetError()){
         qCritical("Screen::paintGL GL GOT GL ERROR %d",e);
     }
     paint_mutex.unlock();
@@ -119,7 +121,7 @@ void Screen::initializeGL()
     if ( result != GLEW_OK )
     {
         const GLubyte* message = glewGetErrorString( result );
-        qFatal("GLEW initialization failed.");
+        qFatal("GLEW initialization failed. ");
     }
     initializeOpenGLFunctions();
     onInitializeGL();

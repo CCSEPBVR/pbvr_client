@@ -25,9 +25,15 @@ ColorEditor::ColorEditor(QWidget *parent) :
     ui->colormap_selection->setCurrentRow( 0 );
     ui->colormap_selection->currentItem()->setSelected(true);
 
-    this->rfe = ui->expression_r->text().toStdString();
-    this->gfe = ui->expression_g->text().toStdString();
-    this->bfe = ui->expression_b->text().toStdString();
+
+    QString tmprfe= ui->expression_r->text();
+    QString tmpgfe= ui->expression_g->text();
+    QString tmpbfe= ui->expression_b->text();
+
+    this->rfe = tmprfe.toStdString();
+    this->gfe = tmpgfe.toStdString();
+    this->bfe = tmpbfe.toStdString();
+
     //ADD BY)T.Osaki 2020.02.28
     this->m_color_map_palette->m_cundoStack = m_undoStack;
 

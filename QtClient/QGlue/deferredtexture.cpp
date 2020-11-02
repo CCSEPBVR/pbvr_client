@@ -4,6 +4,12 @@
 #include <QApplication>
 namespace  QGlue {
 
+/**
+ * @brief DeferredTexture2D::DeferredTexture2D
+ * @param surface, the component (histogram etc.) derrived from QGLUEBaseWidget. Pass null if not derrived from QGLUEBaseWidget
+ * @param bytes, the number of bytes for whole texture
+ * @param name, name for debug purpose.
+ */
 DeferredTexture2D::DeferredTexture2D(QGLUEBase* surface, size_t bytes, std::string name){
     this->surface=surface;
     this->name=name+"[2D]";
@@ -135,12 +141,23 @@ void DeferredTexture2D::unbind()
             Texture2D::unbind();
     }
 }
-
+/**
+ * @brief DeferredTexture1D::DeferredTexture1D
+ * @param surface, the component (histogram etc.) derrived from QGLUEBaseWidget. Pass null if not derrived from QGLUEBaseWidget
+ * @param bytes, the number of bytes for whole texture
+ * @param name, name for debug purpose.
+ */
 DeferredTexture1D::DeferredTexture1D(QGLUEBase* surface, size_t bytes, std::string name){
     this->surface=surface;
     this->name=name+"[1D]";
     this->nbytes=bytes;
 }
+/**
+ * @brief DeferredTexture1D::cacheData
+ * @param w width in pixels
+ * @param data texture data
+ * @param o offset
+ */
 void DeferredTexture1D::cacheData(size_t w, const void* data,size_t o)
 {
     std::cout<<name<<"::makecache : "<< w<<"*"<<nbytes <<std::endl;
@@ -152,7 +169,12 @@ void DeferredTexture1D::cacheData(size_t w, const void* data,size_t o)
     cache= malloc(w*nbytes);
     memcpy(cache,data,w*nbytes);
 }
-
+/**
+ * @brief DeferredTexture1D::create creates the texture and loads data if context available
+ *                                  caches the data for later restore  (in case context was not available)
+ * @param width, width in pixels
+ * @param data, texture data
+ */
 void DeferredTexture1D::create(size_t width, const void* data)
 {
     cacheData(width,data);
@@ -161,6 +183,13 @@ void DeferredTexture1D::create(size_t width, const void* data)
         Texture1D::create(width,data);
     }
 }
+/**
+ * @brief DeferredTexture1D::load , loads the texture data into GPU if context available.
+ *                                  caches the data for later restore  (in case context was not available)
+ * @param width,  width in pixels
+ * @param data, texture data
+ * @param offset, offset
+ */
 void  DeferredTexture1D::load(int width, const void* data, size_t offset){
     std::cout<<name<<"::load "<< width <<std::endl;
     cacheData(width,data,offset);
@@ -173,7 +202,12 @@ void  DeferredTexture1D::load(int width, const void* data, size_t offset){
         Texture1D::unbind();
     }
 }
-
+/**
+ * @brief DeferredTexture1D::bind  binds the texture data for drawing if context is available and ready.
+ *                                 Tries to restore the texture from cache if earlier creation/load failed.
+ *                                 Sets the correct GL_TEXTURE state
+ * @return bool isBound()
+ */
 bool  DeferredTexture1D::bind()
 {
     if(surface->contextReady()){
@@ -216,6 +250,9 @@ bool  DeferredTexture1D::bind()
     }
 }
 
+/**
+ * @brief DeferredTexture1D::unbind , unbinds the texture if context is available and ready.
+ */
 void DeferredTexture1D::unbind()
 {
     if(surface->contextReady()){

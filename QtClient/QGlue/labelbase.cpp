@@ -21,31 +21,46 @@ Label::Label(RenderArea *screen)
     this->setText(QString("#"));
     this->updateBitmap();
 }
+/*===========================================================================*/
+/**
+ * @brief Label::setPosition
+ * @param x
+ * @param y
+ */
+/*===========================================================================*/
 void Label::setPosition( int x, int y)
 {
     this->move(x,y);
 }
-
+/*===========================================================================*/
 /**
  * @brief Label::setText sets the label text and optionally updates text color
  * @param text
  * @param textColor
  */
+/*===========================================================================*/
 void Label::setText(const QString &text, QColor textColor){
     QLabel::setText(text);
     Label::updateBitmap(textColor);
 }
-
+/*===========================================================================*/
+/**
+ * @brief Label::getText
+ * @return
+ */
+/*===========================================================================*/
 const std::string Label::getText()
 {
     return this->text().toStdString();
 }
+/*===========================================================================*/
 /**
  * @brief Label::nextPower2
  * Good-Old Stanford graphics bit twiddle hack to find next power of 2
  * @param size
  * @return
  */
+/*===========================================================================*/
 uint Label::nextPower2(uint size)
 {
     size--;
@@ -56,11 +71,12 @@ uint Label::nextPower2(uint size)
     size |= size >> 16;
     return ++size;
 }
-
+/*===========================================================================*/
 /**
  * @brief Label::updateBitmap , updates the bitmap with the current label text
  * @param textColor
  */
+/*===========================================================================*/
 void Label::updateBitmap(QColor textColor)
 {
     QString lbl_text=this->text();
@@ -90,13 +106,14 @@ void Label::updateBitmap(QColor textColor)
     pnt.drawText(QRect(0, 0,bitmap_w,bitmap_h), lbl_text);
     pnt.end();
 }
-
+/*===========================================================================*/
 /**
  * @brief Label::renderBitMap renders the bitmap using glDrawPixels
  * @param x
  * @param y
  * @param z
  */
+/*===========================================================================*/
 void Label::renderBitMap(float x, float y,float z)
 {
     glPushAttrib( GL_ALL_ATTRIB_BITS );
@@ -108,12 +125,23 @@ void Label::renderBitMap(float x, float y,float z)
     glPixelZoom(1.0,1.0);
     glPopAttrib();
 }
+
+/**
+ * @brief FPSLabel::FPSLabel
+ * @param screen
+ * @param renderer
+ */
 FPSLabel::FPSLabel(RenderArea *screen,  const kvs::RendererBase& renderer ):
     Label(screen),
     m_renderer(&renderer)
 {
 
 }
+/*===========================================================================*/
+/**
+ * @brief FPSLabel::contentUpdate
+ */
+/*===========================================================================*/
 void FPSLabel::contentUpdate( )
 {
     QString fps;
@@ -126,12 +154,23 @@ void FPSLabel::contentUpdate( )
     }
     Label::setText(fps, Qt::white);
 }
-
+/*===========================================================================*/
+/**
+ * @brief StepLabel::StepLabel
+ * @param screen
+ * @param command
+ */
+/*===========================================================================*/
 StepLabel::StepLabel(RenderArea *screen,  ExtCommand* command  ):
     Label(screen)
 {
     (void)command;
 }
+/*===========================================================================*/
+/**
+ * @brief StepLabel::contentUpdate
+ */
+/*===========================================================================*/
 void StepLabel::contentUpdate()
 {
 #ifdef CS_MODE

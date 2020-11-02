@@ -21,7 +21,13 @@
 class PBVRGUI;
 
 /**
- * @brief
+ * @brief The RenderArea class extends the PBVR Screen class with functionality
+ *        for rendering additional components, such as orientation axis, and legend.
+ *
+ *        The RenderArea class is also responsible for all passing all interaction with the scene,
+ *        point object, and renderer from other classes in PBVR.
+ *
+ *        It is also responsible for handling mouse and keyboard events.
  *
  */
 //KVS2.7.0
@@ -44,25 +50,46 @@ private:
     {
 
     private:
-        kvs::PointObject list[2];
+        kvs::PointObject list[2]; // object list
         int index=0;
+
+        /**
+         * @brief active , active returns the currently active object from the object list
+         * @return The currently active point object
+         */
         kvs::PointObject* active(){
             return &list[index];
         }
-    public:
 
+    public:
+        /**
+         * @brief swap, swaps front object and back object
+         * @return
+         */
         kvs::PointObject* swap(){
             index=!index;
+            return active();
         }
+        /**
+         * @brief operator ->  Dereference operator. Allows PointObjectProxy methods and members
+         *                     of the active object to be accessed as if interacting with a standard kvs::PointObject.
+         * @return kvs::PointObject* to currently active object
+         */
         kvs::PointObject *operator->()
         {
             return active();
         }
+        /**
+         * @brief operator kvs::PointObject *  When try to cast to or pass this object as kvs::PointObject,
+         *                 use the currently active object
+         */
         operator kvs::PointObject*(){
             return active();
         }
     };
     static PointObjectProxy m_point_object;
+
+
 public:
 
     explicit RenderArea( QWidget* parent_surface);
@@ -70,6 +97,7 @@ public:
     //MOD BY)T.Osaki 2020.06.29
     //static void ScreenShot( kvs::ScreenBase* screen, const int tstep );
     //static void ScreenShotKeyFrame( kvs::ScreenBase* screen, const int tstep );
+
     static void ScreenShot( kvs::Scene* scene, const int tstep );
     static void ScreenShotKeyFrame( kvs::Scene* scene, const int tstep );
 
@@ -84,40 +112,18 @@ public:
 
     void setShaderParams( );
     void setupEventHandlers( );
-
-    void enableRendererShading(){
-        m_renderer->enableShading();
-    }
-    void setRenderSubPixelLevel(int level){
-        m_renderer->setSubpixelLevel( level );
-    }
-    void setRenderRepetionlLevel(int level){
-#ifndef CPUMODE
-        m_renderer->setRepetitionLevel( level );
-#endif
-    }
-    void recreateRenderImageBuffer()
-    {
-        m_renderer->recreateImageBuffer();
-    }
-
-    kvs::Xform getPointObjectXform()
-    {
-        return  m_point_object->xform();
-    }
-
-    void setPointObjectXform(kvs::Xform xf)
-    {
-        m_point_object->setXform(xf);
-    }
-
-
-    //KVS2.7.0
-    //MOD BY)T.Osaki 2020.05.28
-    //DEL BY)T.Osaki 2020.06.15
-    //    int show( void ){QOpenGLWidget::show(); return 1;}
-    //    void show( void ){QOpenGLWidget::show();}
     void updateCommandInfo(ExtCommand* command_q);
+
+    // Public access methods for interacting with private renderer.
+    void enableRendererShading();
+    void setRenderSubPixelLevel(int level);
+    void setRenderRepetionlLevel(int level);
+    void recreateRenderImageBuffer();
+
+    // Public access methods for interacting with private point object.
+    kvs::Xform getPointObjectXform();
+    void setPointObjectXform(kvs::Xform xf);
+    void attachPointObject(const kvs::PointObject *point);
 
 public:
     static char shadinglevel[256];
@@ -132,12 +138,7 @@ public:
     QGlue::Timer*           qt_timer;
 
     QList<QGlue::Label*>     m_labels;
-    //KVS2.7.0
-    //MOD BY)T.Osaki 2020.07.20
-    //    kvs::Scene* m_scene;
 
-    std::pair<int, int> obj_id_pair;
-    void attachPointObject(const kvs::PointObject *point);
     void toggleTimer(bool state){
         if (state)
             qt_timer->start();
@@ -145,9 +146,10 @@ public:
             qt_timer->stop();
     }
 private:
+    std::pair<int, int> m_obj_id_pair;
     int i_w=0;
     int i_h=0;
-    int yl0=0;
+    //    int yl0=0;
     int msec = DEFAULT_MSEC;
     //    MOD BY)T.Osaki 2020.04.28
     float pixelRatio=1;

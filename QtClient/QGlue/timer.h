@@ -94,10 +94,10 @@ public:
 
     const int interval( void ) const;
 
-    void setRenderer( kvs::visclient::ExtendedParticleVolumeRenderer* renderer )
-    {
-        m_renderer = renderer;
-    }
+//    void setRenderer( kvs::visclient::ExtendedParticleVolumeRenderer* renderer )
+//    {
+//        m_renderer = renderer;
+//    }
 protected:
 
     virtual void timerEvent( QTimerEvent* event );

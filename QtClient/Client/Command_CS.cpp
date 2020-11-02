@@ -465,7 +465,7 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
         m_particle_assign_flag = true;
     }
 #ifdef _DEBUG
-    if (param.m_hasfin) {
+    if (param->m_hasfin) {
         printf(" [debug] current filter parameter file. %s & %s\n", pre_filter_parameter_filename, filter_parameter_filename);
     }
     else {
@@ -487,7 +487,7 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
     {
         qInfo(" *** Command::update::4 starts *** %d",QThread::currentThreadId() );
 #ifdef _DEBUG
-        if (param.m_hasfin) {
+        if (param->m_hasfin) {
             printf(" [debug] change filter parameter file. %s & %s\n", pre_filter_parameter_filename, filter_parameter_filename);
         }
         else {

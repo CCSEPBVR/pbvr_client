@@ -16,7 +16,7 @@
 //ADD BY)T.Osaki 2020.06.04
 #include <kvs/Background>
 #include <kvs/ObjectManager>
-#include <QMutex>
+
 #ifdef PBVR_DEBUG
 int     timestep = 0;
 #endif
@@ -28,7 +28,7 @@ kvs::visclient::TimerEvent* RenderArea::g_timer_event=0;
 
 RenderArea::PointObjectProxy RenderArea::m_point_object;
 RenderArea::RenderArea( QWidget* parent_surface):
-    obj_id_pair (-1,-1)
+    m_obj_id_pair (-1,-1)
 {
 
     Q_UNUSED( parent_surface);
@@ -62,6 +62,56 @@ RenderArea::RenderArea( QWidget* parent_surface):
 
 }
 
+/**
+ * @brief RenderArea::enableRendererShading, enable render shading
+ */
+void RenderArea::enableRendererShading(){
+    m_renderer->enableShading();
+}
+/**
+ * @brief RenderArea::setRenderSubPixelLevel, set render sub pixel level.
+ * @param level
+ */
+void RenderArea::setRenderSubPixelLevel(int level){
+    m_renderer->setSubpixelLevel( level );
+}
+/**
+ * @brief RenderArea::setRenderRepetionlLevel, set render repetion level
+ *              Only has effect in CPUMODE, zero-op in GPUMODE
+ * @param level, int.
+ */
+void RenderArea::setRenderRepetionlLevel(int level){
+#ifndef CPUMODE
+    m_renderer->setRepetitionLevel( level );
+#endif
+}
+/**
+ * @brief RenderArea::recreateRenderImageBuffer, recreate the renderers image buffer.
+ *              Only has effect in CPUMODE, zero-op in GPUMODE
+ */
+void RenderArea::recreateRenderImageBuffer()
+{
+#ifndef CPUMODE
+    m_renderer->recreateImageBuffer();
+#endif
+}
+
+/**
+ * @brief RenderArea::getPointObjectXform, get point object transform from private active point object
+ * @return
+ */
+kvs::Xform RenderArea::getPointObjectXform()
+{
+    return  m_point_object->xform();
+}
+/**
+ * @brief RenderArea::setPointObjectXform, set point object transfor of private active point object.
+ * @param xf
+ */
+void RenderArea::setPointObjectXform(kvs::Xform xf)
+{
+    m_point_object->setXform(xf);
+}
 
 /**
  * @brief RenderArea::updateCommandInfo
@@ -97,7 +147,8 @@ void RenderArea::updateCommandInfo(ExtCommand* extCommand)
 }
 
 /**
- * @brief RenderArea::initializeGL
+ * @brief RenderArea::onInitializeGL, overrides virtual onInitializeGL of PBVR Screen class.
+ *                     PBVR Screen will call onInitializeGL when initializeGL is successful.
  */
 void RenderArea::onInitializeGL( void )
 {
@@ -110,7 +161,8 @@ void RenderArea::onInitializeGL( void )
     m_scene->mouse()->attachCamera(m_scene->camera());
 }
 /**
- * @brief RenderArea::resizeGL, GL Surface resized handler
+ * @brief RenderArea::onResizeGL, GL Surface resized handler overrides PBVR Screen onResizeGL.
+ *                               PBVR Screen will call onResizeGL at the end of Screen::resizeGL
  * @param w int width
  * @param h int height
  */
@@ -130,7 +182,8 @@ void RenderArea::onResizeGL(int w, int h)
 
 }
 /**
- * @brief RenderArea::onPaintGL
+ * @brief RenderArea::onPaintGL GL paint handler overrides PBVR Screen onPaintGL.
+ *                               PBVR Screen will call onResizeGL at the end of Screen::paintGL
  */
 void RenderArea::onPaintGL(void)
 {
@@ -146,14 +199,10 @@ void RenderArea::onPaintGL(void)
         g_legend->paintEvent();
         glPopMatrix();
     }
-    if (objectReplaced){
-        std::cout<<"OBJECT REPLACED !!!!"<<std::endl;
-        objectReplaced=false;
-    }
 }
 
 /**
- * @brief RenderArea::setupEventHandlers
+ * @brief RenderArea::setupEventHandlers,
  */
 void RenderArea::setupEventHandlers()
 {
@@ -174,7 +223,7 @@ void RenderArea::setupEventHandlers()
     //    qt_timer->setRenderer(this->m_renderer);
 
     extCommand->m_glut_timer = qt_timer;
-//    qt_timer->setScreen(this);
+    //    qt_timer->setScreen(this);
 
     g_timer_event=new kvs::visclient::TimerEvent( extCommand,&extCommand->comthread );
     g_timer_event->setScreen( this );
@@ -194,7 +243,7 @@ void RenderArea::setupEventHandlers()
 void RenderArea::attachPointObject(const kvs::PointObject* point)
 {
 
-//    std::cout<<"attachPointObject"<<std::endl;
+    //    std::cout<<"attachPointObject"<<std::endl;
     if (QThread::currentThread() != this->thread()) {
         qWarning("RenderArea::attachPointObject was not called from main thread, ignoring point object");
         return;
@@ -208,19 +257,18 @@ void RenderArea::attachPointObject(const kvs::PointObject* point)
     m_point_object->add(*point);
     // Make sure context is current
     makeCurrent();
-    if (obj_id_pair.first ==-1 && obj_id_pair.second == -1){
-        obj_id_pair=this->m_scene->registerObject(m_point_object,m_renderer);
+    if (m_obj_id_pair.first ==-1 && m_obj_id_pair.second == -1){
+        m_obj_id_pair=this->m_scene->registerObject(m_point_object,m_renderer);
     }
     else {
-        this->m_scene->replaceObject(obj_id_pair.first,m_point_object,false);
-        objectReplaced=true;
+        this->m_scene->replaceObject(m_obj_id_pair.first,m_point_object,false);
     }
     m_orientation_axis->setObject( m_point_object);
     // Let Qt know we are done using the context.
     doneCurrent();
     // Trigger a paint event
     this->update();
-//    std::cout<<"attachPointObject end"<<std::endl;
+    //    std::cout<<"attachPointObject end"<<std::endl;
 }
 
 /**
@@ -233,8 +281,8 @@ void RenderArea::setCoordinateBoundaries(float  crd[6])
     kvs::Vector3f max_t( crd[3], crd[4], crd[5] );
     //KVS2.7.0
     //MOD BY)T.Osaki 2020.07.20
-//    this->m_scene->objectManager()->object()->setMinMaxObjectCoords( min_t, max_t );
-//    this->m_scene->objectManager()->object()->setMinMaxExternalCoords( min_t, max_t );
+    //    this->m_scene->objectManager()->object()->setMinMaxObjectCoords( min_t, max_t );
+    //    this->m_scene->objectManager()->object()->setMinMaxExternalCoords( min_t, max_t );
     m_point_object->setMinMaxObjectCoords(min_t,max_t);
     m_point_object->setMinMaxExternalCoords(min_t,max_t);
 
@@ -248,7 +296,7 @@ void RenderArea::setCoordinateBoundaries(float  crd[6])
 }
 
 /**
- * @brief RenderArea::drawLabelList
+ * @brief RenderArea::drawLabelList, draws the label list
  * @param list
  * @param fontColor
  */
@@ -557,12 +605,12 @@ void RenderArea::mousePressEvent( QMouseEvent *event)
  */
 void RenderArea::mouseMoveEvent(QMouseEvent *event)
 {
-//    std::cout<<"mouseMoveEvent"<<std::endl;
+    //    std::cout<<"mouseMoveEvent"<<std::endl;
     //    BaseClass::eventHandler()->notify( event );
     //KVS2.7.0
     //MOD BY)T.Osaki 2020.06.04
     //if( kvs::ScreenBase::controlTarget() == kvs::ScreenBase::TargetObject )
-    if( m_scene->controlTarget() == m_scene->TargetObject )
+    if( m_scene->controlTarget() == m_scene->TargetObject );
     {
         //if( !kvs::ScreenBase::objectManager()->isEnableAllMove() )
         if( !m_scene->isEnabledObjectOperation())

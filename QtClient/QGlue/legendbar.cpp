@@ -38,7 +38,11 @@ LegendBar::LegendBar( kvs::ScreenBase* screen, const Command& command ) :
     //    MOD BY)T.Osaki 2020.04.28
     pixelRatio=QApplication::desktop()->devicePixelRatioF();
 }
-
+/*===========================================================================*/
+/**
+ * @brief LegendBar::screenUpdated
+ */
+/*===========================================================================*/
 void LegendBar::screenUpdated()
 {
     kvs::visclient::ExtendedTransferFunctionMessage m_doc;
@@ -61,7 +65,12 @@ void LegendBar::screenUpdated()
     m_texture_downloaded=false;
 
 }
-
+/*===========================================================================*/
+/**
+ * @brief LegendBar::screenResizedAfterSelectTransferFunction
+ * @param i
+ */
+/*===========================================================================*/
 void LegendBar::screenResizedAfterSelectTransferFunction( const int i )
 {
     m_selected_transfer_function = i;
@@ -283,6 +292,12 @@ void LegendBar::draw_border( const int x, const int y, const int width, const in
     glEnd();
 
 }
+/*===========================================================================*/
+/**
+ * @brief LegendBar::setFont
+ * @param f
+ */
+/*===========================================================================*/
 void LegendBar::setFont(const QFont& f)
 {
     maxLabel.setFont(f);
