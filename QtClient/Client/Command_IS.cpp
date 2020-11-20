@@ -1,80 +1,63 @@
 ﻿//HASCHANGES MANY CHANGES
 #include <QOpenGLContext>
+
+#include "ExtendedParticleVolumeRenderer.h"
+
+#include <QThread>
 #include <algorithm>
 #include <string.h>
 #include "ParticleTransferClient.h"
-
-#include <kvs/glut/Screen>
-#include <kvs/glut/Timer>
-
 #include "ParticleMerger.h"
 #include "ParticleServer.h"
 #include "Command.h"
-//#include "PVRenderer.h"
-#include "ExtendedParticleVolumeRenderer.h"
-//#include "Controller.h"
+
 #include "TimerEvent.h"
-//#include "TFE_main.h"
 
-//#include "Profiler.h"
 
-#include <kvs/Directory>
-#include <kvs/File>
-
-#include "timer_simple.h"
-#include "Panels/particlepanel.h"
-#include <Panels/filterinfopanel.h>
 #include <Panels/transferfunceditor_IS.h>
 #include "Panels/particlepanel.h"
 #include "Panels/coordinatepanel.h"
 #include "Panels/timecontrolpanel.h"
 #include "Panels/systemstatuspanel.h"
-#include "Panels/renderoptionpanel.h"
+#include <Panels/filterinfopanel.h>
+#include <Panels/renderoptionpanel.h>
+
 #include "QGlue/renderarea.h"
+
+#include <kvs/Directory>
+#include <kvs/File>
+
+#include "timer_simple.h"
+
+
 #include "v3defines.h"
-//#include "AnimationControl.h"
 
 using namespace kvs::visclient;
 
 // APPEND START fp)m.tanaka 2013.09.01
 int subpixellevela = PBVR_SUB_PIXEL_LEVEL_ABSTRACT;
 int subpixelleveld = PBVR_SUB_PIXEL_LEVEL_DETAILED;
-extern int repeatlevela;
-extern int repeatleveld;
-//extern float pdensitylevel;
-
-//int plimitlevel = PBVR_PARTICLE_LIMIT;
-
-//float resolution_width_level;
-//float resolution_height_level;
-
-// APPEND START fp)m.takizawa 2014.05.21
-float Command::PVBRmaxcoords[3]={0.0,0.0,0.0};
-float Command::PVBRmincoords[3]={0.0,0.0,0.0};
-// APPEND END fp)m.takizawa 2014.05.21
 
 
-// APPEND START fp)m.takizawa 2014.05.29
-static int pretimestep  = -1;
-//extern	void	ScreenShot(  kvs::ScreenBase* screen, int tstep );
-// APPEND END fp)m.takizawa 2014.05.29
 
-//extern auto_ptr<kvs::visclient::ProgressBar> *g_screen3_progress;
-// APPEND END fp)m.tanaka 2013.09.01
+char pfi_path_server[256];
+char filter_parameter_filename[256];
+static char pre_pfi_path_server[256];
 
-static int numvol, numstep = 0;
+
 #ifdef _TIMER_
 #define TIMER_MAX_COUNT 9
 static int timer_count = 0;
 #endif
 
-char pfi_path_server[256];
-static char pre_pfi_path_server[256];
+extern int repeatlevela;
+extern int repeatleveld;
+static int pretimestep  = -1;
+static int numvol, numstep = 0;
 static int exportMergedParticleStartStep = -1;
-char filter_parameter_filename[256];
-#if 1 // FEAST modify 20160128
-//extern int TimecontrolPanel::g_curStep;
-#endif // FEAST modify 20160128 end
+
+float Command::PVBRmaxcoords[3]={1.0,1.0,1.0};
+float Command::PVBRmincoords[3]={0.0,0.0,0.0};
 
 Command::Command( ParticleServer* server ) :
     m_is_under_animation( true ),
@@ -126,24 +109,11 @@ void Command::startDetailedAnalysis()
 
 void Command::changeShowHide()
 {
-//    if ( isShown )
-//    {
-//        progress->hide();
-//        timeSlider->hide();
-//        minTimeSlider->hide();
-//        maxTimeSlider->hide();
-//    }
-//    else
-//    {
-//        timeSlider->show();
-//#if 0 //delete show jupiter
-//        progress->show();
-//        minTimeSlider->show();
-//        maxTimeSlider->show();
-//#endif
-//    }
 
     m_is_shown = !m_is_shown;
+    qWarning("Command::changeShowHide() depreceated, use TimecontrolPanel::changeShowHide instead");
+    exit(1);
+
 }
 
 void Command::preUpdate()
@@ -177,49 +147,6 @@ void Command::preUpdate()
             printf( "filepath = Empty\n" );
         }
     }
-#if 0 // FEAST modify 20160128
-    if ( isUnderAnimation )
-    {
-        if ( param.transferType == PBVRParam::Detailed )
-        {
-#ifndef CPUMODE
-            if ( param.repeatLevel == param.detailedRepeatLevel )
-            {
-#endif
-                param.timeStep++;
-#ifndef CPUMODE
-            }
-#endif
-        }
-        else if ( param.transferType == PBVRParam::Abstract )
-        {
-#ifndef CPUMODE
-            if ( param.repeatLevel == param.abstractRepeatLevel )
-            {
-#endif
-                param.timeStep++;
-#ifndef CPUMODE
-            }
-#endif
-        }
-    }
-    if ( param.timeStep > maxTimeSlider->value() ) //99) {
-    {
-        //param.timeStep = 1;
-        //param.timeStep = 0;
-        //if( param.transferType == PBVRParam::Detailed ) param.timeStep = minTimeSlider->value();
-// APPEND START fj) 2015.04.03
-        if ( minTimeSlider->value() >= param.minTimeStep )
-        {
-            param.timeStep = minTimeSlider->value();
-        }
-        else
-        {
-            param.timeStep = param.minTimeStep;
-        }
-// APPEND END   fj) 2015.04.03
-    }
-#endif // FEAST modify 20160128 end
 
     // for KeyFrameAnimation
     if ( m_is_key_frame_animation )
@@ -242,27 +169,6 @@ void Command::preUpdate()
         kvsMessageError( "communication cancel." );
         m_is_under_communication = false;
     }
-
-#if 0 // FEAST modify 20160128
-    if ( isUnderCommunication )
-    {
-        if ( param.transferType == PBVRParam::Abstract )
-        {
-            progress->setValue( static_cast<float>( param.timeStep ) );
-            timeSlider->setValue( static_cast<float>( param.timeStep ) );
-        }
-        else if ( param.transferType == PBVRParam::Detailed )
-        {
-            if ( param.timeStep > param.maxTimeStep )
-            {
-                param.timeStep = param.minTimeStep;
-            }
-            float ratio = float( param.timeStep - param.minTimeStep ) / float( param.maxTimeStep - param.minTimeStep ) * 100;
-            progress->setValue( static_cast<float>( ratio ) );
-            timeSlider->setValue( static_cast<float>( param.timeStep ) );
-        }
-    }
-#endif // FEAST modify 20160128 end
 
     if ( m_is_under_communication )
     {
@@ -307,10 +213,14 @@ void Command::preUpdate()
         }
     }
 }
-
+/**
+ * @brief Command::update_doExport export parameters to as result of setparam
+ * @param param
+ */
 void Command::update( VisualizationParameter* param, ReceivedMessage* result )
 {
-    // Viewer のスケール正規化用
+    // Viewer のスケール正規化用.
+    qInfo(" *** Command::update starts *** %d",QThread::currentThreadId() );
     bool resetflag = false;
     bool server_resetflag = false;
     bool local_particle_exits = false;
@@ -326,16 +236,16 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
         for ( size_t step = time_start; step <= time_end; step++ )
         {
             kvs::PointObject* p = NULL;
-            kvs::PointObject* object = m_server_particles[step];
+            kvs::PointObject* object;
             if ( object->nvertices() <= 1 )
             {
-//                p = merger.doMerge( NULL, step );
                 object = NULL;
             }
             else
             {
-                p = merger.doMerge( *object, step );
+                object = m_server_particles[step];
             }
+            p = merger.doMerge( *object, step );
             delete p;
         }
         param->m_particle_merge_param.m_do_export = false;
@@ -357,21 +267,21 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
 
                 if ( param->m_detailed_transfer_type == VisualizationParameter::Divided )
                 {
-                    std::cout << "*** param.detailedTransferType == PBVRParam::Divided" << std::endl;
+                    std::cout << "*** param->m_detailed_transfer_type == PBVRParam::Divided" << std::endl;
 #ifndef CPUMODE
-                    std::cout << "param.repeatLevel=" << param.repeatLevel << " param.abstractRepeatLevel=" << param.abstractRepeatLevel << std::endl;
-                    if ( param.repeatLevel == param.abstractRepeatLevel )
+                    std::cout << "param->m_repeat_level=" << param->m_repeat_level << " param->abstractRepeatLevel =" << param->m_abstract_repeat_level << std::endl;
+                    if ( param->m_repeat_level == param->m_abstract_repeat_level )
                     {
 #endif
                         //delete abstractParticles[param.timeStep];
                         m_abstract_particles[param->m_time_step] = m_server->getPointObjectFromServer( *param, result, numvol, param->m_time_step );
 #ifndef CPUMODE
                     }
-                    else if ( param.repeatLevel < param.abstractRepeatLevel )
+                    else if ( param->m_repeat_level < param->m_abstract_repeat_level )
                     {
-                        PointObject* dividedObject = server->getPointObjectFromServer( param, result, numvol );
+                        PointObject* dividedObject = m_server->getPointObjectFromServer( *param, result, numvol ,param->m_time_step);
 
-                        abstractParticles[param.timeStep]->add( *dividedObject );
+                        m_abstract_particles[param->m_time_step]->add( *dividedObject );
                         delete dividedObject;
                     }
                     else
@@ -396,17 +306,17 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
                 if ( param->m_detailed_transfer_type == VisualizationParameter::Divided )
                 {
 #ifndef CPUMODE
-                    if ( param.repeatLevel == param.detailedRepeatLevel )
+                    if ( param->m_repeat_level == param->m_detailed_repeat_level )
                     {
 #endif
                         //delete detailedParticles[param.timeStep];
                         m_detailed_particles[param->m_time_step] = m_server->getPointObjectFromServer( *param, result, numvol, param->m_time_step );
 #ifndef CPUMODE
                     }
-                    else if ( param.repeatLevel < param.detailedRepeatLevel )
+                    else if (  param->m_repeat_level < param->m_detailed_repeat_level )
                     {
-                        PointObject* dividedObject = server->getPointObjectFromServer( param, result, numvol );
-                        detailedParticles[param.timeStep]->add( *dividedObject );
+                        PointObject* dividedObject = m_server->getPointObjectFromServer( *param, result, numvol,param->m_time_step  );
+                        m_detailed_particles[param->m_time_step]->add( *dividedObject );
                         delete dividedObject;
                     }
                     else
@@ -487,45 +397,14 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
             m_local_subpixel_level = object->size( 0 );
         }
 
-//#if 0
-//        if ( maxTimeSlider->maxValue() != result->maxMergedTimeStep
-//                || minTimeSlider->minValue() != result->minMergedTimeStep )
-//        {
-//            minTimeSlider->hide();
-//            maxTimeSlider->hide();
-//        }
-//#endif
-//        if ( maxTimeSlider->maxValue() != result->maxMergedTimeStep )
-//        {
-//            param.maxTimeStep = result->maxMergedTimeStep;
-//            maxTimeSlider->setValue( static_cast<float>( param.maxTimeStep ) );
-//        }
 
-//        if ( minTimeSlider->minValue() != result->minMergedTimeStep )
-//        {
-//            param.minTimeStep = result->minMergedTimeStep;
-//            minTimeSlider->setValue( static_cast<float>( param.minTimeStep ) );
-//        }
 
-//        if ( maxTimeSlider->maxValue() != result->maxMergedTimeStep
-//                || minTimeSlider->minValue() != result->minMergedTimeStep )
-//        {
-//            maxTimeSlider->setRange( param.minTimeStep, param.maxTimeStep );
-//            minTimeSlider->setRange( param.minTimeStep, param.maxTimeStep );
-//            timeSlider->setRange( param.minTimeStep, param.maxTimeStep );
-//#if 0 //delete show (jupiter)
-//            maxTimeSlider->show();
-//            minTimeSlider->show();
-//#endif
-//        }
 
-////        timeSlider->hide();
-//        size_t timeStep = std::max( param.minTimeStep, std::min( param.maxTimeStep, param.timeStep ) );
 
-////      timeSlider->setCaption( "Time step" );
-//        timeSlider->setRange( param.minTimeStep, param.maxTimeStep );
-////        timeSlider->show();
+
         TimecontrolPanel::requestUpdate(param, result);
+
+
 
         // reallocate abstractParticles and detailedParticles
         if ( param->m_max_time_step > m_detailed_particles.size() - 1 )
@@ -660,15 +539,12 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
     // change view
     if ( resetflag )
     {
-        kvs::Vector3f min_t( crd[0], crd[1], crd[2] );
-        kvs::Vector3f max_t( crd[3], crd[4], crd[5] );
-        m_screen->scene()->objectManager()->object()->setMinMaxObjectCoords( min_t, max_t );
-        m_screen->scene()->objectManager()->object()->setMinMaxExternalCoords( min_t, max_t );
-        m_screen->scene()->objectManager()->updateExternalCoords();
-        std::cout << " !!!!!!!!!!!!!!!!!!! Reset Viewer Scale !!!!!!!!!!!!!!!!!!!!!!!! " << std::endl;
+        qInfo(" *** Command::update::9 starts *** %d",QThread::currentThreadId() );
+        ((RenderArea*)m_screen)->setCoordinateBoundaries(crd);
     }
 
-   FilterinfoPanel::updateFilterInfo();
+    FilterinfoPanel::updateFilterInfo();
+    qInfo(" *** Command::update ends *** %d\n",QThread::currentThreadId() );
 }
 
 void Command::postUpdate()
@@ -711,30 +587,31 @@ void Command::postUpdate()
     }
     m_parameter.m_detailed_subpixel_level = m_local_subpixel_level;
 #ifdef CPUMODE
-    m_renderer->setSubpixelLevel( m_parameter.m_detailed_subpixel_level );
-    m_renderer->recreateImageBuffer();
+    m_screen->setRenderSubPixelLevel(m_parameter.m_detailed_subpixel_level );
+    m_screen->recreateRenderImageBuffer( );
 #endif
 //  Profiler::get()->start( "rendering time" );
     PBVR_TIMER_STA( 150 );
 
+
 #ifndef CPUMODE
-    if ( param.transferType == PBVRParam::Abstract )
+    if ( m_parameter.m_transfer_type == VisualizationParameter::Abstract)
     {
 #ifndef CPUMODE
-        renderer->setRepetitionLevel( param.abstractRepeatLevel );
+        m_screen->setRenderRepetionlLevel(m_parameter.m_abstract_repeat_level);
 #endif
-        renderer->setSubpixelLevel( param.abstractSubpixelLevel );
-        PointObject* object = abstractParticles[param.timeStep];
-        renderer->changePointObject( object );
+        m_screen->setRenderSubPixelLevel( m_parameter.m_abstract_subpixel_level );
+        PointObject* object = m_abstract_particles[m_parameter.m_time_step];
+        m_screen->attachPointObject( object );
     }
-    else if ( param.transferType == PBVRParam::Detailed )
+    else if ( m_parameter.m_transfer_type == VisualizationParameter::Detailed )
     {
 #ifndef CPUMODE
-        renderer->setRepetitionLevel( param.repeatLevel );
+        m_screen->setRenderRepetionlLevel( m_parameter.m_detailed_repeat_level );
 #endif
-        renderer->setSubpixelLevel( param.detailedSubpixelLevel );
-        PointObject* object = detailedParticles[param.timeStep];
-        renderer->changePointObject( object );
+        m_screen->setRenderSubPixelLevel( m_parameter.m_detailed_subpixel_level );
+        PointObject* object = m_detailed_particles[m_parameter.m_time_step];
+        m_screen->attachPointObject( object );
     }
     else
     {
@@ -794,6 +671,8 @@ void Command::getServerParticleInfomation( VisualizationParameter* param, Receiv
             jpv::ParticleTransferServerMessage reply;
 
             client.initClient();
+
+
 
             reply.camera = new kvs::Camera();
 
@@ -1049,13 +928,13 @@ size_t Command::getUsingMemoryByKiloByte()
 {
     size_t memory = 0;
 #ifndef CPUMODE
-    for ( size_t i = 0; i < abstractParticles.size(); ++i )
+    for ( size_t i = 0; i < m_abstract_particles.size(); ++i )
     {
-        memory += abstractParticles[i]->coords().size() * sizeof( kvs::Real32 ) + abstractParticles[i]->normals().size() * sizeof( kvs::Real32 ) + abstractParticles[i]->colors().size() * sizeof( kvs::UInt8 );
+        memory += m_abstract_particles[i]->coords().size() * sizeof( kvs::Real32 ) + m_abstract_particles[i]->normals().size() * sizeof( kvs::Real32 ) + m_abstract_particles[i]->colors().size() * sizeof( kvs::UInt8 );
     }
-    for ( size_t i = 0; i < detailedParticles.size(); ++i )
+    for ( size_t i = 0; i < m_detailed_particles.size(); ++i )
     {
-        memory += detailedParticles[i]->coords().size() * sizeof( kvs::Real32 ) + detailedParticles[i]->normals().size() * sizeof( kvs::Real32 ) + detailedParticles[i]->colors().size() * sizeof( kvs::UInt8 );
+        memory += m_detailed_particles[i]->coords().size() * sizeof( kvs::Real32 ) + m_detailed_particles[i]->normals().size() * sizeof( kvs::Real32 ) + m_detailed_particles[i]->colors().size() * sizeof( kvs::UInt8 );
     }
 #endif
     return memory / 1024;

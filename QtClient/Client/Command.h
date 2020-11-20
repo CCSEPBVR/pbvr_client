@@ -124,7 +124,7 @@ public:
     bool m_particle_assign_flag;
     VisualizationParameter m_parameter;
     ReceivedMessage m_result;
-    ExtendedParticleVolumeRenderer* m_renderer;
+//    ExtendedParticleVolumeRenderer* m_renderer;
     //    TransferFunctionEditorMain* m_extend_transfer_function_editor;
     TransferFuncEditor* extransfuncedit;
     TimecontrolPanel* m_timectrl_panel;
