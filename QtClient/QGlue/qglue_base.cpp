@@ -57,8 +57,60 @@ void QGLUEBase::end_draw( void )
     glPopMatrix();
     glPopAttrib();
 }
+/*===========================================================================*/
+/**
+ * @brief QGLUEBase::initializeOpenGLFunctions
+ */
+/*===========================================================================*/
+void QGLUEBase::initializeOpenGLFunctions(){
+    QOpenGLFunctions::initializeOpenGLFunctions();
+    m_gl_initialized=true;
+}
+/*===========================================================================*/
+/**
+ * @brief QGLUEBase::checkGLerrors
+ * @return
+ */
+/*===========================================================================*/
+bool QGLUEBase::checkGLerrors()
+{
+    int e;
+    bool eflag=false;
+    while (e = glGetError()){
+        qCritical("QGLUEBase GL Context:: HAS ERROR %d",e);
+        eflag=true;
+    }
+    return eflag;
+}
+/*===========================================================================*/
+/**
+ * @brief QGLUEBase::contextReady
+ * @return
+ */
+/*===========================================================================*/
+bool QGLUEBase::contextReady()
+{
 
-
+    if (!m_gl_initialized){
+        qCritical("QGLUEBase GL Context:: is not initialized");
+        return false;
+    }
+    if (QOpenGLContext::currentContext() == 0){
+        qCritical("QGLUEBase GL Context:: is not current");
+        return false;
+    }
+    if (QThread::currentThread() != QApplication::instance()->thread()){
+        qCritical("QGLUEBase GL Thread  is not main");
+        return false;
+    }
+    return true;
+}
+/*===========================================================================*/
+/**
+ * @brief QGLUEBaseWidget::QGLUEBaseWidget
+ * @param parent
+ */
+/*===========================================================================*/
 QGLUEBaseWidget::QGLUEBaseWidget(QWidget* parent) :
     QOpenGLWidget(parent),
     QGLUEBase(parent)
@@ -67,15 +119,26 @@ QGLUEBaseWidget::QGLUEBaseWidget(QWidget* parent) :
     //    this->setAutoFillBackground(false);
     m_margin=0;
 }
-
+/*===========================================================================*/
+/**
+ * @brief QGLUEBaseWidget::initializeGL
+ */
+/*===========================================================================*/
 void QGLUEBaseWidget::initializeGL()
 {
     initializeOpenGLFunctions();
     QColor bg=QWidget::palette().color(QWidget::backgroundRole());
     glClearColor(bg.redF(), bg.blueF(),bg.greenF(),1.0);
 }
-
-
+/*===========================================================================*/
+/**
+ * @brief QGLUEBaseWidget::drawText
+ * @param x
+ * @param y
+ * @param text
+ * @param fontColor
+ */
+/*===========================================================================*/
 void QGLUEBaseWidget::drawText(int x, int y,std::string text,QColor fontColor)
 {
     y=this->height()-y;
@@ -121,6 +184,15 @@ void QGLUEBaseWidget::drawRectangle(
     }
     glEnd();
 }
+/*===========================================================================*/
+/**
+ * @brief QGLUEBaseWidget::drawQuad draw Quad
+ * @param x0 x of p0
+ * @param y0 y of p0
+ * @param x1 x of p2
+ * @param y1 y of p2
+ */
+/*===========================================================================*/
 void QGLUEBaseWidget::drawQuad( int x0, int y0, int x1, int y1)
 {
     glBegin( GL_QUADS );
@@ -130,6 +202,19 @@ void QGLUEBaseWidget::drawQuad( int x0, int y0, int x1, int y1)
     glVertex2i( x0, y1 );
     glEnd();
 }
+/*===========================================================================*/
+/**
+ * @brief QGLUEBaseWidget::drawUVQuad draw textured quad.
+ * @param u0 texture coordinate
+ * @param v0 texture coordinate
+ * @param u1 texture coordinate
+ * @param v1 texture coordinate
+ * @param x0 x of p0
+ * @param y0 y of p0
+ * @param x1 x of p2
+ * @param y1 y of p2
+ */
+/*===========================================================================*/
 void QGLUEBaseWidget::drawUVQuad(float u0, float v0, float u1, float v1, int x0, int y0, int x1, int y1)
 {
     glBegin( GL_QUADS );
@@ -139,13 +224,25 @@ void QGLUEBaseWidget::drawUVQuad(float u0, float v0, float u1, float v1, int x0,
     glTexCoord2f( u0, v1    ); glVertex2i( x0, y1 );
     glEnd();
 }
-
+/*===========================================================================*/
+/**
+ * @brief QGLUEBaseWidget::get_fitted_width returns the fitted width of string
+ * @param st, string to be measured
+ * @return int fitted width
+ */
+/*===========================================================================*/
 int QGLUEBaseWidget::get_fitted_width( std::string st )
 {
     const size_t width = st.size() * CharacterWidth + m_margin * 2;
     return(  width>DEFAULT_WIDTH?width:DEFAULT_WIDTH );
 }
-
+/*===========================================================================*/
+/**
+ * @brief QGLUEBaseWidget::get_fitted_height get the fitted height of one
+ *                         line + margins.
+ * @return int fitted height
+ */
+/*===========================================================================*/
 int QGLUEBaseWidget::get_fitted_height( void )
 {
     return( DEFAULT_HEIGHT + CharacterHeight + m_margin * 2 );

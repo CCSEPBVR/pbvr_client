@@ -662,9 +662,9 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
     {
         kvs::Vector3f min_t( crd[0], crd[1], crd[2] );
         kvs::Vector3f max_t( crd[3], crd[4], crd[5] );
-        m_screen->m_scene->objectManager()->object()->setMinMaxObjectCoords( min_t, max_t );
-        m_screen->m_scene->objectManager()->object()->setMinMaxExternalCoords( min_t, max_t );
-        m_screen->m_scene->objectManager()->updateExternalCoords();
+        m_screen->scene()->objectManager()->object()->setMinMaxObjectCoords( min_t, max_t );
+        m_screen->scene()->objectManager()->object()->setMinMaxExternalCoords( min_t, max_t );
+        m_screen->scene()->objectManager()->updateExternalCoords();
         std::cout << " !!!!!!!!!!!!!!!!!!! Reset Viewer Scale !!!!!!!!!!!!!!!!!!!!!!!! " << std::endl;
     }
 
@@ -752,7 +752,7 @@ void Command::postUpdate()
 #else
     if ( pretimestep != TimecontrolPanel::g_curStep )
     {
-        RenderArea::ScreenShot( m_screen->m_scene, TimecontrolPanel::g_curStep );
+        RenderArea::ScreenShot( m_screen->scene(), TimecontrolPanel::g_curStep );
 
         pretimestep = TimecontrolPanel::g_curStep;
     }

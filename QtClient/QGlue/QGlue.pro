@@ -10,20 +10,7 @@ message (Building PBVR:$${TARGET} -  Mode:$${PBVR_MODE}  - Platform: $${PLATFORM
 
 CONFIG += warn_off
 QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.14
-#QMAKE_CFLAGS_WARN_ON -= -Wall
-#QMAKE_CXXFLAGS_WARN_ON -= -Wall
-#QMAKE_CFLAGS_WARN_ON -= -W
-#QMAKE_CXXFLAGS_WARN_ON -= -W
-#QMAKE_CFLAGS_WARN_OFF += -Wall
-#QMAKE_CXXFLAGS_WARN_OFF += -Wall
-#QMAKE_CFLAGS_WARN_OFF += -W
-#QMAKE_CXXFLAGS_WARN_OFF += -W
-win32{
-QMAKE_CFLAGS_RELEASE += /MT
-QMAKE_CXXFLAGS_RELEASE += /MT
-QMAKE_CFLAGS_RELEASE -= -MD
-QMAKE_CXXFLAGS_RELEASE -= -MD
-}
+
 HEADERS += \
     colorpalette.h \
     colormappalette.h \
@@ -42,7 +29,9 @@ HEADERS += \
     typedSignalConnect.h \
     systeminfo.h \
     colorundoredocommand.h \
-    opacityundoredocommand.h
+    opacityundoredocommand.h \
+    deferredtexture.h \
+    screen.h
 
 SOURCES +=     \
     colorpalette.cpp \
@@ -61,6 +50,8 @@ SOURCES +=     \
     extCommand.cpp \
     systeminfo.cpp \
     colorundoredocommand.cpp \
-    opacityundoredocommand.cpp
+    opacityundoredocommand.cpp \
+    deferredtexture.cpp \
+    screen.cpp
 
 

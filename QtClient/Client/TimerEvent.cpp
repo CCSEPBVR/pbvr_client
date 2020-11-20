@@ -121,8 +121,9 @@ void TimerEvent::update( kvs::TimeEvent* event )
             m_front_object->setMinMaxExternalCoords(kvs::Vector3f(extCommand->PVBRmincoords),kvs::Vector3f(extCommand->PVBRmaxcoords));
             //KVS2.7.0
             //MOD BY)T.Osaki 2020.07.20
-            m_command->m_screen->m_scene->objectManager()->change(m_object_id,m_front_object);
-            m_command->m_screen->m_orientation_axis->setObject( m_front_object );
+//            m_command->m_screen->m_scene->objectManager()->change(m_object_id,m_front_object);
+            m_command->m_screen->attachPointObject(m_front_object);
+//            m_command->m_screen->m_orientation_axis->setObject( m_front_object );
             view_flag = true;
             m_command->m_particle_assign_flag = false;
         }
@@ -325,7 +326,7 @@ void TimerEvent::update( kvs::TimeEvent* event )
     {
         //KVS2.7.0
         //MOD BY)T.Osaki 2020.07.20
-        RenderArea::ScreenShotKeyFrame( m_command->m_screen->m_scene, m_command->m_step_key_frame );
+        RenderArea::ScreenShotKeyFrame( m_command->m_screen->scene(), m_command->m_step_key_frame );
         m_command->m_previous_key_frame = m_command->m_step_key_frame;
     }
 

@@ -497,7 +497,7 @@ void PBVRGUI::keyPressEvent(QKeyEvent* ke)
 void PBVRGUI::setBackgroundColor(kvs::RGBColor c){
     //KVS2.7.0
     //MOD BY)T.Osaki 2020.07.20
-    extCommand->m_screen->m_scene->background()->setColor(c);
+    extCommand->m_screen->scene()->background()->setColor(c);
     extCommand->m_screen->update();
     update();
 }
@@ -506,13 +506,13 @@ void PBVRGUI::onViewer_ControlsMenuAction()
     qInfo("VIEWER CONTROLS");
     //KVS2.7.0
     //MOD BY)T.Osaki 2020.07.20
-    vc.selected_color=kvs_renderarea->m_scene->background()->color();
+    vc.selected_color=kvs_renderarea->scene()->background()->color();
     vc.setCurrentFont(kvs_renderarea->font());
     int result = vc.exec();
     if (result == QDialog::Accepted){
         //KVS2.7.0
         //MOD BY)T.Osaki 2020.07.20
-        kvs_renderarea->m_scene->background()->setColor(vc.selected_color);
+        kvs_renderarea->scene()->background()->setColor(vc.selected_color);
         kvs_renderarea->setLabelFont(vc.getFontSelection());
     }
 }
