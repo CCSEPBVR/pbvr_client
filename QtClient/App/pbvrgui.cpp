@@ -370,24 +370,39 @@ void PBVRGUI::onDisconnect_From_ServerMenuAction()
 {
     showStatusMessage( "Disconnecting from server....\nNot implemented\n");
 }
+//#define PBVR_VERSION "OST"
+#define QUOTE(name) #name
+#define STR(macro) QUOTE(macro)
 
 void PBVRGUI::onAbout_PBVR_ClientMenuAction()
 {
-    QMessageBox::about(this,tr("About PBVR"), tr("\n\n\nThis is an early preview of the Qt reimplementation of the PBVR Client GUI.\n\nVersion: Still versionless. \n"));
+#ifdef CPUMODE
+    const char* graphics_mode="CPU";
+#else
+    const char* graphics_mode="GPU";
+#endif
+#ifdef CS_MODE
+    const char* render_mode="CS";
+#else
+    const char* render_mode="IS";
+#endif
+    QString message=QString("\n\n\nPBVR QtClient \n\nRender mode:%1 \nServer mode:%2 \n\nVersion: %4").arg(graphics_mode, render_mode ,STR(PBVR_VERSION));
     QMessageBox::aboutQt(this,  tr("About Qt"));
+    QMessageBox::about(this,tr("About PBVR"), tr(message.toStdString().c_str()));
 }
 
 void PBVRGUI::onImportMenuAction()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Import Parameter File"), ".", tr("Parameter Files (*.ini *.INI *.*)"));
     if (!fileName.isEmpty()){
-        VizParameterFile::ConversionClassToFloat();
+        VizParameterFile::ConversionClassToFloat(kvs_renderarea->getPointObjectXform());
         VizParameterFile::ReadParamFile( fileName.toStdString().c_str());
         tf_editor.importFile( fileName.toStdString());
         coordinatePanel.setUISynthesizer();
         legendPanel.importFile(fileName.toStdString().c_str());
         legendPanel.set2UI();
-        VizParameterFile::ConversionFloatToClass();
+        kvs::Xform xf = VizParameterFile::ConversionFloatToClass();
+        kvs_renderarea->setPointObjectXform(xf);
         kvs_renderarea->redraw();
     }
 }
@@ -399,7 +414,7 @@ void PBVRGUI::onExportMenuAction()
         fileName += ".ini";
     }
     if (!fileName.isEmpty()){
-        VizParameterFile::ConversionClassToFloat();
+        VizParameterFile::ConversionClassToFloat(kvs_renderarea->getPointObjectXform());
         VizParameterFile::WriteParamFile( fileName.toStdString().c_str() ); // APPEND BY)M.Tanaka 2015.03.03
         tf_editor.exportFile( fileName.toStdString(), true ); // APPEND Fj 2015.03.05
         legendPanel.exportFile( fileName.toStdString() );
