@@ -227,7 +227,7 @@ void RenderArea::setupEventHandlers()
 #endif
     //KVS2.7.0
     //ADD BY)T.Osaki  2020.06.19
-    g_timer_event->setScene( m_scene );
+//    g_timer_event->setScene( m_scene );
     g_timer_event->setScreen( this );
     qt_timer->setEventListener( g_timer_event );
     qt_timer->start();
