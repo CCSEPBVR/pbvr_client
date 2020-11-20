@@ -5,18 +5,13 @@
 
 #include <kvs/EventListener>
 #include <kvs/EventHandler>
-#include <kvs/TimeEvent>
+//#include <kvs/TimeEvent>
+#include "Client/TimerEvent.h"
 #include <kvs/ClassName>
 #include "kvs/PointObject"
 
 #include "Client/ComThread.h"
 #include "extCommand.h"
-
-#ifdef CPUMODE
-
-#else
-#include "kvs/ParticleVolumeRenderer"
-#endif
 
 class RenderArea;
 using namespace kvs::visclient;
@@ -39,21 +34,15 @@ protected:
     int                 m_interval;       ///< interval time in millisecond
     bool                m_is_stopped;     ///< checl flag whether the time is stopped
     kvs::TimeEvent*     m_time_event;     ///< time event
-    kvs::EventListener* m_event_listener; ///< event listener
+    kvs::visclient::TimerEvent* m_event_listener; ///< event listener
     kvs::EventHandler*  m_event_handler;  ///< event handler
 private:
     Command* m_command;
     ComThread* m_comthread;
     bool oneShot=true;
-#ifdef CPUMODE
-    int m_object_id;
-    kvs::PointObject* m_front_object;
-    kvs::PointObject* m_back_object;
-//    kvs::ParticleVolumeRenderer* m_renderer;
-#endif
-//#else
+
     kvs::visclient::ExtendedParticleVolumeRenderer* m_renderer;
-//#endif
+
     int m_interpolation_counter;
     int m_ninterpolation;
     int m_is_key_frame_animation;
@@ -97,7 +86,7 @@ public:
     void onTimerUpdate( );
     void setInterval( int msec );
 
-    void setEventListener( kvs::EventListener* listener );
+    void setEventListener(kvs::visclient::TimerEvent *listener );
 
     void setEventHandler( kvs::EventHandler* handler );
 
@@ -105,10 +94,10 @@ public:
 
     const int interval( void ) const;
 
-    void setRenderer( kvs::visclient::ExtendedParticleVolumeRenderer* renderer )
-    {
-        m_renderer = renderer;
-    }
+//    void setRenderer( kvs::visclient::ExtendedParticleVolumeRenderer* renderer )
+//    {
+//        m_renderer = renderer;
+//    }
 protected:
 
     virtual void timerEvent( QTimerEvent* event );

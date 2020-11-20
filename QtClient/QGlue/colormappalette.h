@@ -5,7 +5,7 @@
 #include "colorpalette.h"
 
 #include <kvs/Vector2>
-#include <kvs/Texture1D>
+#include "deferredtexture.h"
 #include <kvs/ColorMap>
 #include <Client/ColorMapLibrary.h>
 
@@ -23,9 +23,7 @@ public:
     ColorMapPalette(QWidget* parent = 0 );
     QStringList getLibraryEntries();
     void setEditable(bool m_editable, ColorPalette* color_palette);
-    void calculate_equation( const std::string& eq, kvs::UInt8* val ) const;
-    uint setColorMapEquation(const std::string r_eq,const std::string g_eq,const std::string b_eq);
-//    void setColorMapEquation(const std::string& r_eq, const std::string& g_eq, const std::string& b_eq);
+    uint setColorMapEquation(std::string rfe, std::string gfe, std::string bfe);
     void setColorMap( const kvs::ColorMap& color_map );
     void setColorMapIndex(int val );
     //ADD BY)T.Osaki 2020.02.03
@@ -57,7 +55,7 @@ private:
     //ADD BY)T.Osaki 2020.02.28
     kvs::ColorMap        m_fromColorMap;     ///< Undo from color map
 
-    kvs::Texture1D       m_texture;          ///< color map texture
+    DeferredTexture1D     m_texture;          ///< color map texture
     QRect m_palette;          ///< palette
     QColor        m_upper_edge_color; ///< upper edge color
     QColor        m_lower_edge_color; ///< lower edge color

@@ -75,7 +75,11 @@ ExtCommand::ExtCommand(int argc, char *argv[]):
         this->parseArguments();
         this->initCommand();
 }
-
+/*===========================================================================*/
+/**
+ * @brief ExtCommand::parseArguments
+ */
+/*===========================================================================*/
 void ExtCommand::parseArguments()
 {
     if ( argument.m_repeat_level_detailed_flag )
@@ -135,7 +139,11 @@ void ExtCommand::parseArguments()
         printf( "***** 1 shading:%s\n", RenderArea::shadinglevel );
     }
 }
-
+/*===========================================================================*/
+/**
+ * @brief ExtCommand::inSituInit
+ */
+/*===========================================================================*/
 void ExtCommand::inSituInit()
 {
 #ifdef IS_MODE
@@ -143,7 +151,7 @@ void ExtCommand::inSituInit()
 
     if ( argument.m_server_subvolume_directory != "" )
     {
-        m_parameter.m_input_directory = argument.m_server_subvolume_directory;
+        m_parameter.m_input_directory  = argument.m_server_subvolume_directory;
     }
     else
     {
@@ -182,6 +190,11 @@ void ExtCommand::inSituInit()
     m_parameter.particle_data_size_limit = RenderoptionPanel::data_size_limit;
 #endif
 }
+/*===========================================================================*/
+/**
+ * @brief ExtCommand::clientServerInit
+ */
+/*===========================================================================*/
 void ExtCommand::clientServerInit()
 {
 #ifdef CS_MODE
@@ -213,6 +226,11 @@ void ExtCommand::clientServerInit()
     }
 #endif
 }
+/*===========================================================================*/
+/**
+ * @brief ExtCommand::initCommand
+ */
+/*===========================================================================*/
 void ExtCommand::initCommand()
 {
     qInfo("ExtCommand::initCommand()");
@@ -273,8 +291,12 @@ void ExtCommand::initCommand()
         }
     }
 }
-
-
+/*===========================================================================*/
+/**
+ * @brief ExtCommand::CallBackApply
+ * @param i
+ */
+/*===========================================================================*/
 void ExtCommand::CallBackApply( const int i )
 {
     if ( wk_subpixellevela != subpixellevela )
@@ -371,7 +393,6 @@ void ExtCommand::CallBackApply( const int i )
     //m_screen->kvs::ScreenBase::reset();
     //m_screen->reset(); //camera()->resetXform();
 //    m_screen->Scene::reset();
-    m_screen->scene()->reset();
     /*
     m_screen->objectManager()->translate( kvs::Vector3f(
                                             TransformPanel::param.translateX,
@@ -386,6 +407,7 @@ void ExtCommand::CallBackApply( const int i )
     */
     //KVS2.7.0
     //MOD BY)T.Osaki 2020.07.20
+    m_screen->scene()->reset();
     m_screen->scene()->objectManager()->translate( kvs::Vector3f(
                                             TransformPanel::param.translateX,
                                             TransformPanel::param.translateY,

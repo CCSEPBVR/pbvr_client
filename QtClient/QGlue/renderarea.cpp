@@ -1,5 +1,4 @@
 #include "screen.h"
-
 #include "QGlue/renderarea.h"
 
 #include <QDesktopWidget>
@@ -291,7 +290,7 @@ void RenderArea::setCoordinateBoundaries(float  crd[6])
     if(m_reset_count == 0){
         m_reset_count++;
     }else{
-        this->m_scene->reset();
+//        this->m_scene->reset();
     }
     std::cout << " !!!!!!!!!!!!!!!!!!! Reset Viewer Scale !!!!!!!!!!!!!!!!!!!!!!!! " << std::endl;
 }

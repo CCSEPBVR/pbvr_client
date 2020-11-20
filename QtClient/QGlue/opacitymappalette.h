@@ -54,8 +54,8 @@ protected:
     //ADD BY)T.Osaki 2020.02.28
     kvs::OpacityMap      m_fromOpacityMap;
 
-    kvs::Texture1D       m_texture;          ///< opacity map texture
-    kvs::Texture2D       m_checkerboard;     ///< checkerboard texture
+    DeferredTexture1D    m_texture;          ///< opacity map texture
+    DeferredTexture2D    m_checkerboard;     ///< checkerboard texture
     QRect                m_palette;          ///< palette
     QColor               m_upper_edge_color; ///< upper edge color
     QColor               m_lower_edge_color; ///< lower edge color
@@ -95,8 +95,8 @@ public:
 
     void setCaption( const std::string& caption );
 
-    uint setOpacityExpression(const std::string ofe);
-//    void setOpacityMapEquation( const std::string& eq );
+    uint setOpacityExpression(std::string ofe);
+
     void setOpacityMap( const kvs::OpacityMap& opacity_map );
 
 public:

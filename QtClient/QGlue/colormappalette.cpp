@@ -1,8 +1,5 @@
 #include "QGlue/colormappalette.h"
-#include "function_parser.h"
-#include "ExpressionTokenizer.h"
-#include "ExpressionConverter.h"
-#include "ReversePolishNotation.h"
+#include "FunctionParser/function_parser.h"
 #include <QMouseEvent>
 #include <QDebug>
 #include <QApplication>
@@ -25,6 +22,7 @@ namespace  QGlue {
 ColorMapPalette::ColorMapPalette( QWidget* parent ):
     QGLUEBaseWidget( parent ),
     m_color_palette( NULL ),
+    m_texture(this, 3*sizeof( kvs::UInt8 ),"ColorMP m_texture"),
     m_resolution(256)
 {
     //    MOD BY)T.Osaki 2020.04.28
@@ -173,149 +171,21 @@ static  char charx1[2] ="x";
  * @return uint Error code as bitflags (4|2|1)
  *         (BLUE_EXPRESSION_ERROR|GREEN_EXPRESSION_ERROR|RED_EXPRESSION_ERROR)
 /*===========================================================================*/
-//uint ColorMapPalette::setColorMapEquation(std::string rfe, std::string gfe, std::string bfe)
-//{
-//    const float min_value = 0.0;
-//    const float max_value = 1.0;
-
-//    FuncParser::Variables vars;
-//    FuncParser::Variable var_x;
-//    FuncParser::Function rf, gf, bf;
-
-//    var_x.tag( charx1);
-//    vars.push_back( var_x );
-
-//    FuncParser::FunctionParser rf_parse( rfe, (int)rfe.size() + 1 );
-//    FuncParser::FunctionParser gf_parse( gfe,  (int)gfe.size() + 1 );
-//    FuncParser::FunctionParser bf_parse( bfe,  (int)bfe.size() + 1 );
-//    FuncParser::FunctionParser::Error err_r = rf_parse.express( rf, vars );
-//    FuncParser::FunctionParser::Error err_g = gf_parse.express( gf, vars );
-//    FuncParser::FunctionParser::Error err_b = bf_parse.express( bf, vars );
-
-//    uint status=0;
-//    if (  err_r != FuncParser::FunctionParser::ERR_NONE ){
-//        std::cerr << "Red Expression Error. " << std::endl;
-//        status=status | RED_EXPRESSION_ERROR;
-//    }
-//    if (  err_g != FuncParser::FunctionParser::ERR_NONE ){
-//        std::cerr << "Green Expression Error. " << std::endl;
-//        status=status | GREEN_EXPRESSION_ERROR;
-//    }
-//    if (  err_b != FuncParser::FunctionParser::ERR_NONE ){
-//        std::cerr << "Blue Expression Error. " << std::endl;
-//        status=status | BLUE_EXPRESSION_ERROR;
-//    }
-
-//    if (status != 0){
-//        return status;
-//    }
-//    kvs::ColorMap cmap( m_resolution, min_value, max_value );
-
-//    const float stride = ( max_value - min_value ) / ( m_resolution - 1 );
-//    float x = min_value;
-//    for ( size_t i = 0; i < m_resolution; ++i, x += stride )
-//    {
-//        //int r,g,b;
-//        float r, g, b; //kawamura
-
-//        var_x = x;
-//        r = rf.eval();
-//        g = gf.eval();
-//        b = bf.eval();
-
-//        /*
-//        r = ( r > 255 )? 255: ( r < 0 )? 0: r;
-//        g = ( g > 255 )? 255: ( g < 0 )? 0: g;
-//        b = ( b > 255 )? 255: ( b < 0 )? 0: b;
-//        */
-//        //kawamura
-//        r = ( r > 1.0 ) ? 1.0 : ( r < 0 ) ? 0 : r;
-//        g = ( g > 1.0 ) ? 1.0 : ( g < 0 ) ? 0 : g;
-//        b = ( b > 1.0 ) ? 1.0 : ( b < 0 ) ? 0 : b;
-
-//        r *= 255;
-//        g *= 255;
-//        b *= 255;
-
-//        kvs::RGBColor color( ( int )r, ( int )g, ( int )b );
-//        cmap.addPoint( x, color );
-//    }
-//    cmap.create();
-
-//    this->setColorMap( cmap );
-//    return status;
-//}
-
-void ColorMapPalette::calculate_equation( const std::string& eq, kvs::UInt8* val ) const
+uint ColorMapPalette::setColorMapEquation(std::string rfe, std::string gfe, std::string bfe)
 {
-    FuncParser::ExpressionTokenizer tokenizer;
-
-    FuncParser::ExpressionConverter exprconv;
-
-    FuncParser::ReversePolishNotation rpn;
-
-    tokenizer.tokenizeString( eq.c_str() );
-
-    exprconv.convertExpToken( tokenizer.m_exp_token );
-
-    int size = exprconv.token_array.size();
-
-    int exp_token[128];
-    int var_name[128];
-    float value_array[128];
-    float var_value[128];
-
-    for( int i = 0; i < size; i++ )
-    {
-        exp_token[i] = exprconv.token_array[i];
-        var_name[i] = exprconv.var_array[i];
-        value_array[i] = exprconv.value_array[i];
-    }
-
-    rpn.setExpToken( &exp_token[0] );
-    rpn.setVariableName( &var_name[0] );
-    rpn.setNumber( &value_array[0] );
-
     const float min_value = 0.0;
     const float max_value = 1.0;
-    const float stride = ( max_value - min_value ) / ( m_resolution - 1 );
-    float x = min_value;
-
-    for ( size_t i = 0; i < m_resolution; ++i, x += stride )
-    {
-        var_value[X] = x;
-
-        rpn.setVariableValue( &var_value[0] );
-
-        float value = rpn.eval();
-
-        value = ( value > 1.0 ) ? 1.0 : ( value < 0 ) ? 0 : value;
-
-        value *= 255;
-
-        val[i] = (kvs::UInt8)value;
-    }
-}
-
-//kawamura
-//set input color range to 0,1 -> 0,255
-uint ColorMapPalette::setColorMapEquation(std::string r_eq, std::string g_eq, std::string b_eq)
-//void ColorMapPalette::setColorMapEquation( const std::string& r_eq, const std::string& g_eq, const std::string& b_eq )
-{
-    kvs::UInt8* red   = new kvs::UInt8[m_resolution];
-    kvs::UInt8* green = new kvs::UInt8[m_resolution];
-    kvs::UInt8* blue  = new kvs::UInt8[m_resolution];
 
     FuncParser::Variables vars;
     FuncParser::Variable var_x;
     FuncParser::Function rf, gf, bf;
 
-    var_x.tag(charx1);
+    var_x.tag( charx1);
     vars.push_back( var_x );
 
-    FuncParser::FunctionParser rf_parse( r_eq, (int)r_eq.size() + 1 );
-    FuncParser::FunctionParser gf_parse( g_eq, (int)g_eq.size() + 1 );
-    FuncParser::FunctionParser bf_parse( b_eq, (int)b_eq.size() + 1 );
+    FuncParser::FunctionParser rf_parse( rfe, (int)rfe.size() + 1 );
+    FuncParser::FunctionParser gf_parse( gfe,  (int)gfe.size() + 1 );
+    FuncParser::FunctionParser bf_parse( bfe,  (int)bfe.size() + 1 );
     FuncParser::FunctionParser::Error err_r = rf_parse.express( rf, vars );
     FuncParser::FunctionParser::Error err_g = gf_parse.express( gf, vars );
     FuncParser::FunctionParser::Error err_b = bf_parse.express( bf, vars );
@@ -337,35 +207,43 @@ uint ColorMapPalette::setColorMapEquation(std::string r_eq, std::string g_eq, st
     if (status != 0){
         return status;
     }
-
-//    std::cout << "change" << std::endl;
-//    std::cout << r_eq << std::endl;
-//    std::cout << g_eq << std::endl;
-//    std::cout << b_eq << std::endl;
-    this->calculate_equation( r_eq, red );
-    this->calculate_equation( g_eq, green );
-    this->calculate_equation( b_eq, blue );
-//    std::cout << *red << std::endl;
-//    std::cout << *green << std::endl;
-//    std::cout << *blue << std::endl;
-    const float min_value = 0.0;
-    const float max_value = 1.0;
     kvs::ColorMap cmap( m_resolution, min_value, max_value );
+
     const float stride = ( max_value - min_value ) / ( m_resolution - 1 );
     float x = min_value;
-
-    for ( size_t i = 0; i < m_resolution; ++i, x+=stride )
+    for ( size_t i = 0; i < m_resolution; ++i, x += stride )
     {
-        kvs::RGBColor color( red[i], green[i], blue[i] );
+        //int r,g,b;
+        float r, g, b; //kawamura
+
+        var_x = x;
+        r = rf.eval();
+        g = gf.eval();
+        b = bf.eval();
+
+        /*
+        r = ( r > 255 )? 255: ( r < 0 )? 0: r;
+        g = ( g > 255 )? 255: ( g < 0 )? 0: g;
+        b = ( b > 255 )? 255: ( b < 0 )? 0: b;
+        */
+        //kawamura
+        r = ( r > 1.0 ) ? 1.0 : ( r < 0 ) ? 0 : r;
+        g = ( g > 1.0 ) ? 1.0 : ( g < 0 ) ? 0 : g;
+        b = ( b > 1.0 ) ? 1.0 : ( b < 0 ) ? 0 : b;
+
+        r *= 255;
+        g *= 255;
+        b *= 255;
+
+        kvs::RGBColor color( ( int )r, ( int )g, ( int )b );
         cmap.addPoint( x, color );
     }
     cmap.create();
 
-//    m_color_map_palette->setColorMap( cmap );
     this->setColorMap( cmap );
-//    this->redraw();
     return status;
 }
+
 
 /*===========================================================================*/
 /**
@@ -412,6 +290,7 @@ void ColorMapPalette::resizeGL(int w, int h)
 /*===========================================================================*/
 void ColorMapPalette::paintGL( void )
 {
+    std::cout<<"ColorMapPalette::paintGL:"<<isVisible()<<std::endl;
     if ( !isVisible() ) return;
 
     if ( m_texture_downloaded)
@@ -473,9 +352,9 @@ void ColorMapPalette::mousePressEvent( QMouseEvent* event )
         pdata[2] = static_cast<kvs::UInt8>( drawing_color.b() * ratio + pdata[2] * ( 1 - ratio ) );
 
         const size_t width = m_color_map.resolution();
-        m_texture.bind();
-        m_texture.download( width, data );
-        m_texture.unbind();
+        QOpenGLWidget::makeCurrent();
+        m_texture.load( width, m_color_map.table().pointer()  );
+        QOpenGLWidget::doneCurrent();
     }
 
     update();
@@ -532,9 +411,9 @@ void ColorMapPalette::mouseMoveEvent( QMouseEvent* event )
         }
 
         const size_t width = m_color_map.resolution();
-        m_texture.bind();
-        m_texture.download( width, data );
-        m_texture.unbind();
+        QOpenGLWidget::makeCurrent();
+        m_texture.load( width, data);
+        QOpenGLWidget::doneCurrent();
     }
 
     update();
@@ -567,19 +446,15 @@ void ColorMapPalette::mouseReleaseEvent( QMouseEvent* event )
 /*===========================================================================*/
 void ColorMapPalette::initialize_texture( const kvs::ColorMap& color_map )
 {
-    const size_t nchannels  = 3; // rgb
-    const size_t width = color_map.resolution();
-    const kvs::UInt8* data = color_map.table().pointer();
-    m_texture.release();
-    m_texture.setPixelFormat( nchannels, sizeof( kvs::UInt8 ) );
-    m_texture.setMinFilter( GL_LINEAR );
-    m_texture.setMagFilter( GL_LINEAR );
-    //KVS2.7.0
-    //MOD BY)T.Osaki 2020.07.20
-    m_texture.create( width, data );
-    m_texture.download( width, data );
-    m_texture_downloaded=false;
-    update();
+        const size_t nchannels  = 3; // rgb
+        const size_t width = color_map.resolution();
+        const kvs::UInt8* data = color_map.table().data();
+//        m_texture.release();
+        m_texture.setPixelFormat( nchannels, sizeof( kvs::UInt8 ) );
+        m_texture.setMinFilter( GL_LINEAR );
+        m_texture.setMagFilter( GL_LINEAR );
+        m_texture.create( width, data);
+        m_texture_downloaded=false;
 }
 
 /*===========================================================================*/
@@ -596,18 +471,11 @@ void ColorMapPalette::draw_palette( void )
     const int y0 = m_palette.y();
     const int y1 = m_palette.y() + m_palette.height();
 
-    glDisable( GL_BLEND );
-    glEnable( GL_TEXTURE_1D );
-    glDisable( GL_TEXTURE_2D );
-#if defined( GL_TEXTURE_3D )
-    glDisable( GL_TEXTURE_3D );
-#endif
-
     // Draw color map texture.
-    m_texture.bind();
-    BaseClass::drawUVQuad(0.0,0.0,1.0,1.0,x0,y0,x1,y1);
-    m_texture.unbind();
-
+    if ( m_texture.bind()){
+        BaseClass::drawUVQuad(0.0,0.0,1.0,1.0,x0,y0,x1,y1);
+        m_texture.unbind();
+    }
     glPopAttrib();
 
     // Draw border.

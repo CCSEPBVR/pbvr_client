@@ -3,7 +3,7 @@
 #include <QGlue/qglue_base.h>
 
 #include <Client/Command.h>
-#include <kvs/Texture2D>
+#include "deferredtexture.h"
 #include <kvs/ScreenBase>
 #include <kvs/EventListener>
 
@@ -110,7 +110,7 @@ public:
 private:
     const Command* m_command;
     int m_selected_transfer_function;
-        kvs::Texture2D  m_texture;      ///< texture data
+    DeferredTexture2D  m_texture;      ///< texture data
 
     kvs::ColorMap   m_colormap;     ///< color map
     double          m_min_value;    ///< min. value
