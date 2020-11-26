@@ -1,3 +1,3 @@
 # pbvr_client
 
-More info in [ github wikipages ](../../wiki)
+More info in [ PBVR Client wiki ](../../wiki)
