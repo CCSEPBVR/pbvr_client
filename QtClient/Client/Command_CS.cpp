@@ -222,7 +222,7 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
             {
                 object = m_server_particles[step];
             }
-            p = merger.doMerge( *object, step );
+            p = merger.doMerge( object, step );
             delete p;
         }
         param->m_particle_merge_param.m_do_export = false;
@@ -399,7 +399,7 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
             server_object = m_server_particles[param->m_time_step];
         kvs::PointObject* object;
         merger.setParam( param->m_particle_merge_param, param->m_min_server_time_step, param->m_max_server_time_step );
-        object = merger.doMerge( *server_object, param->m_time_step );
+        object = merger.doMerge( server_object, param->m_time_step );
         result->m_min_merged_time_step = merger.getMergedInitialTimeStep();
         result->m_max_merged_time_step = merger.getMergedFinalTimeStep();
         // サーバにないステップは対象としない 2018.12.19 start
