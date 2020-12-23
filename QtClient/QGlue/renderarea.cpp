@@ -73,7 +73,11 @@ void RenderArea::enableRendererShading(){
  * @param level
  */
 void RenderArea::setRenderSubPixelLevel(int level){
+#ifdef CPUMODE
     m_renderer->setSubpixelLevel( level );
+#else
+    m_renderer->setRepetitionLevel( level * level );
+#endif
 }
 /**
  * @brief RenderArea::setRenderRepetionlLevel, set render repetion level
@@ -82,7 +86,13 @@ void RenderArea::setRenderSubPixelLevel(int level){
  */
 void RenderArea::setRenderRepetionlLevel(int level){
 #ifndef CPUMODE
+    // Replacing renderer might not be needed in future KVS releases
+    m_renderer=new ExtendedParticleVolumeRenderer(m_point_object, 1, level);
     m_renderer->setRepetitionLevel( level );
+    m_scene->replaceRenderer(m_obj_id_pair.second, m_renderer, true);
+#else
+    std::cout<<"setRenderRepetionlLevel only for GPU MODE"<<std::endl;
+    exit(1);
 #endif
 }
 /**
@@ -248,10 +258,17 @@ void RenderArea::attachPointObject(const kvs::PointObject* point)
         qWarning("RenderArea::attachPointObject was not called from main thread, ignoring point object");
         return;
     }
+    if (point == NULL || point->coords().size() == 0){
+        qCritical("RenderArea::attachPointObject. !!!!!!! NULL OR ZERO OBJECT - INTERPRETED AS CLEAR !!!!!! t\n" );
+        m_scene->removeObject(m_obj_id_pair.first,false,false);
+        m_obj_id_pair.first=-1;
+        return;
+    }
     if (point->coords().size() <= 3){
         qCritical("RenderArea::attachPointObject.  PointObject with single point attached t\n" );
-
+//        return;
     }
+
     m_point_object.swap();
     m_point_object->clear();
     m_point_object->add(*point);
@@ -259,6 +276,9 @@ void RenderArea::attachPointObject(const kvs::PointObject* point)
     makeCurrent();
     if (m_obj_id_pair.first ==-1 && m_obj_id_pair.second == -1){
         m_obj_id_pair=this->m_scene->registerObject(m_point_object,m_renderer);
+    }
+    else if (m_obj_id_pair.first ==-1){
+        m_obj_id_pair = m_scene->registerObject(m_point_object,m_renderer);
     }
     else {
         this->m_scene->replaceObject(m_obj_id_pair.first,m_point_object,false);
