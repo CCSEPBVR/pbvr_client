@@ -37,7 +37,7 @@ LIBS += -L$$(KVS_DIR)/lib -lkvsCore
 #QMAKE_CXXFLAGS += -DQT_NO_OPENGL_ES
 #LIBS += -lOpenGL32
 win32{
-LIBS += glu32.lib
+#LIBS += glu32.lib
 LIBS += opengl32.lib
 LIBS += ws2_32.lib
 }
