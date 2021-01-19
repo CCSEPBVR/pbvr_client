@@ -68,17 +68,18 @@ void TimerEvent::update( kvs::TimeEvent* event )
         if ( m_command->m_is_under_animation && m_command->m_particle_assign_flag )
         {
            kvs::PointObject* m_front_object = new PointObject();
+           int sp_level=1;
             if ( m_command->m_parameter.m_transfer_type == VisualizationParameter::Abstract )
             {
                 std::cout << "Abstract" << std::endl;
                 *m_front_object = *( m_command->m_abstract_particles[m_command->m_parameter.m_time_step] );
-                m_screen->setRenderSubPixelLevel( m_command->m_parameter.m_abstract_subpixel_level );
+                sp_level=m_command->m_parameter.m_abstract_subpixel_level;
             }
             else if ( m_command->m_parameter.m_transfer_type == VisualizationParameter::Detailed )
             {
                 std::cout << "Detailed" << std::endl;
                 *m_front_object = *( m_command->m_detailed_particles[m_command->m_parameter.m_time_step] );
-                m_screen->setRenderSubPixelLevel( m_command->m_parameter.m_detailed_subpixel_level );
+                sp_level= m_command->m_parameter.m_detailed_subpixel_level;
             }
             else
             {
@@ -90,7 +91,7 @@ void TimerEvent::update( kvs::TimeEvent* event )
 
             m_front_object->setMinMaxObjectCoords(kvs::Vector3f(extCommand->PVBRmincoords),kvs::Vector3f(extCommand->PVBRmaxcoords));
             m_front_object->setMinMaxExternalCoords(kvs::Vector3f(extCommand->PVBRmincoords),kvs::Vector3f(extCommand->PVBRmaxcoords));
-            m_screen->attachPointObject(m_front_object);
+            m_screen->attachPointObject(m_front_object,sp_level);
             delete m_front_object;
             view_flag = true;
             m_command->m_particle_assign_flag = false;
