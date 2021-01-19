@@ -50,7 +50,7 @@ PBVR QtClient for PBVR, a Particle Based Volume Rendering framework for Client-S
       mkdir build
       cd build
       
-      /usr/local/opt/qt5/bin/qmake ../QtClient/QtClient.pro
+      /usr/local/opt/qt5/bin/qmake ../QtClient/QtClient.pro  # Your qmake might be in a different location
       make KVS_DIR=~/pbvr_dev/kvs_release
       
       
