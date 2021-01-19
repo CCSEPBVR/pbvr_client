@@ -117,13 +117,13 @@ public:
     // Public access methods for interacting with private renderer.
     void enableRendererShading();
     void setRenderSubPixelLevel(int level);
-    void setRenderRepetionlLevel(int level);
-    void recreateRenderImageBuffer();
+    void setRenderRepetitionLevel(int level);
+    void recreateRenderImageBuffer(int level);
 
     // Public access methods for interacting with private point object.
     kvs::Xform getPointObjectXform();
     void setPointObjectXform(kvs::Xform xf);
-    void attachPointObject(const kvs::PointObject *point);
+    void attachPointObject(const kvs::PointObject *point, int level);
 
 public:
     static char shadinglevel[256];
