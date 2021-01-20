@@ -41,7 +41,7 @@ PBVR QtClient for PBVR, a Particle Based Volume Rendering framework for Client-S
        make install
        
 
-## Commandline build of QtPBVR Client
+# Commandline build of QtPBVR Client
 
       cd =~/pbvr_dev
       git clone https://github.com/CCSEPBVR/pbvr_client.git
@@ -56,13 +56,13 @@ PBVR QtClient for PBVR, a Particle Based Volume Rendering framework for Client-S
       /usr/local/opt/qt5/bin/qmake ../QtClient/QtClient.pro  # Your qmake might be in a different location
       make KVS_DIR=~/pbvr_dev/kvs_release
       
-### Deploying QtPBVR Client
+## Deploying QtPBVR Client
 
-#### OSX
+### OSX
 
       /usr/local/opt/qt5/bin/macdeployqt  App/pbvr_client.app  -always-overwrite -dmg  #dmg is optional
   
-#### Windows - TO BE DONE:
+### Windows - TO BE DONE:
 
        ---
       
