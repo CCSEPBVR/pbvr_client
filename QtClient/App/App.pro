@@ -3,6 +3,20 @@ TEMPLATE = app
 #CONFIG += static
 QT       += core gui opengl widgets
 CONFIG += console
+CONFIG += file_copies
+
+COPIES += kvs_shader_bundle
+
+kvs_shader_bundle.files = $$files( $$(KVS_DIR)/include/Core/Visualization/Shader/PBR*)
+unix:macx{
+    kvs_shader_bundle.path = $$OUT_PWD/pbvr_client.app/Contents/MacOS
+}
+else{
+    kvs_shader_bundle.path = $$OUT_PWD
+}
+
+
+
 #PRECOMPILED_HEADER=stable.h
 
 CONFIG += warn_off
@@ -22,14 +36,14 @@ LIBS += -L../FunctionParser -lpbvrFunc
 LIBS += -L../Common -lCommon
 #LIBS += -L$${KVS_DIR} -lKVS
 LIBS += -L$$(KVS_DIR)/lib -lkvsCore
-win32{
-LIBS += -L$$(GLEW_DIR)/lib -lglew32
-}
-else {
-LIBS += -L$$(GLEW_DIR)/lib
-}
-unix:macx:LIBS +=  -lglew
-unix:!macx:LIBS += -lGLEW -lGLU
+#win32{
+#LIBS += -L$$(GLEW_DIR)/lib -lglew32
+#}
+#else {
+#LIBS += -L$$(GLEW_DIR)/lib
+#}
+#unix:macx:LIBS +=  -lglew
+#unix:!macx:LIBS += -lGLEW -lGLU
 #QT += opengl
 #QT += core gui opengl widgets
 #QMAKE_CXXFLAGS += -DQT_NO_OPENGL_ES_2
@@ -37,7 +51,7 @@ unix:!macx:LIBS += -lGLEW -lGLU
 #QMAKE_CXXFLAGS += -DQT_NO_OPENGL_ES
 #LIBS += -lOpenGL32
 win32{
-LIBS += glu32.lib
+#LIBS += glu32.lib
 LIBS += opengl32.lib
 LIBS += ws2_32.lib
 }
