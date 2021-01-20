@@ -6,7 +6,7 @@ PBVR QtClient for PBVR, a Particle Based Volume Rendering framework for Client-S
 
 ## Checkout KVS
 
-        cd =~/pbvr_dev
+        cd ~/pbvr_dev
         git clone https://github.com/CCSEPBVR/KVS.git
         cd KVS
         git checkout release-v2.9.0.pbvr.memfix
@@ -43,7 +43,7 @@ PBVR QtClient for PBVR, a Particle Based Volume Rendering framework for Client-S
 
 # Commandline build of QtPBVR Client
 
-      cd =~/pbvr_dev
+      cd ~/pbvr_dev
       git clone https://github.com/CCSEPBVR/pbvr_client.git
       cd pbvr_client
       git checkout no_glew_glu                          # Test branch for building without GLEW, and GLU
