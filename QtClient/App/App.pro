@@ -3,6 +3,20 @@ TEMPLATE = app
 #CONFIG += static
 QT       += core gui opengl widgets
 CONFIG += console
+CONFIG += file_copies
+
+COPIES += kvs_shader_bundle
+
+kvs_shader_bundle.files = $$files( $$(KVS_DIR)/include/Core/Visualization/Shader/PBR*)
+unix:macx{
+    kvs_shader_bundle.path = $$OUT_PWD/pbvr_client.app/Contents/MacOS
+}
+else{
+    kvs_shader_bundle.path = $$OUT_PWD
+}
+
+
+
 #PRECOMPILED_HEADER=stable.h
 
 CONFIG += warn_off
