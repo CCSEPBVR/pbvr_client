@@ -48,7 +48,7 @@ PBVR QtClient for PBVR, a Particle Based Volume Rendering framework for Client-S
       cd ~/pbvr_dev
       git clone https://github.com/CCSEPBVR/pbvr_client.git
       cd pbvr_client
-      git checkout no_glew_glu                          # Test branch for building without GLEW, and GLU
+      git checkout develop                              
       mkdir build                                       
       cd build
       rm -r *.*                                         # Make sure build directory IS CLEAN 
