@@ -46,13 +46,25 @@ PBVR QtClient for PBVR, a Particle Based Volume Rendering framework for Client-S
       cd =~/pbvr_dev
       git clone https://github.com/CCSEPBVR/pbvr_client.git
       cd pbvr_client
-      git checkout no_glew_glu                                # Test branch for building without GLEW, and GLU
-      mkdir build
+      git checkout no_glew_glu                          # Test branch for building without GLEW, and GLU
+      mkdir build                                       
       cd build
+      rm -r *.*                                         # Make sure build directory IS CLEAN 
+                                                        # If it contains old build files Make will 
+                                                        # complain about glew_ symbols
       
       /usr/local/opt/qt5/bin/qmake ../QtClient/QtClient.pro  # Your qmake might be in a different location
       make KVS_DIR=~/pbvr_dev/kvs_release
       
+### Deploying QtPBVR Client
+
+#### OSX
+
+      /usr/local/opt/qt5/bin/macdeployqt  App/pbvr_client.app  -always-overwrite -dmg  #dmg is optional
+  
+#### Windows - TO BE DONE:
+
+       ---
       
       
       
