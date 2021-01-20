@@ -62,7 +62,7 @@ PBVR QtClient for PBVR, a Particle Based Volume Rendering framework for Client-S
 
       /usr/local/opt/qt5/bin/macdeployqt  App/pbvr_client.app  -always-overwrite -dmg  #dmg is optional
       
-( ERROR: Unexpected prefix "@executable_path" might occur, but should not prevent deployment process from completing)
+( ERROR: Unexpected prefix "@executable_path" might occur, but this should not prevent deployment process from completing)
   
 ### Windows - TO BE DONE:
 
