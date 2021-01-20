@@ -236,7 +236,7 @@ size_t ParticleMerger::getMergedFinalTimeStep()
 }
 
 kvs::PointObject* ParticleMerger::doMerge(
-    const kvs::PointObject& server_particle,
+    const kvs::PointObject* server_particle,
     const size_t step )
 {
     kvs::PointObject* obj = new kvs::PointObject();
@@ -249,11 +249,13 @@ kvs::PointObject* ParticleMerger::doMerge(
         //if ( ( step < m_initial_step[n] ) && ( !m_parameter.m_particles[n].m_keep_initial_step ) ) continue;
         //if ( ( step > m_final_step[n] )   && ( !m_parameter.m_particles[n].m_keep_final_step )  ) continue;
         if ( ( step >= m_initial_step[n] && step <= m_final_step[n] || m_parameter.m_particles[n].m_keep_initial_step || m_parameter.m_particles[n].m_keep_final_step )
-         && ( m_parameter.m_particles[n].m_file_path == "server" ) )
+             && ( m_parameter.m_particles[n].m_file_path == "server" ) )
         {
-//std::cout << "========== obj : " << obj << std::endl;
-//std::cout << "========== server : " << &server_particle << std::endl;
-            ( *obj ) += server_particle;
+            //std::cout << "========== obj : " << obj << std::endl;
+            //std::cout << "========== server : " << &server_particle << std::endl;
+            if (server_particle != NULL){
+                ( *obj ) +=  (*server_particle);
+            }
             continue;
         }
 

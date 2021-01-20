@@ -69,29 +69,43 @@ void RenderArea::enableRendererShading(){
     m_renderer->enableShading();
 }
 /**
- * @brief RenderArea::setRenderSubPixelLevel, set render sub pixel level.
+ * @brief RenderArea::setRenderRepetitionLevel, set render repetition level.
  * @param level
  */
-void RenderArea::setRenderSubPixelLevel(int level){
-    m_renderer->setSubpixelLevel( level );
-}
-/**
- * @brief RenderArea::setRenderRepetionlLevel, set render repetion level
- *              Only has effect in CPUMODE, zero-op in GPUMODE
- * @param level, int.
- */
-void RenderArea::setRenderRepetionlLevel(int level){
+void RenderArea::setRenderRepetitionLevel(int level)
+{
 #ifndef CPUMODE
+    level=level>1?level:1;
+    m_renderer=new ExtendedParticleVolumeRenderer(m_point_object, level);
     m_renderer->setRepetitionLevel( level );
+    m_scene->replaceRenderer(m_obj_id_pair.second, m_renderer, true);
 #endif
 }
+
+
+/**
+ * @brief RenderArea::setRenderSubPixelLevel, set render sub pixel level.
+ *                    When this is called in GPU mode level will be squared before applied.
+ *                    When this is called in GPU mode, renderer instance will be recreated and replaced in scene.
+ * @param level
+ */
+void RenderArea::setRenderSubPixelLevel(int level)
+{
+    level=level>1?level:1;
+#ifdef CPUMODE
+    m_renderer->setSubpixelLevel( level );
+#endif
+}
+
 /**
  * @brief RenderArea::recreateRenderImageBuffer, recreate the renderers image buffer.
  *              Only has effect in CPUMODE, zero-op in GPUMODE
  */
-void RenderArea::recreateRenderImageBuffer()
+void RenderArea::recreateRenderImageBuffer(int level)
 {
-#ifndef CPUMODE
+    level=level>1?level:1;
+#ifdef CPUMODE
+    m_renderer->setSubpixelLevel( level );
     m_renderer->recreateImageBuffer();
 #endif
 }
@@ -130,7 +144,9 @@ void RenderArea::updateCommandInfo(ExtCommand* extCommand)
     m_point_object->setMinMaxExternalCoords( min, max );
 
     // Setup Extended Particle Volume Renderer
-    m_renderer = new kvs::visclient::ExtendedParticleVolumeRenderer( *object1, extCommand->m_parameter.m_detailed_subpixel_level, extCommand->m_parameter.m_detailed_repeat_level );
+    int sp_level= extCommand->m_parameter.m_detailed_subpixel_level;
+    m_renderer = new kvs::visclient::ExtendedParticleVolumeRenderer( *object1,sp_level);
+    setRenderSubPixelLevel(sp_level);
     if ( !m_renderer )
     {
         kvsMessageError( "Cannot create a point m_renderer." );
@@ -218,10 +234,9 @@ void RenderArea::setupEventHandlers()
     }
 
     // Timer
-
     qt_timer = new QGlue::Timer( msec ,extCommand);
-    //    qt_timer->setRenderer(this->m_renderer);
 
+    //    qt_timer->setRenderer(this->m_renderer);
     extCommand->m_glut_timer = qt_timer;
     //    qt_timer->setScreen(this);
 
@@ -240,25 +255,38 @@ void RenderArea::setupEventHandlers()
  *        Creates local copy of point object, to ensure life time.
  * @param point, the point to be attached
  */
-void RenderArea::attachPointObject(const kvs::PointObject* point)
+void RenderArea::attachPointObject(const kvs::PointObject* point, int level)
 {
-
-    //    std::cout<<"attachPointObject"<<std::endl;
     if (QThread::currentThread() != this->thread()) {
         qWarning("RenderArea::attachPointObject was not called from main thread, ignoring point object");
         return;
     }
+    if (point == NULL || point->coords().size() == 0){
+        qCritical("RenderArea::attachPointObject. !!!!!!! NULL OR ZERO OBJECT - INTERPRETED AS CLEAR !!!!!! t\n" );
+        m_scene->removeObject(m_obj_id_pair.first,false,false);
+        m_obj_id_pair.first=-1;
+        return;
+    }
     if (point->coords().size() <= 3){
         qCritical("RenderArea::attachPointObject.  PointObject with single point attached t\n" );
-
     }
+
     m_point_object.swap();
     m_point_object->clear();
     m_point_object->add(*point);
     // Make sure context is current
     makeCurrent();
+    // Update subpixel/renderrepetitoion level
+#ifdef CPU_MODE
+    this->setRenderSubPixelLevel(level);
+#else
+    this->setRenderRepetitionLevel(level * level);
+#endif
     if (m_obj_id_pair.first ==-1 && m_obj_id_pair.second == -1){
         m_obj_id_pair=this->m_scene->registerObject(m_point_object,m_renderer);
+    }
+    else if (m_obj_id_pair.first ==-1){
+        m_obj_id_pair = m_scene->registerObject(m_point_object,m_renderer);
     }
     else {
         this->m_scene->replaceObject(m_obj_id_pair.first,m_point_object,false);
@@ -557,7 +585,6 @@ void    RenderArea::ScreenShotKeyFrame( kvs::Scene* scene, const int tstep )
 */
 void RenderArea::mousePressEvent( QMouseEvent *event)
 {
-
     //    ADD BY)T.Osaki 2020.03.03
     QWidget::setFocus();
     bool MOD_Shift = event->modifiers() & Qt::SHIFT;
@@ -620,7 +647,6 @@ void RenderArea::mouseMoveEvent(QMouseEvent *event)
             {
                 return;
             }
-
         }
     }
 

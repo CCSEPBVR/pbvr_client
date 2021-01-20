@@ -4,11 +4,11 @@
 #ifdef CPUMODE
 #include <kvs/ParticleVolumeRenderer>
 #define RENDERER_BASE   kvs::ParticleVolumeRenderer
-#define BASE_INIT_ARGS  &point, subpixel_level
+#define BASE_INIT_ARGS  &point, subpixel_level // Init arguments for kvs::ParticleVolumeRenderer
 #else
 #include <kvs/ParticleBasedRenderer>
 #define RENDERER_BASE   kvs::glsl::ParticleBasedRenderer
-#define BASE_INIT_ARGS  //&(const_cast<kvs::PointObject&>(point)), subpixel_level, repeat_level
+#define BASE_INIT_ARGS  // No init arguments for  base class kvs::glsl::ParticleBasedRenderer
 #endif
 
 namespace kvs
@@ -20,7 +20,7 @@ namespace visclient
 class ExtendedParticleVolumeRenderer : public RENDERER_BASE
 {
 public:
-    ExtendedParticleVolumeRenderer( const kvs::PointObject& point, const size_t subpixel_level = 1, const size_t repeat_level = 1 ): RENDERER_BASE( BASE_INIT_ARGS )
+    ExtendedParticleVolumeRenderer( const kvs::PointObject& point, const size_t subpixel_level = 1): RENDERER_BASE( BASE_INIT_ARGS )
     {
 
     }

@@ -36,7 +36,7 @@ public:
     size_t getMergedInitialTimeStep();
     size_t getMergedFinalTimeStep();
     kvs::PointObject* doMerge(
-        const kvs::PointObject& server_particle,
+        const kvs::PointObject* server_particle,
         const size_t step );
     void setEnable( const int i );
 
