@@ -69,21 +69,13 @@ void TimerEvent::update( kvs::TimeEvent* event )
         {
            kvs::PointObject* m_front_object = new PointObject();
            int sp_level=1;
-            if ( m_command->m_parameter.m_transfer_type == VisualizationParameter::Abstract )
+           if ( m_command->m_parameter.m_transfer_type == VisualizationParameter::Detailed )
             {
-                std::cout << "Abstract" << std::endl;
-                *m_front_object = *( m_command->m_abstract_particles[m_command->m_parameter.m_time_step] );
-                sp_level=m_command->m_parameter.m_abstract_subpixel_level;
-            }
-            else if ( m_command->m_parameter.m_transfer_type == VisualizationParameter::Detailed )
-            {
-                std::cout << "Detailed" << std::endl;
                 *m_front_object = *( m_command->m_detailed_particles[m_command->m_parameter.m_time_step] );
                 sp_level= m_command->m_parameter.m_detailed_subpixel_level;
             }
             else
             {
-                std::cout << "else" << std::endl;
                 assert( false );
             }
             if ( m_command->m_parameter.m_shading_type_flag )

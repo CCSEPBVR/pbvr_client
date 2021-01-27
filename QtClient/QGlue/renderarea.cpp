@@ -137,7 +137,7 @@ void RenderArea::updateCommandInfo(ExtCommand* extCommand)
     //MOD BY)T.Osaki 2020.07.20
     extCommand->m_parameter.m_camera = this->m_scene->camera();
     // Setup Controll Object
-    kvs::PointObject* object1 = extCommand->m_abstract_particles[0];
+    kvs::PointObject* object1 = extCommand->m_detailed_particles[0];
     const kvs::Vector3f& min = object1->minObjectCoord();
     const kvs::Vector3f& max = object1->maxObjectCoord();
     m_point_object->setMinMaxObjectCoords( min, max );

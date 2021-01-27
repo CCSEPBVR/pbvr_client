@@ -315,8 +315,6 @@ void PBVRGUI::load_parameter_file(kvs::visclient::Argument& argument)
     //    local_time_end = command_q.m_parameter.m_max_server_time_step;
     std::cout << " PBVRGUI::load_parameter_file local_time_start  "<<local_time_start << std::endl;
     std::cout << " PBVRGUI::load_parameter_file local_time_end  "<<local_time_end << std::endl;
-
-    extCommand->initializeAbstractParticles( &extCommand->m_parameter, &extCommand->m_result, local_time_start, local_time_end );
     extCommand->generateDetailedParticles();
     //    Win3vd();
     std::cout << " ### Win3vd() done " << std::endl;
