@@ -339,6 +339,7 @@ void PBVRGUI::closeEvent(QCloseEvent *event)
 #ifdef ENABLE_CROP
     crop_dialog.close();
 #endif
+    coordinatePanel.close();
     tf_editor.close();
     particlePanel.close();
     QMainWindow::closeEvent(event);
