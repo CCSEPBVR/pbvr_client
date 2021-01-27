@@ -101,9 +101,6 @@ public:
     void generateAbstractParticles( PBVRParam& param, PBVRResult* result);
 #else
     int getServerParticleInfomation( VisualizationParameter* param, ReceivedMessage* result );
-    void initializeAbstractParticles( VisualizationParameter* param, ReceivedMessage* result, const int localminstep, const int localmaxstep );
-//    void generateAbstractParticles( PBVRParam& param, PBVRResult* result, int localminstep = -1, int localmaxstep = -1 );
-    void generateAbstractParticles( VisualizationParameter* param, ReceivedMessage* result );
 #endif
     void generateDetailedParticles();
 
@@ -142,7 +139,6 @@ public:
     int  m_step_key_frame;
     int  m_previous_key_frame;
 
-    std::vector<kvs::PointObject*> m_abstract_particles;
     std::vector<kvs::PointObject*> m_detailed_particles;
 
     float particle_data_size_limit_input;
@@ -168,8 +164,8 @@ public:
     float m_min_object_coord[3];
     float m_max_object_coord[3];
 
-    static float	PVBRmaxcoords[3];
-    static float	PVBRmincoords[3];
+    static float	PBVRmaxcoords[3];
+    static float	PBVRmincoords[3];
 private:
     std::vector<kvs::PointObject*> m_server_particles;
     std::vector<kvs::Vector3f> m_server_coord_min;

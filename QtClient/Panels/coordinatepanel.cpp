@@ -172,6 +172,17 @@ void CoordinatePanel::onApplyButton()
     this->setXCoordinateExpression();
     this->setYCoordinateExpression();
     this->setZCoordinateExpression();
+
+    if(
+            (param_x_synthesis.empty() || param_x_synthesis == "X" || param_x_synthesis == "x") &&
+            (param_y_synthesis.empty() || param_y_synthesis == "Y" || param_y_synthesis == "y") &&
+            (param_z_synthesis.empty() || param_z_synthesis == "Z" || param_x_synthesis == "z"))
+    {
+        m_use_particle_side_coords = false;
+    }else{
+        m_use_particle_side_coords = true;
+    }
+
     m_coordinate = true;
     m_coordinate_for_store_particle = true;
     extCommand->m_screen->update();

@@ -78,6 +78,7 @@ void RenderArea::setRenderRepetitionLevel(int level)
     level=level>1?level:1;
     m_renderer=new ExtendedParticleVolumeRenderer(m_point_object, level);
     m_renderer->setRepetitionLevel( level );
+    this->setShaderParams();
     m_scene->replaceRenderer(m_obj_id_pair.second, m_renderer, true);
 #endif
 }
@@ -107,6 +108,7 @@ void RenderArea::recreateRenderImageBuffer(int level)
 #ifdef CPUMODE
     m_renderer->setSubpixelLevel( level );
     m_renderer->recreateImageBuffer();
+    this->setShaderParams();
 #endif
 }
 
@@ -137,7 +139,7 @@ void RenderArea::updateCommandInfo(ExtCommand* extCommand)
     //MOD BY)T.Osaki 2020.07.20
     extCommand->m_parameter.m_camera = this->m_scene->camera();
     // Setup Controll Object
-    kvs::PointObject* object1 = extCommand->m_abstract_particles[0];
+    kvs::PointObject* object1 = extCommand->m_detailed_particles[0];
     const kvs::Vector3f& min = object1->minObjectCoord();
     const kvs::Vector3f& max = object1->maxObjectCoord();
     m_point_object->setMinMaxObjectCoords( min, max );
@@ -234,9 +236,10 @@ void RenderArea::setupEventHandlers()
     }
 
     // Timer
-    qt_timer = new QGlue::Timer( msec ,extCommand);
 
+    qt_timer = new QGlue::Timer( msec ,extCommand);
     //    qt_timer->setRenderer(this->m_renderer);
+
     extCommand->m_glut_timer = qt_timer;
     //    qt_timer->setScreen(this);
 
@@ -269,8 +272,8 @@ void RenderArea::attachPointObject(const kvs::PointObject* point, int level)
     }
     if (point->coords().size() <= 3){
         qCritical("RenderArea::attachPointObject.  PointObject with single point attached t\n" );
-    }
 
+    }
     m_point_object.swap();
     m_point_object->clear();
     m_point_object->add(*point);
@@ -450,8 +453,10 @@ void RenderArea::keyPressEvent(QKeyEvent *kbEvent){
         break;
 
     case kvs::Key::x:
+        //2020,11,27 T.Osaki sceneが持っているObjectManagerのXfromを使用する。
         qInfo(" [debug] 'x' pressed. (add Xform)");
-        KeyFrameAnimationAdd(this->getPointObjectXform());
+//        KeyFrameAnimationAdd(this->getPointObjectXform());
+        KeyFrameAnimationAdd(this->scene()->objectManager()->xform());
         break;
     case kvs::Key::d:
         qInfo(" [debug] 'd' pressed. (delete last Xform)");
@@ -477,6 +482,55 @@ void RenderArea::keyPressEvent(QKeyEvent *kbEvent){
     case kvs::Key::F:
         qInfo(" [debug] 'F' pressed. (read Xform from file)");
         KeyFrameAnimationRead();
+        break;
+    case kvs::Key::z:
+        std::cout << "[Press Z Key]" << std::endl;
+
+//        this->scene()->object()->scale(kvs::Vector3f(0.638638,0.638638,0.638638),kvs::Vector3f(0,0,0));
+////        this->scene()->object()->xform().Scaling(kvs::Vector3f(0.638638,0.638638,0.638638));
+//        this->scene()->object()->translate(kvs::Vector3f(-4.48984,-2.21817,2.53699));
+//        kvs::Vector3f trans(-4.48984,-2.21817,2.53699);
+//        kvs::Vector3f scal(0.638638,0.638638,0.638638);
+//        kvs::Matrix33f mat(1,0,0,
+//                           0,1,0,
+//                           0,0,1);
+//        kvs::Xform xf(trans,scal,mat);
+//        this->scene()->object()->setXform(xf);
+        std::cout << "-----------------------------------" << std::endl;
+        std::cout << "[ObjectManager]" << std::endl;
+        std::cout << *(this->scene()->objectManager()) << std::endl;
+        std::cout << "[Translation]" << std::endl;
+        std::cout << this->scene()->objectManager()->xform().translation() << std::endl;
+        std::cout << "[Scaling]" << std::endl;
+        std::cout << this->scene()->objectManager()->xform().scaling() << std::endl;
+        std::cout << "[Rotation]" << std::endl;
+        std::cout << this->scene()->objectManager()->xform().rotation() << std::endl;
+        std::cout << "[min object coord]" << std::endl;
+        std::cout << this->scene()->objectManager()->minObjectCoord() << std::endl;
+        std::cout << "[max object coord]" << std::endl;
+        std::cout << this->scene()->objectManager()->maxObjectCoord() << std::endl;
+        std::cout << "[min object external coord]" << std::endl;
+        std::cout << this->scene()->objectManager()->minExternalCoord() << std::endl;
+        std::cout << "[max object external coord]" << std::endl;
+        std::cout << this->scene()->objectManager()->maxExternalCoord() << std::endl;
+        std::cout << "-----------------------------------" << std::endl;
+        std::cout << "[Object]" << std::endl;
+        std::cout << *(this->scene()->object()) << std::endl;
+        std::cout << "[Translation]" << std::endl;
+        std::cout << this->scene()->object()->xform().translation() << std::endl;
+        std::cout << "[Scaling]" << std::endl;
+        std::cout << this->scene()->object()->xform().scaling() << std::endl;
+        std::cout << "[Rotation]" << std::endl;
+        std::cout << this->scene()->object()->xform().rotation() << std::endl;
+        std::cout << "[min object coord]" << std::endl;
+        std::cout << this->scene()->object()->minObjectCoord() << std::endl;
+        std::cout << "[max object coord]" << std::endl;
+        std::cout << this->scene()->object()->maxObjectCoord() << std::endl;
+        std::cout << "[min object external coord]" << std::endl;
+        std::cout << this->scene()->object()->minExternalCoord() << std::endl;
+        std::cout << "[max object external coord]" << std::endl;
+        std::cout << this->scene()->object()->maxExternalCoord() << std::endl;
+        std::cout << "-----------------------------------" << std::endl;
         break;
     default:
         break;
@@ -585,6 +639,7 @@ void    RenderArea::ScreenShotKeyFrame( kvs::Scene* scene, const int tstep )
 */
 void RenderArea::mousePressEvent( QMouseEvent *event)
 {
+
     //    ADD BY)T.Osaki 2020.03.03
     QWidget::setFocus();
     bool MOD_Shift = event->modifiers() & Qt::SHIFT;
@@ -647,6 +702,7 @@ void RenderArea::mouseMoveEvent(QMouseEvent *event)
             {
                 return;
             }
+
         }
     }
 
