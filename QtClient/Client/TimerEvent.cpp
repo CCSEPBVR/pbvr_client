@@ -206,7 +206,7 @@ void TimerEvent::update( kvs::TimeEvent* event )
     if ( m_is_key_frame_animation )
     {
         m_ninterpolation = AnimationControls::getInterpolationValue();
-        if ( m_interpolation_counter >= m_ninterpolation )
+        if ( m_interpolation_counter > m_ninterpolation )
         {
             m_interpolation_counter = 0;
             m_xform_index++;
@@ -227,11 +227,17 @@ void TimerEvent::update( kvs::TimeEvent* event )
                 }
                 if ( m_is_ready )
                 {
-                    if ( m_interpolation_counter < m_ninterpolation )
+                    if ( m_interpolation_counter <= m_ninterpolation )
                     {
                         kvs::Xform Xform_new = InterpolateXform( t, m_ninterpolation, m_xforms->at( i ), m_xforms->at( i + 1 ) );
+                        //2020,11,27 sceneが持つObjectManagerのtranslate,scale,rotateに補完された値が入っているXform_newを渡す。
 //                        m_front_object->setXform( Xform_new );
-                        m_screen->setPointObjectXform(Xform_new);
+                        m_screen->scene()->reset();
+                        m_screen->scene()->objectManager()->translate(Xform_new.translation());
+                        m_screen->scene()->objectManager()->scale(Xform_new.scaling());
+                        m_screen->scene()->objectManager()->rotate(Xform_new.rotation());
+
+//                        m_screen->setPointObjectXform(Xform_new);
                         m_command->m_step_key_frame++;
                         t++;
                         m_interpolation_counter = t;
@@ -249,8 +255,12 @@ void TimerEvent::update( kvs::TimeEvent* event )
                     if ( m_interpolation_counter < m_ninterpolation )
                     {
                         kvs::Xform Xform_new = InterpolateXform( t, m_ninterpolation, m_xforms->at( i ), m_xforms->at( i + 1 ) );
+                        //2020,11,27 sceneが持つObjectManagerのtranslate,scale,rotateに補完された値が入っているXform_newを渡す。
 //                        m_front_object->setXform( Xform_new );
-                        m_screen->setPointObjectXform(Xform_new);
+                        m_screen->scene()->reset();
+                        m_screen->scene()->objectManager()->translate(Xform_new.translation());
+                        m_screen->scene()->objectManager()->scale(Xform_new.scaling());
+                        m_screen->scene()->objectManager()->rotate(Xform_new.rotation());
                         m_command->m_step_key_frame++;
                         t++;
                         m_interpolation_counter = t;
@@ -271,7 +281,7 @@ void TimerEvent::update( kvs::TimeEvent* event )
     }
 
     m_screen->update();
-
+    paint_mutex.unlock();
     if ( m_is_key_frame_animation && m_command->m_previous_key_frame != m_command->m_step_key_frame )
     {
         //KVS2.7.0
@@ -288,7 +298,7 @@ void TimerEvent::update( kvs::TimeEvent* event )
 //        }
 //        exit( 1 );
 //    }
-    paint_mutex.unlock();
+//    paint_mutex.unlock();
 }
 
 static kvs::Xform InterpolateXform( const int interp_step, const int num_frame, const kvs::Xform& start, const kvs::Xform& end )
