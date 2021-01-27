@@ -48,8 +48,8 @@ char filter_parameter_filename[256];
 
 // add:end by @hira at 2016/12/01
 int start_store_step = -1;
-float Command::PVBRmaxcoords[3]={1.0,1.0,1.0};
-float Command::PVBRmincoords[3]={0.0,0.0,0.0};
+float Command::PBVRmaxcoords[3]={0.0,0.0,0.0};
+float Command::PBVRmincoords[3]={0.0,0.0,0.0};
 
 
 Command::Command( ParticleServer* server ) :
@@ -256,7 +256,11 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
                         int stepno;
                         if ((stepno = getServerStep(param)) >= 0 ){
                             delete m_detailed_particles[param->m_time_step];
+                            if(m_coord_panel_ui->m_use_particle_side_coords){
                             m_detailed_particles[param->m_time_step] = m_server->getPointObjectFromServer(*param, result, numvol, stepno);
+                            }else{
+                            m_detailed_particles[param->m_time_step] = m_server->getPointObjectFromServer(*param, result, numvol, stepno,PBVRmincoords,PBVRmaxcoords);
+                            }
                             // ADD START FEAST 2016.01.07
                             if (m_detailed_particles[param->m_time_step] == NULL)
                             {
@@ -277,11 +281,18 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
                         if (m_detailed_particles.size() > param->m_time_step){
                             if (m_detailed_particles[param->m_time_step])
                                 delete m_detailed_particles[param->m_time_step];
+                            if(m_coord_panel_ui->m_use_particle_side_coords){
                             m_detailed_particles[param->m_time_step] = m_server->getPointObjectFromServer(*param, result, numvol, stepno);
+                            }else{
+                            m_detailed_particles[param->m_time_step] = m_server->getPointObjectFromServer(*param, result, numvol, stepno,PBVRmincoords,PBVRmaxcoords);
+                            }
                         }
                         else{
-                            m_detailed_particles.push_back(m_server->getPointObjectFromServer(*param, result, numvol, stepno));
-                        }
+                            if(m_coord_panel_ui->m_use_particle_side_coords){
+                            m_detailed_particles[param->m_time_step] = m_server->getPointObjectFromServer(*param, result, numvol, stepno);
+                            }else{
+                            m_detailed_particles[param->m_time_step] = m_server->getPointObjectFromServer(*param, result, numvol, stepno,PBVRmincoords,PBVRmaxcoords);
+                            }                        }
                         if (m_server_particles.size() < param->m_time_step + 1){
                             m_server_particles.resize(param->m_time_step + 1, NULL);
                             // サーバー生成粒子の各stepの存在範囲を格納
@@ -510,12 +521,12 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
                 if ( resetflag == false )
                 {
                     // サーバの粒子情報とlocalの粒子情報を比較して範囲が広い方を採用
-                    crd[0] = std::min( local_crd[0], PVBRmincoords[0] );
-                    crd[1] = std::min( local_crd[1], PVBRmincoords[1] );
-                    crd[2] = std::min( local_crd[2], PVBRmincoords[2] );
-                    crd[3] = std::max( local_crd[3], PVBRmaxcoords[0] );
-                    crd[4] = std::max( local_crd[4], PVBRmaxcoords[1] );
-                    crd[5] = std::max( local_crd[5], PVBRmaxcoords[2] );
+                    crd[0] = std::min( local_crd[0], PBVRmincoords[0] );
+                    crd[1] = std::min( local_crd[1], PBVRmincoords[1] );
+                    crd[2] = std::min( local_crd[2], PBVRmincoords[2] );
+                    crd[3] = std::max( local_crd[3], PBVRmaxcoords[0] );
+                    crd[4] = std::max( local_crd[4], PBVRmaxcoords[1] );
+                    crd[5] = std::max( local_crd[5], PBVRmaxcoords[2] );
                     resetflag = true;
                 }
             }
@@ -555,12 +566,12 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
                 // サーバの粒子存在情報無かったか、正規化ボタンが押されずにここに来た場合
                 if ( resetflag == false )
                 {
-                    crd[0] = PVBRmincoords[0];
-                    crd[1] = PVBRmincoords[1];
-                    crd[2] = PVBRmincoords[2];
-                    crd[3] = PVBRmaxcoords[0];
-                    crd[4] = PVBRmaxcoords[1];
-                    crd[5] = PVBRmaxcoords[2];
+                    crd[0] = PBVRmincoords[0];
+                    crd[1] = PBVRmincoords[1];
+                    crd[2] = PBVRmincoords[2];
+                    crd[3] = PBVRmaxcoords[0];
+                    crd[4] = PBVRmaxcoords[1];
+                    crd[5] = PBVRmaxcoords[2];
                     resetflag = true;
                 }
             }
@@ -580,23 +591,23 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
         if ( local_particle_exits )
         {
             // サーバの粒子情報とlocalの粒子情報を比較して範囲が広い方を採用
-            crd[0] = std::min( local_crd[0], PVBRmincoords[0] );
-            crd[1] = std::min( local_crd[1], PVBRmincoords[1] );
-            crd[2] = std::min( local_crd[2], PVBRmincoords[2] );
-            crd[3] = std::max( local_crd[3], PVBRmaxcoords[0] );
-            crd[4] = std::max( local_crd[4], PVBRmaxcoords[1] );
-            crd[5] = std::max( local_crd[5], PVBRmaxcoords[2] );
+            crd[0] = std::min( local_crd[0], PBVRmincoords[0] );
+            crd[1] = std::min( local_crd[1], PBVRmincoords[1] );
+            crd[2] = std::min( local_crd[2], PBVRmincoords[2] );
+            crd[3] = std::max( local_crd[3], PBVRmaxcoords[0] );
+            crd[4] = std::max( local_crd[4], PBVRmaxcoords[1] );
+            crd[5] = std::max( local_crd[5], PBVRmaxcoords[2] );
             resetflag = true;
         }
         else
         {
             // サーバの粒子情報で設定
-            crd[0] = PVBRmincoords[0];
-            crd[1] = PVBRmincoords[1];
-            crd[2] = PVBRmincoords[2];
-            crd[3] = PVBRmaxcoords[0];
-            crd[4] = PVBRmaxcoords[1];
-            crd[5] = PVBRmaxcoords[2];
+            crd[0] = PBVRmincoords[0];
+            crd[1] = PBVRmincoords[1];
+            crd[2] = PBVRmincoords[2];
+            crd[3] = PBVRmaxcoords[0];
+            crd[4] = PBVRmaxcoords[1];
+            crd[5] = PBVRmaxcoords[2];
             resetflag = true;
         }
     }
@@ -738,13 +749,13 @@ int Command::getServerParticleInfomation( VisualizationParameter* param, Receive
 
             minObjectCoord = kvs::Vector3f( reply.m_min_object_coord );
             maxObjectCoord = kvs::Vector3f( reply.m_max_object_coord );
-            PVBRmaxcoords[0] = reply.m_max_object_coord[0];
-            PVBRmaxcoords[1] = reply.m_max_object_coord[1];
-            PVBRmaxcoords[2] = reply.m_max_object_coord[2];
+            PBVRmaxcoords[0] = reply.m_max_object_coord[0];
+            PBVRmaxcoords[1] = reply.m_max_object_coord[1];
+            PBVRmaxcoords[2] = reply.m_max_object_coord[2];
 
-            PVBRmincoords[0] = reply.m_min_object_coord[0];
-            PVBRmincoords[1] = reply.m_min_object_coord[1];
-            PVBRmincoords[2] = reply.m_min_object_coord[2];
+            PBVRmincoords[0] = reply.m_min_object_coord[0];
+            PBVRmincoords[1] = reply.m_min_object_coord[1];
+            PBVRmincoords[2] = reply.m_min_object_coord[2];
 
             float minValue = reply.m_min_value;
             float maxValue = reply.m_max_value;
@@ -809,10 +820,6 @@ size_t Command::getUsingMemoryByKiloByte()
 {
     size_t memory = 0;
 #ifndef CPUMODE
-    for ( size_t i = 0; i < m_abstract_particles.size(); ++i )
-    {
-        memory += m_abstract_particles[i]->coords().size() * sizeof( kvs::Real32 ) + m_abstract_particles[i]->normals().size() * sizeof( kvs::Real32 ) + m_abstract_particles[i]->colors().size() * sizeof( kvs::UInt8 );
-    }
     for ( size_t i = 0; i < m_detailed_particles.size(); ++i )
     {
         memory += m_detailed_particles[i]->coords().size() * sizeof( kvs::Real32 ) + m_detailed_particles[i]->normals().size() * sizeof( kvs::Real32 ) + m_detailed_particles[i]->colors().size() * sizeof( kvs::UInt8 );

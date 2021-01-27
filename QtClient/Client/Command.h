@@ -164,8 +164,8 @@ public:
     float m_min_object_coord[3];
     float m_max_object_coord[3];
 
-    static float	PVBRmaxcoords[3];
-    static float	PVBRmincoords[3];
+    static float	PBVRmaxcoords[3];
+    static float	PBVRmincoords[3];
 private:
     std::vector<kvs::PointObject*> m_server_particles;
     std::vector<kvs::Vector3f> m_server_coord_min;

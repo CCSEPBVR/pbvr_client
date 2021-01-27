@@ -81,8 +81,6 @@ void TimerEvent::update( kvs::TimeEvent* event )
             if ( m_command->m_parameter.m_shading_type_flag )
                 m_screen->enableRendererShading();
 
-            m_front_object->setMinMaxObjectCoords(kvs::Vector3f(extCommand->PVBRmincoords),kvs::Vector3f(extCommand->PVBRmaxcoords));
-            m_front_object->setMinMaxExternalCoords(kvs::Vector3f(extCommand->PVBRmincoords),kvs::Vector3f(extCommand->PVBRmaxcoords));
             m_screen->attachPointObject(m_front_object,sp_level);
             delete m_front_object;
             view_flag = true;
