@@ -78,6 +78,7 @@ void RenderArea::setRenderRepetitionLevel(int level)
     level=level>1?level:1;
     m_renderer=new ExtendedParticleVolumeRenderer(m_point_object, level);
     m_renderer->setRepetitionLevel( level );
+    this->setShaderParams();
     m_scene->replaceRenderer(m_obj_id_pair.second, m_renderer, true);
 #endif
 }
@@ -107,6 +108,7 @@ void RenderArea::recreateRenderImageBuffer(int level)
 #ifdef CPUMODE
     m_renderer->setSubpixelLevel( level );
     m_renderer->recreateImageBuffer();
+    this->setShaderParams();
 #endif
 }
 
