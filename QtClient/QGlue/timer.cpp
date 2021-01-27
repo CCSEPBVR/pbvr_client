@@ -240,7 +240,6 @@ void Timer::comThreadExitEvent()
         if ( m_command->m_parameter.m_transfer_type == VisualizationParameter::Detailed )
         {
             *m_front_object = *( m_command->m_detailed_particles[m_command->m_parameter.m_time_step] );
-            m_screen->setRenderSubPixelLevel( m_command->m_parameter.m_detailed_subpixel_level );
             sp_level= m_command->m_parameter.m_detailed_subpixel_level;
         }
         else
