@@ -237,12 +237,7 @@ void Timer::comThreadExitEvent()
     {
         kvs::PointObject* m_front_object = new kvs::PointObject();
         int sp_level=1;
-        if ( m_command->m_parameter.m_transfer_type == VisualizationParameter::Abstract )
-        {
-            *m_front_object = *( m_command->m_abstract_particles[m_command->m_parameter.m_time_step] );
-           sp_level=m_command->m_parameter.m_abstract_subpixel_level;
-        }
-        else if ( m_command->m_parameter.m_transfer_type == VisualizationParameter::Detailed )
+        if ( m_command->m_parameter.m_transfer_type == VisualizationParameter::Detailed )
         {
             *m_front_object = *( m_command->m_detailed_particles[m_command->m_parameter.m_time_step] );
             sp_level= m_command->m_parameter.m_detailed_subpixel_level;

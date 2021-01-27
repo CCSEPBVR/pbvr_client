@@ -268,6 +268,8 @@ void ParticlePanel::onExportButtonClick()
     QDir dir(".");
     QString absolute_path=QFileDialog::getSaveFileName(this, tr("Select Export Folder and prefix for dataset name"), "", "");
 
+    if(!absolute_path.isEmpty() && !absolute_path.isNull())
+    {
     m_text_output_file_path = dir.relativeFilePath(absolute_path);
 
     int check = 0;
@@ -287,6 +289,7 @@ void ParticlePanel::onExportButtonClick()
         ui->exportButton->setDisabled(true);
         // flagを立てる
         m_do_export = true;
+    }
     }
 }
 
