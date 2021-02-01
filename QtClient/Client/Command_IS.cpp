@@ -56,8 +56,8 @@ static int pretimestep  = -1;
 static int numvol, numstep = 0;
 static int exportMergedParticleStartStep = -1;
 
-float Command::PVBRmaxcoords[3]={1.0,1.0,1.0};
-float Command::PVBRmincoords[3]={0.0,0.0,0.0};
+float Command::PBVRmaxcoords[3]={1.0,1.0,1.0};
+float Command::PBVRmincoords[3]={0.0,0.0,0.0};
 
 Command::Command( ParticleServer* server ) :
     m_is_under_animation( true ),
@@ -245,7 +245,7 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
             {
                 object = m_server_particles[step];
             }
-            p = merger.doMerge( *object, step );
+            p = merger.doMerge( object, step );
             delete p;
         }
         param->m_particle_merge_param.m_do_export = false;
@@ -262,45 +262,7 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
         else
         {
             // When Transfer Functions are edited.
-            if ( param->m_transfer_type == VisualizationParameter::Abstract )
-            {
-
-                if ( param->m_detailed_transfer_type == VisualizationParameter::Divided )
-                {
-                    std::cout << "*** param->m_detailed_transfer_type == PBVRParam::Divided" << std::endl;
-#ifndef CPUMODE
-                    std::cout << "param->m_repeat_level=" << param->m_repeat_level << " param->abstractRepeatLevel =" << param->m_abstract_repeat_level << std::endl;
-                    if ( param->m_repeat_level == param->m_abstract_repeat_level )
-                    {
-#endif
-                        //delete abstractParticles[param.timeStep];
-                        m_abstract_particles[param->m_time_step] = m_server->getPointObjectFromServer( *param, result, numvol, param->m_time_step );
-#ifndef CPUMODE
-                    }
-                    else if ( param->m_repeat_level < param->m_abstract_repeat_level )
-                    {
-                        PointObject* dividedObject = m_server->getPointObjectFromServer( *param, result, numvol ,param->m_time_step);
-
-                        m_abstract_particles[param->m_time_step]->add( *dividedObject );
-                        delete dividedObject;
-                    }
-                    else
-                    {
-                        assert( false );
-                    }
-#endif
-                }
-                else if ( param->m_detailed_transfer_type == VisualizationParameter::Summalized )
-                {
-                    //delete abstractParticles[param.timeStep];
-                    m_abstract_particles[param->m_time_step] = m_server->getPointObjectFromServer( *param, result, numvol, param->m_time_step );
-                }
-                else
-                {
-                    assert( false );
-                }
-            }
-            else if ( param->m_transfer_type == VisualizationParameter::Detailed )
+            if ( param->m_transfer_type == VisualizationParameter::Detailed )
             {
 
                 if ( param->m_detailed_transfer_type == VisualizationParameter::Divided )
@@ -360,20 +322,20 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
             m_particle_assign_flag = true;
             m_is_under_animation = result->isUnderAnimation;
         }
-        PVBRmaxcoords[0] = result->maxObjectCoord[0];
-        PVBRmaxcoords[1] = result->maxObjectCoord[1];
-        PVBRmaxcoords[2] = result->maxObjectCoord[2];
+        PBVRmaxcoords[0] = result->maxObjectCoord[0];
+        PBVRmaxcoords[1] = result->maxObjectCoord[1];
+        PBVRmaxcoords[2] = result->maxObjectCoord[2];
 
-        PVBRmincoords[0] = result->minObjectCoord[0];
-        PVBRmincoords[1] = result->minObjectCoord[1];
-        PVBRmincoords[2] = result->minObjectCoord[2];
+        PBVRmincoords[0] = result->minObjectCoord[0];
+        PBVRmincoords[1] = result->minObjectCoord[1];
+        PBVRmincoords[2] = result->minObjectCoord[2];
 
         // Merge Point Object
         ParticleMerger merger;
         kvs::PointObject* server_object = m_server_particles[param->m_time_step];
         kvs::PointObject* object;
         merger.setParam( param->m_particle_merge_param, param->m_min_server_time_step, param->m_max_server_time_step );
-        object = merger.doMerge( *server_object, param->m_time_step );
+        object = merger.doMerge( server_object, param->m_time_step );
 
         result->m_min_merged_time_step = merger.getMergedInitialTimeStep();
         result->m_max_merged_time_step = merger.getMergedFinalTimeStep();
@@ -409,7 +371,7 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
         // reallocate abstractParticles and detailedParticles
         if ( param->m_max_time_step > m_detailed_particles.size() - 1 )
         {
-            generateAbstractParticles( param, result );
+//            generateAbstractParticles( param, result );
             this->m_parameter = *param;
             this->m_result = *result;
             generateDetailedParticles();
@@ -478,23 +440,23 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
             if ( local_particle_exits )
             {
                 // サーバの粒子情報とlocalの粒子情報を比較して範囲が広い方を採用
-                crd[0] = std::min( local_crd[0], PVBRmincoords[0] );
-                crd[1] = std::min( local_crd[1], PVBRmincoords[1] );
-                crd[2] = std::min( local_crd[2], PVBRmincoords[2] );
-                crd[3] = std::max( local_crd[3], PVBRmaxcoords[0] );
-                crd[4] = std::max( local_crd[4], PVBRmaxcoords[1] );
-                crd[5] = std::max( local_crd[5], PVBRmaxcoords[2] );
+                crd[0] = std::min( local_crd[0], PBVRmincoords[0] );
+                crd[1] = std::min( local_crd[1], PBVRmincoords[1] );
+                crd[2] = std::min( local_crd[2], PBVRmincoords[2] );
+                crd[3] = std::max( local_crd[3], PBVRmaxcoords[0] );
+                crd[4] = std::max( local_crd[4], PBVRmaxcoords[1] );
+                crd[5] = std::max( local_crd[5], PBVRmaxcoords[2] );
                 resetflag = true;
             }
             else
             {
                 // localの統合粒子が１つも選択されていない状態なのでサーバの粒子情報で設定
-                crd[0] = PVBRmincoords[0];
-                crd[1] = PVBRmincoords[1];
-                crd[2] = PVBRmincoords[2];
-                crd[3] = PVBRmaxcoords[0];
-                crd[4] = PVBRmaxcoords[1];
-                crd[5] = PVBRmaxcoords[2];
+                crd[0] = PBVRmincoords[0];
+                crd[1] = PBVRmincoords[1];
+                crd[2] = PBVRmincoords[2];
+                crd[3] = PBVRmaxcoords[0];
+                crd[4] = PBVRmaxcoords[1];
+                crd[5] = PBVRmaxcoords[2];
                 resetflag = true;
             }
         }
@@ -506,34 +468,34 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
         if ( local_particle_exits )
         {
             // サーバの粒子情報とlocalの粒子情報を比較して範囲が広い方を採用
-            crd[0] = std::min( local_crd[0], PVBRmincoords[0] );
-            crd[1] = std::min( local_crd[1], PVBRmincoords[1] );
-            crd[2] = std::min( local_crd[2], PVBRmincoords[2] );
-            crd[3] = std::max( local_crd[3], PVBRmaxcoords[0] );
-            crd[4] = std::max( local_crd[4], PVBRmaxcoords[1] );
-            crd[5] = std::max( local_crd[5], PVBRmaxcoords[2] );
+            crd[0] = std::min( local_crd[0], PBVRmincoords[0] );
+            crd[1] = std::min( local_crd[1], PBVRmincoords[1] );
+            crd[2] = std::min( local_crd[2], PBVRmincoords[2] );
+            crd[3] = std::max( local_crd[3], PBVRmaxcoords[0] );
+            crd[4] = std::max( local_crd[4], PBVRmaxcoords[1] );
+            crd[5] = std::max( local_crd[5], PBVRmaxcoords[2] );
             resetflag = true;
         }
         else
         {
             // サーバの粒子情報で設定
-            crd[0] = PVBRmincoords[0];
-            crd[1] = PVBRmincoords[1];
-            crd[2] = PVBRmincoords[2];
-            crd[3] = PVBRmaxcoords[0];
-            crd[4] = PVBRmaxcoords[1];
-            crd[5] = PVBRmaxcoords[2];
+            crd[0] = PBVRmincoords[0];
+            crd[1] = PBVRmincoords[1];
+            crd[2] = PBVRmincoords[2];
+            crd[3] = PBVRmaxcoords[0];
+            crd[4] = PBVRmaxcoords[1];
+            crd[5] = PBVRmaxcoords[2];
             resetflag = true;
         }
     }
     else
     {
-        crd[0] = PVBRmincoords[0];
-        crd[1] = PVBRmincoords[1];
-        crd[2] = PVBRmincoords[2];
-        crd[3] = PVBRmaxcoords[0];
-        crd[4] = PVBRmaxcoords[1];
-        crd[5] = PVBRmaxcoords[2];
+        crd[0] = PBVRmincoords[0];
+        crd[1] = PBVRmincoords[1];
+        crd[2] = PBVRmincoords[2];
+        crd[3] = PBVRmaxcoords[0];
+        crd[4] = PBVRmaxcoords[1];
+        crd[5] = PBVRmaxcoords[2];
         resetflag = true;
     }
     // change view
@@ -594,30 +556,30 @@ void Command::postUpdate()
     PBVR_TIMER_STA( 150 );
 
 
-#ifndef CPUMODE
-    if ( m_parameter.m_transfer_type == VisualizationParameter::Abstract)
+//#ifndef CPUMODE
+//    if ( m_parameter.m_transfer_type == VisualizationParameter::Abstract)
+//    {
+//#ifndef CPUMODE
+//        m_screen->setRenderRepetionlLevel(m_parameter.m_abstract_repeat_level);
+//#endif
+//        m_screen->setRenderSubPixelLevel( m_parameter.m_abstract_subpixel_level );
+//        PointObject* object = m_abstract_particles[m_parameter.m_time_step];
+//        m_screen->attachPointObject( object );
+//    }
+    if ( m_parameter.m_transfer_type == VisualizationParameter::Detailed )
     {
-#ifndef CPUMODE
-        m_screen->setRenderRepetionlLevel(m_parameter.m_abstract_repeat_level);
-#endif
-        m_screen->setRenderSubPixelLevel( m_parameter.m_abstract_subpixel_level );
-        PointObject* object = m_abstract_particles[m_parameter.m_time_step];
-        m_screen->attachPointObject( object );
-    }
-    else if ( m_parameter.m_transfer_type == VisualizationParameter::Detailed )
-    {
-#ifndef CPUMODE
-        m_screen->setRenderRepetionlLevel( m_parameter.m_detailed_repeat_level );
-#endif
-        m_screen->setRenderSubPixelLevel( m_parameter.m_detailed_subpixel_level );
-        PointObject* object = m_detailed_particles[m_parameter.m_time_step];
-        m_screen->attachPointObject( object );
-    }
-    else
-    {
-        assert( false );
-    }
-#endif
+//#ifndef CPUMODE
+//        m_screen->setRenderRepetionlLevel( m_parameter.m_detailed_repeat_level );
+//#endif
+//        m_screen->setRenderSubPixelLevel( m_parameter.m_detailed_subpixel_level );
+//        PointObject* object = m_detailed_particles[m_parameter.m_time_step];
+//        m_screen->attachPointObject( object );
+//    }
+//    else
+//    {
+//        assert( false );
+//    }
+//#endif
 
 #if 0  // FEAST modify 20160128
     if ( pretimestep != param.timeStep )
@@ -655,6 +617,7 @@ void Command::postUpdate()
     if ( timer_count == TIMER_MAX_COUNT ) TIMER_FIN();
 #endif
 
+}
 }
 
 void Command::getServerParticleInfomation( VisualizationParameter* param, ReceivedMessage* result)
@@ -699,13 +662,13 @@ void Command::getServerParticleInfomation( VisualizationParameter* param, Receiv
 
             minObjectCoord = kvs::Vector3f( reply.m_min_object_coord );
             maxObjectCoord = kvs::Vector3f( reply.m_max_object_coord );
-            PVBRmaxcoords[0] = reply.m_max_object_coord[0];
-            PVBRmaxcoords[1] = reply.m_max_object_coord[1];
-            PVBRmaxcoords[2] = reply.m_max_object_coord[2];
+            PBVRmaxcoords[0] = reply.m_max_object_coord[0];
+            PBVRmaxcoords[1] = reply.m_max_object_coord[1];
+            PBVRmaxcoords[2] = reply.m_max_object_coord[2];
 
-            PVBRmincoords[0] = reply.m_min_object_coord[0];
-            PVBRmincoords[1] = reply.m_min_object_coord[1];
-            PVBRmincoords[2] = reply.m_min_object_coord[2];
+            PBVRmincoords[0] = reply.m_min_object_coord[0];
+            PBVRmincoords[1] = reply.m_min_object_coord[1];
+            PBVRmincoords[2] = reply.m_min_object_coord[2];
 
             RenderoptionPanel::plimitlevel      = reply.particle_limit;
             RenderoptionPanel::pdensitylevel    = reply.particle_density;
@@ -741,166 +704,166 @@ void Command::getServerParticleInfomation( VisualizationParameter* param, Receiv
 
 }
 
-void Command::initializeAbstractParticles( VisualizationParameter* param, ReceivedMessage* result, int localminstep, int localmaxstep )
-{
-    // stepの範囲を示すparamのメンバー変数に設定を行う
-    param->m_min_time_step = localminstep;
-    param->m_max_time_step = localmaxstep;
+//void Command::initializeAbstractParticles( VisualizationParameter* param, ReceivedMessage* result, int localminstep, int localmaxstep )
+//{
+//    // stepの範囲を示すparamのメンバー変数に設定を行う
+//    param->m_min_time_step = localminstep;
+//    param->m_max_time_step = localmaxstep;
 
-    std::cout << "Command::generateAbstractParticles numvol " << numvol << std::endl;
-    std::cout << "Command::generateAbstractParticles numstep " << param->m_max_server_time_step << std::endl;
-    std::cout << "Command::generateAbstractParticles minstep " << param->m_min_time_step << std::endl;
-    std::cout << "Command::generateAbstractParticles maxstep " << param->m_max_time_step << std::endl;
+//    std::cout << "Command::generateAbstractParticles numvol " << numvol << std::endl;
+//    std::cout << "Command::generateAbstractParticles numstep " << param->m_max_server_time_step << std::endl;
+//    std::cout << "Command::generateAbstractParticles minstep " << param->m_min_time_step << std::endl;
+//    std::cout << "Command::generateAbstractParticles maxstep " << param->m_max_time_step << std::endl;
 
-    for (size_t i = 0; i < m_abstract_particles.size(); ++i)
-    {
-        delete m_abstract_particles[i];
-    }
+//    for (size_t i = 0; i < m_abstract_particles.size(); ++i)
+//    {
+//        delete m_abstract_particles[i];
+//    }
 
-    m_abstract_particles.clear();
+//    m_abstract_particles.clear();
 
-    {
-        size_t mt = (param->m_max_time_step > param->m_max_server_time_step) ? param->m_max_time_step : param->m_max_server_time_step;
-        for (size_t i = 0; i < mt + 1; ++i)
-        {
-            m_abstract_particles.push_back( m_server->getPointObjectFromLocal() );
-        }
-    }
+//    {
+//        size_t mt = (param->m_max_time_step > param->m_max_server_time_step) ? param->m_max_time_step : param->m_max_server_time_step;
+//        for (size_t i = 0; i < mt + 1; ++i)
+//        {
+//            m_abstract_particles.push_back( m_server->getPointObjectFromLocal() );
+//        }
+//    }
 
-    // サーバの情報が無い場合のViewer正規化処理
-    // Viewer正規化処理をする
-    if (param->m_client_server_mode == 1)
-    {
-        kvs::Vector3f minObjectCoord;
-        kvs::Vector3f maxObjectCoord;
-        minObjectCoord.set( PVBRmincoords );
-        maxObjectCoord.set( PVBRmaxcoords );
+//    // サーバの情報が無い場合のViewer正規化処理
+//    // Viewer正規化処理をする
+//    if (param->m_client_server_mode == 1)
+//    {
+//        kvs::Vector3f minObjectCoord;
+//        kvs::Vector3f maxObjectCoord;
+//        minObjectCoord.set( PBVRmincoords );
+//        maxObjectCoord.set( PBVRmaxcoords );
 
-        m_abstract_particles.front()->setMinMaxObjectCoords( minObjectCoord, maxObjectCoord );
-        m_abstract_particles.front()->setMinMaxExternalCoords( minObjectCoord, maxObjectCoord );
-    }else
-    {
-        m_abstract_particles.front() = m_server->getPointObjectFromServer( *param, result, numvol, param->m_time_step );
-    }
-}
+//        m_abstract_particles.front()->setMinMaxObjectCoords( minObjectCoord, maxObjectCoord );
+//        m_abstract_particles.front()->setMinMaxExternalCoords( minObjectCoord, maxObjectCoord );
+//    }else
+//    {
+//        m_abstract_particles.front() = m_server->getPointObjectFromServer( *param, result, numvol, param->m_time_step );
+//    }
+//}
 
 
-void Command::generateAbstractParticles( VisualizationParameter* param, ReceivedMessage* result)
-{
-//   std::cout<<" IN Command::generateAbstractParticles"<<std::endl;
-    kvs::Vector3f minObjectCoord;
-    kvs::Vector3f maxObjectCoord;
-    if ( param->m_client_server_mode == 1 )
-    {
-        if ( param->m_max_server_time_step == 0 )
-        {
-            jpv::ParticleTransferClient client( param->m_hostname, param->m_port );
-            jpv::ParticleTransferClientMessage message;
-            jpv::ParticleTransferServerMessage reply;
+//void Command::generateAbstractParticles( VisualizationParameter* param, ReceivedMessage* result)
+//{
+////   std::cout<<" IN Command::generateAbstractParticles"<<std::endl;
+//    kvs::Vector3f minObjectCoord;
+//    kvs::Vector3f maxObjectCoord;
+//    if ( param->m_client_server_mode == 1 )
+//    {
+//        if ( param->m_max_server_time_step == 0 )
+//        {
+//            jpv::ParticleTransferClient client( param->m_hostname, param->m_port );
+//            jpv::ParticleTransferClientMessage message;
+//            jpv::ParticleTransferServerMessage reply;
 
-            reply.camera = new kvs::Camera();
+//            reply.camera = new kvs::Camera();
 
-            client.initClient();
+//            client.initClient();
 
-            // Send inputDir
-            strncpy( message.m_header, "JPTP /1.0\r\n", 11 );
-            message.m_initialize_parameter = -3;
-            // message.inputDir = param.inputdir;
-            message.m_input_directory = std::string( pfi_path_server );
-            strcpy( pre_pfi_path_server, pfi_path_server );
-            // transfer function
-            param->m_parameter_extend_transfer_function.applyToClientMessage( &message );
+//            // Send inputDir
+//            strncpy( message.m_header, "JPTP /1.0\r\n", 11 );
+//            message.m_initialize_parameter = -3;
+//            // message.inputDir = param.inputdir;
+//            message.m_input_directory = std::string( pfi_path_server );
+//            strcpy( pre_pfi_path_server, pfi_path_server );
+//            // transfer function
+//            param->m_parameter_extend_transfer_function.applyToClientMessage( &message );
 
-            message.m_message_size = message.byteSize();
-            client.sendMessage( message );
+//            message.m_message_size = message.byteSize();
+//            client.sendMessage( message );
 
-            // Recive server condition
-            client.recvMessage( reply );
-            numvol = reply.m_number_volume_divide;
-            param->m_min_server_time_step = reply.m_start_step;
-            param->m_max_server_time_step = reply.m_end_step;
-            param->m_min_time_step = reply.m_start_step;
-            param->m_max_time_step = reply.m_end_step;
-            param->m_time_step = reply.m_time_step;
+//            // Recive server condition
+//            client.recvMessage( reply );
+//            numvol = reply.m_number_volume_divide;
+//            param->m_min_server_time_step = reply.m_start_step;
+//            param->m_max_server_time_step = reply.m_end_step;
+//            param->m_min_time_step = reply.m_start_step;
+//            param->m_max_time_step = reply.m_end_step;
+//            param->m_time_step = reply.m_time_step;
 
-// APPEND START fp)m.takizawa 2014.05.21
+//// APPEND START fp)m.takizawa 2014.05.21
 
-            minObjectCoord = kvs::Vector3f( reply.m_min_object_coord );
-            maxObjectCoord = kvs::Vector3f( reply.m_max_object_coord );
-            PVBRmaxcoords[0] = reply.m_max_object_coord[0];
-            PVBRmaxcoords[1] = reply.m_max_object_coord[1];
-            PVBRmaxcoords[2] = reply.m_max_object_coord[2];
+//            minObjectCoord = kvs::Vector3f( reply.m_min_object_coord );
+//            maxObjectCoord = kvs::Vector3f( reply.m_max_object_coord );
+//            PBVRmaxcoords[0] = reply.m_max_object_coord[0];
+//            PBVRmaxcoords[1] = reply.m_max_object_coord[1];
+//            PBVRmaxcoords[2] = reply.m_max_object_coord[2];
 
-            PVBRmincoords[0] = reply.m_min_object_coord[0];
-            PVBRmincoords[1] = reply.m_min_object_coord[1];
-            PVBRmincoords[2] = reply.m_min_object_coord[2];
+//            PBVRmincoords[0] = reply.m_min_object_coord[0];
+//            PBVRmincoords[1] = reply.m_min_object_coord[1];
+//            PBVRmincoords[2] = reply.m_min_object_coord[2];
 
-// APPEND END fp)m.takizawa 2014.05.21
+//// APPEND END fp)m.takizawa 2014.05.21
 
-            float minValue = reply.m_min_value;
-            float maxValue = reply.m_max_value;
-            std::cout << "minValue: " << minValue
-                      << " maxValue: " << maxValue << std::endl;
-            std::cout << "minObjectCoord: " << minObjectCoord << std::endl;
-            std::cout << "maxObjectCoord: " << maxObjectCoord << std::endl;
+//            float minValue = reply.m_min_value;
+//            float maxValue = reply.m_max_value;
+//            std::cout << "minValue: " << minValue
+//                      << " maxValue: " << maxValue << std::endl;
+//            std::cout << "minObjectCoord: " << minObjectCoord << std::endl;
+//            std::cout << "maxObjectCoord: " << maxObjectCoord << std::endl;
 
-            if ( m_is_import_transfer_function_parameter == false )
-            {
-                apply_variable_range( reply.m_variable_range );
-            }
+//            if ( m_is_import_transfer_function_parameter == false )
+//            {
+//                apply_variable_range( reply.m_variable_range );
+//            }
 
-            /* delete for 140521 server */
-            strncpy( message.m_header, "JPTP /1.0\r\n", 11 );
-            message.m_initialize_parameter = -1;
-            message.m_message_size = message.byteSize();
-            client.sendMessage( message );
-            client.recvMessage( reply );
-            client.termClient();
-            delete reply.camera;
-        }
+//            /* delete for 140521 server */
+//            strncpy( message.m_header, "JPTP /1.0\r\n", 11 );
+//            message.m_initialize_parameter = -1;
+//            message.m_message_size = message.byteSize();
+//            client.sendMessage( message );
+//            client.recvMessage( reply );
+//            client.termClient();
+//            delete reply.camera;
+//        }
 
-    }
+//    }
 
-    /*
-    if ( localminstep > -1 && localmaxstep > -1 )
-    {
-        // stepの範囲を示すparamのメンバー変数に設定を行う
-        param.minTimeStep = localminstep;
-        param.maxTimeStep = localmaxstep;
-    }
-    */
-    std::cout << "Command::generateAbstractParticles numvol " << numvol << std::endl;
-    std::cout << "Command::generateAbstractParticles numstep " << param->m_max_server_time_step << std::endl;
-    std::cout << "Command::generateAbstractParticles minstep " << param->m_min_time_step << std::endl;
-    std::cout << "Command::generateAbstractParticles maxstep " << param->m_max_time_step << std::endl;
+//    /*
+//    if ( localminstep > -1 && localmaxstep > -1 )
+//    {
+//        // stepの範囲を示すparamのメンバー変数に設定を行う
+//        param.minTimeStep = localminstep;
+//        param.maxTimeStep = localmaxstep;
+//    }
+//    */
+//    std::cout << "Command::generateAbstractParticles numvol " << numvol << std::endl;
+//    std::cout << "Command::generateAbstractParticles numstep " << param->m_max_server_time_step << std::endl;
+//    std::cout << "Command::generateAbstractParticles minstep " << param->m_min_time_step << std::endl;
+//    std::cout << "Command::generateAbstractParticles maxstep " << param->m_max_time_step << std::endl;
 
-    for ( size_t i = 0; i < m_abstract_particles.size(); ++i )
-    {
-        delete m_abstract_particles[i];
-    }
+//    for ( size_t i = 0; i < m_abstract_particles.size(); ++i )
+//    {
+//        delete m_abstract_particles[i];
+//    }
 
-    m_abstract_particles.clear();
+//    m_abstract_particles.clear();
 
-    {
-        size_t mt = ( param->m_max_time_step > param->m_max_server_time_step ) ? param->m_max_time_step : param->m_max_server_time_step;
-        for ( size_t i = 0; i < mt + 1; ++i )
-        {
-            m_abstract_particles.push_back( m_server->getPointObjectFromLocal() );
-        }
-    }
+//    {
+//        size_t mt = ( param->m_max_time_step > param->m_max_server_time_step ) ? param->m_max_time_step : param->m_max_server_time_step;
+//        for ( size_t i = 0; i < mt + 1; ++i )
+//        {
+//            m_abstract_particles.push_back( m_server->getPointObjectFromLocal() );
+//        }
+//    }
 
-    if ( param->m_client_server_mode == 1 )
-    {
-        m_abstract_particles.front()->setMinMaxObjectCoords( minObjectCoord, maxObjectCoord );
-        m_abstract_particles.front()->setMinMaxExternalCoords( minObjectCoord, maxObjectCoord );
-    }
-    else
-    {
-        m_abstract_particles.front() = m_server->getPointObjectFromServer( *param, result, numvol, param->m_time_step );
-    }
-//    std::cout<<"END Command::generateAbstractParticles"<<std::endl;
+//    if ( param->m_client_server_mode == 1 )
+//    {
+//        m_abstract_particles.front()->setMinMaxObjectCoords( minObjectCoord, maxObjectCoord );
+//        m_abstract_particles.front()->setMinMaxExternalCoords( minObjectCoord, maxObjectCoord );
+//    }
+//    else
+//    {
+//        m_abstract_particles.front() = m_server->getPointObjectFromServer( *param, result, numvol, param->m_time_step );
+//    }
+////    std::cout<<"END Command::generateAbstractParticles"<<std::endl;
 
-}
+//}
 
 void Command::generateDetailedParticles()
 {
@@ -928,10 +891,10 @@ size_t Command::getUsingMemoryByKiloByte()
 {
     size_t memory = 0;
 #ifndef CPUMODE
-    for ( size_t i = 0; i < m_abstract_particles.size(); ++i )
-    {
-        memory += m_abstract_particles[i]->coords().size() * sizeof( kvs::Real32 ) + m_abstract_particles[i]->normals().size() * sizeof( kvs::Real32 ) + m_abstract_particles[i]->colors().size() * sizeof( kvs::UInt8 );
-    }
+//    for ( size_t i = 0; i < m_abstract_particles.size(); ++i )
+//    {
+//        memory += m_abstract_particles[i]->coords().size() * sizeof( kvs::Real32 ) + m_abstract_particles[i]->normals().size() * sizeof( kvs::Real32 ) + m_abstract_particles[i]->colors().size() * sizeof( kvs::UInt8 );
+//    }
     for ( size_t i = 0; i < m_detailed_particles.size(); ++i )
     {
         memory += m_detailed_particles[i]->coords().size() * sizeof( kvs::Real32 ) + m_detailed_particles[i]->normals().size() * sizeof( kvs::Real32 ) + m_detailed_particles[i]->colors().size() * sizeof( kvs::UInt8 );

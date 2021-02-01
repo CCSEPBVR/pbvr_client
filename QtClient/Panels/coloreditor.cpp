@@ -25,9 +25,16 @@ ColorEditor::ColorEditor(QWidget *parent) :
     ui->colormap_selection->setCurrentRow( 0 );
     ui->colormap_selection->currentItem()->setSelected(true);
 
-    this->rfe = ui->expression_r->text().toStdString();
-    this->gfe = ui->expression_g->text().toStdString();
-    this->bfe = ui->expression_b->text().toStdString();
+    // Temporary strings just to prevent crash in windows debug mode
+    std::string tmprfe= ui->expression_r->text().toStdString();
+    std::string tmpgfe= ui->expression_g->text().toStdString();
+    std::string tmpbfe= ui->expression_b->text().toStdString();
+
+
+    this->rfe = tmprfe;
+    this->gfe = tmpgfe;
+    this->bfe = tmpbfe;
+
     //ADD BY)T.Osaki 2020.02.28
     this->m_color_map_palette->m_cundoStack = m_undoStack;
 
@@ -98,7 +105,7 @@ void ColorEditor::onExpressionChange(){
     this->bfe = ui->expression_b->text().toStdString();
 
     uint status=this->m_color_map_palette->setColorMapEquation(rfe,gfe,bfe);
-//    this->m_color_map_palette->setColorMapEquation(rfe,gfe,bfe);
+
     bool redStatus   = status & QGlue::ColorMapPalette::RED_EXPRESSION_ERROR;
     bool greenStatus = status & QGlue::ColorMapPalette::GREEN_EXPRESSION_ERROR;
     bool blueStatus  = status & QGlue::ColorMapPalette::BLUE_EXPRESSION_ERROR;

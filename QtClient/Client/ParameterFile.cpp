@@ -182,17 +182,17 @@ float ParameterFile::getCropRegion( const int index )
     return value;
 }
     //Osaki QTISPBVR update(2020/11/16) std::stringの&を削除
-int ParameterFile::getInt( const std::string name )
+int ParameterFile::getInt( const std::string& name )
 {
     return std::atoi( m_param[name].c_str() );
 }
 
-float ParameterFile::getFloat( const std::string name )
+float ParameterFile::getFloat( const std::string& name )
 {
     return std::atof( m_param[name].c_str() );
 }
 
-std::string ParameterFile::getString( const std::string name )
+std::string ParameterFile::getString( const std::string& name )
 {
     if ( m_param.find( name ) == m_param.end() )
         return "";

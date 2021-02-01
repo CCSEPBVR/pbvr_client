@@ -27,9 +27,9 @@ public:
     size_t getRepeatLevel();
 
     //Osaki QTISPBVR update(2020/11/16) std::stringの&を削除
-    int         getInt( const std::string name );
-    float       getFloat( const std::string name );
-    std::string getString( const std::string name );
+    int         getInt( const std::string& name );
+    float       getFloat( const std::string& name );
+    std::string getString( const std::string& name );
 
 public:
     bool   loadIN( const std::string& filename );

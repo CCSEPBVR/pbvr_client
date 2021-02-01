@@ -261,7 +261,6 @@ public:
         int client_mode = 1;
         m_header = "";
 #endif
-
         // 初期化
         for ( int i = 0; i < 10; i++ )
         {

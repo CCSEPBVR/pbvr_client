@@ -236,15 +236,11 @@ void Timer::comThreadExitEvent()
     if ( m_command->m_is_under_animation && m_command->m_particle_assign_flag )
     {
         kvs::PointObject* m_front_object = new kvs::PointObject();
-        if ( m_command->m_parameter.m_transfer_type == VisualizationParameter::Abstract )
-        {
-            *m_front_object = *( m_command->m_abstract_particles[m_command->m_parameter.m_time_step] );
-            m_screen->setRenderSubPixelLevel(m_command->m_parameter.m_abstract_subpixel_level );
-        }
-        else if ( m_command->m_parameter.m_transfer_type == VisualizationParameter::Detailed )
+        int sp_level=1;
+        if ( m_command->m_parameter.m_transfer_type == VisualizationParameter::Detailed )
         {
             *m_front_object = *( m_command->m_detailed_particles[m_command->m_parameter.m_time_step] );
-            m_screen->setRenderSubPixelLevel( m_command->m_parameter.m_detailed_subpixel_level );
+            sp_level= m_command->m_parameter.m_detailed_subpixel_level;
         }
         else
         {
@@ -253,7 +249,7 @@ void Timer::comThreadExitEvent()
 
         if ( m_command->m_parameter.m_shading_type_flag )
             m_screen->enableRendererShading();
-        m_screen->attachPointObject( m_front_object );
+        m_screen->attachPointObject( m_front_object,sp_level );
 
         delete m_front_object;
         //KVS2.7.0

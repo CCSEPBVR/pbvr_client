@@ -227,7 +227,7 @@ private:
 
     unsigned long int m_id;
     int               m_disable;
-    char*             m_tag;
+    const char*       m_tag;
 
     FunctionCore( void );
 
@@ -337,7 +337,7 @@ public:
         return ( !m_disable );
     };
 
-    inline char* tag( void ) const
+    inline const char* tag( void ) const
     {
         return ( m_tag );
     };
@@ -506,12 +506,12 @@ public:
         m_p->m_disable = 0;
     };
 
-    inline void tag( char* tag )
+    inline void tag( const char* tag )
     {
         m_p->m_tag = tag;
     };
 
-    inline char* tag( void )
+    inline const char* tag( void )
     {
         return ( m_p->m_tag );
     };

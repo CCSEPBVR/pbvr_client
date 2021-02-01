@@ -147,14 +147,39 @@ void ParticleMerger::setParam( const ParticleMergeParameter& param, const size_t
 
                     const kvs::File file( filename );
                     kvs::PointObject* impobj = new kvs::PointImporter( filename );
-                    const kvs::Vector3f& min_t = impobj->minObjectCoord();
-                    const kvs::Vector3f& max_t = impobj->maxObjectCoord();
-                    m_parameter.m_particles[n].m_x_min = min_t[0];
-                    m_parameter.m_particles[n].m_y_min = min_t[1];
-                    m_parameter.m_particles[n].m_z_min = min_t[2];
-                    m_parameter.m_particles[n].m_x_max = max_t[0];
-                    m_parameter.m_particles[n].m_y_max = max_t[1];
-                    m_parameter.m_particles[n].m_z_max = max_t[2];
+                    //サーバ側のmix max coordsを書き記したテキストファイルを読み込む。
+                    //ない場合は従来の方法でminmaxの値を決める。
+                    std::string filename_minMax = prefix + ".minMax";
+
+                    std::cout << prefix << std::endl;
+                    FILE* serverMinMaxCoords_file = fopen(filename_minMax.c_str(),"r");
+                    if(serverMinMaxCoords_file == NULL)
+                    {
+                        const kvs::Vector3f& min_t = impobj->minObjectCoord();
+                        const kvs::Vector3f& max_t = impobj->maxObjectCoord();
+                        m_parameter.m_particles[n].m_x_min = min_t[0];
+                        m_parameter.m_particles[n].m_y_min = min_t[1];
+                        m_parameter.m_particles[n].m_z_min = min_t[2];
+                        m_parameter.m_particles[n].m_x_max = max_t[0];
+                        m_parameter.m_particles[n].m_y_max = max_t[1];
+                        m_parameter.m_particles[n].m_z_max = max_t[2];
+                    }else{
+                        kvs::Vector3f min_t;
+                        kvs::Vector3f max_t;
+                        fscanf(serverMinMaxCoords_file,"%f,%f,%f,%f,%f,%f",
+                               &min_t[0],
+                                &min_t[1],
+                                &min_t[2],
+                                &max_t[0],
+                                &max_t[1],
+                                &max_t[2]);
+                        m_parameter.m_particles[n].m_x_min = min_t[0];
+                        m_parameter.m_particles[n].m_y_min = min_t[1];
+                        m_parameter.m_particles[n].m_z_min = min_t[2];
+                        m_parameter.m_particles[n].m_x_max = max_t[0];
+                        m_parameter.m_particles[n].m_y_max = max_t[1];
+                        m_parameter.m_particles[n].m_z_max = max_t[2];
+                    }
                     delete impobj;
                 }
             }
@@ -236,7 +261,7 @@ size_t ParticleMerger::getMergedFinalTimeStep()
 }
 
 kvs::PointObject* ParticleMerger::doMerge(
-    const kvs::PointObject& server_particle,
+    const kvs::PointObject* server_particle,
     const size_t step )
 {
     kvs::PointObject* obj = new kvs::PointObject();
@@ -249,11 +274,13 @@ kvs::PointObject* ParticleMerger::doMerge(
         //if ( ( step < m_initial_step[n] ) && ( !m_parameter.m_particles[n].m_keep_initial_step ) ) continue;
         //if ( ( step > m_final_step[n] )   && ( !m_parameter.m_particles[n].m_keep_final_step )  ) continue;
         if ( ( step >= m_initial_step[n] && step <= m_final_step[n] || m_parameter.m_particles[n].m_keep_initial_step || m_parameter.m_particles[n].m_keep_final_step )
-         && ( m_parameter.m_particles[n].m_file_path == "server" ) )
+             && ( m_parameter.m_particles[n].m_file_path == "server" ) )
         {
-//std::cout << "========== obj : " << obj << std::endl;
-//std::cout << "========== server : " << &server_particle << std::endl;
-            ( *obj ) += server_particle;
+            //std::cout << "========== obj : " << obj << std::endl;
+            //std::cout << "========== server : " << &server_particle << std::endl;
+            if (server_particle != NULL){
+                ( *obj ) +=  (*server_particle);
+            }
             continue;
         }
 
@@ -303,6 +330,12 @@ kvs::PointObject* ParticleMerger::doMerge(
 
         std::cout << basename << std::endl;
         KVSMLObjectPointWriter( *obj, basename );
+
+        //サーバ側のmix max coordsを書き記したテキストファイルを生成する。
+        std::string fileName = m_parameter.m_export_file_path +".minMax";
+        FILE* serverMinMaxCoords_file = fopen(fileName.c_str(), "w");
+        fprintf(serverMinMaxCoords_file,"%f,%f,%f,%f,%f,%f",obj->minObjectCoord().x(),obj->minObjectCoord().y(),obj->minObjectCoord().z(),obj->maxObjectCoord().x(),obj->maxObjectCoord().y(),obj->maxObjectCoord().z());
+        fclose(serverMinMaxCoords_file);
     }
 
     return obj;

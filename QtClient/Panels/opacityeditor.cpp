@@ -57,7 +57,6 @@ void OpacityEditor::onOpacityExpressionChanged(const QString &arg1)
     QPushButton* save_button = ui->buttonBox->button(QDialogButtonBox::Save);
     this->ofe =  arg1.toStdString();
     bool status=this->m_opacity_map_palette->setOpacityExpression(this->ofe);
-//    this->m_opacity_map_palette->setOpacityMapEquation(this->ofe);
     ui->expression_o->setStyleSheet(STATUS_STYLE(status==0));
     if (status==0){
         m_opacity_map_palette->update();

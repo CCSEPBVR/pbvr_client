@@ -37,14 +37,15 @@ private:
 public:
 
     ParticleServer( void ) :
-        m_status( Idle ),
-        m_point_object( NULL )
+        m_status( Idle )
+//        m_point_object( NULL )
     {
         m_number_repeat = 0;
     }
 
 	// 2018.12.25 
-	kvs::PointObject* getPointObjectFromServer( const VisualizationParameter& param, ReceivedMessage* result, const int numvol, const int stepno );
+    kvs::PointObject* getPointObjectFromServer( const VisualizationParameter& param, ReceivedMessage* result, const int numvol, const int stepno );
+    kvs::PointObject* getPointObjectFromServer( const VisualizationParameter& param, ReceivedMessage* result, const int numvol, const int stepno, float server_side_min_coords[3], float server_side_max_coords[3] );
 
     kvs::PointObject* getPointObjectFromLocal();
     void close( const VisualizationParameter& param );

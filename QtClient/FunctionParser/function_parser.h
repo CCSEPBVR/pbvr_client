@@ -92,7 +92,7 @@ protected:
 
 public:
 
-    FunctionParser( const std::string& func, const int& size )
+    FunctionParser( std::string& func, const int& size )
     {
         m_func = new char [size];
         if ( !m_func )

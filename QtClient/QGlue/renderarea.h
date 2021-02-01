@@ -93,7 +93,7 @@ private:
 public:
 
     explicit RenderArea( QWidget* parent_surface);
-
+    virtual ~RenderArea( void );
     //MOD BY)T.Osaki 2020.06.29
     //static void ScreenShot( kvs::ScreenBase* screen, const int tstep );
     //static void ScreenShotKeyFrame( kvs::ScreenBase* screen, const int tstep );
@@ -117,13 +117,13 @@ public:
     // Public access methods for interacting with private renderer.
     void enableRendererShading();
     void setRenderSubPixelLevel(int level);
-    void setRenderRepetionlLevel(int level);
-    void recreateRenderImageBuffer();
+    void setRenderRepetitionLevel(int level);
+    void recreateRenderImageBuffer(int level);
 
     // Public access methods for interacting with private point object.
     kvs::Xform getPointObjectXform();
     void setPointObjectXform(kvs::Xform xf);
-    void attachPointObject(const kvs::PointObject *point);
+    void attachPointObject(const kvs::PointObject *point, int level);
 
 public:
     static char shadinglevel[256];
