@@ -101,6 +101,23 @@ protected:
 //    ADD BY)T.Osaki 2020.03.03
     void mousePressEvent(QMouseEvent *event);
 
+private slots:
+    void on_actionZoomIn_triggered();
+    void on_actionZoomOut_triggered();
+    void on_actionYpos_triggered();
+    void on_actionYneg_triggered();
+    void on_actionXpos_triggered();
+    void on_actionXneg_triggered();
+    void on_actionCPU_triggered();
+    void on_actionGPU_triggered();
+    void on_actionRrep_triggered();
+
+
+    void on_actionAddFrame_triggered();
+
+    void on_actionRemoveFrame_triggered();
+
+    void on_actionPlayFrames_triggered();
 };
 
 #endif // PBVRCLIENT_H
