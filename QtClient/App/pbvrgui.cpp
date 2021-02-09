@@ -612,25 +612,25 @@ void PBVRGUI::on_actionYneg_triggered()
 
 void PBVRGUI::on_actionCPU_triggered()
 {
-//    kvs_renderarea->switch_gpu(false);
+    kvs_renderarea->switch_gpu(false);
 }
 
 void PBVRGUI::on_actionGPU_triggered()
 {
-//    kvs_renderarea->switch_gpu(true);
+    kvs_renderarea->switch_gpu(true);
 }
 
 void PBVRGUI::on_actionAddFrame_triggered()
 {
-//    kvs_renderarea->animation_add();
+    kvs_renderarea->animation_add();
 
 }
 void PBVRGUI::on_actionRemoveFrame_triggered()
 {
-//    kvs_renderarea->animation_del();
+    kvs_renderarea->animation_del();
 }
 void PBVRGUI::on_actionPlayFrames_triggered()
 {
-//    kvs_renderarea->animation_play();
+    kvs_renderarea->animation_play();
 }
 
