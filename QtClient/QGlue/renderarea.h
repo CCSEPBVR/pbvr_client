@@ -125,6 +125,7 @@ public:
     void setPointObjectXform(kvs::Xform xf);
     void attachPointObject(const kvs::PointObject *point, int level);
 
+
 public:
     static char shadinglevel[256];
     static kvs::visclient::TimerEvent* g_timer_event;
@@ -147,6 +148,7 @@ public:
     }
 private:
     std::pair<int, int> m_obj_id_pair;
+    kvs::Xform m_stored_xf;
     int i_w=0;
     int i_h=0;
     //    int yl0=0;
@@ -157,6 +159,8 @@ private:
 
     int m_reset_count = 0;
 
+    void storeCurrentXForm();
+    void restoreXForm();
 protected:
 
     void mouseReleaseEvent(QMouseEvent *event);

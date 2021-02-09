@@ -69,6 +69,22 @@ void RenderArea::enableRendererShading(){
     m_renderer->enableShading();
 }
 /**
+ * @brief RenderArea::storeCurrentXForm stores the current ObjectManager XForm
+ */
+void  RenderArea::storeCurrentXForm(){
+    m_stored_xf=m_scene->objectManager()->xform();
+}
+/**
+ * @brief RenderArea::restoreXForm restores the saved xform
+ */
+void RenderArea::restoreXForm()
+{
+    // Restore Saved X form
+    m_scene->objectManager()->translate(m_stored_xf.translation());
+    m_scene->objectManager()->scale(m_stored_xf.scaling());
+    m_scene->objectManager()->rotate(m_stored_xf.rotation());
+}
+/**
  * @brief RenderArea::setRenderRepetitionLevel, set render repetition level.
  * @param level
  */
@@ -80,6 +96,22 @@ void RenderArea::setRenderRepetitionLevel(int level)
     m_renderer->setRepetitionLevel( level );
     this->setShaderParams();
     m_scene->replaceRenderer(m_obj_id_pair.second, m_renderer, true);
+
+    // The lines below are a work around for m_initial_modelview problem
+    // in kvs::glsl::ParticleBasedRenderer.
+
+    makeCurrent();
+    // Save current X form
+    storeCurrentXForm();
+    // Reset object Manager's XForm
+    m_scene->objectManager()->resetXform();
+    // Manually call  paint function, to set m_initial_xform in Renderer
+    m_scene->paintFunction();
+    // Restore xform to original scene xform
+    restoreXForm();
+    // Paint the frame again, to erase previous frame
+    m_scene->paintFunction();
+    doneCurrent();
 #endif
 }
 
