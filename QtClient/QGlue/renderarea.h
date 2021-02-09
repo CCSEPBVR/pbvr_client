@@ -155,7 +155,7 @@ private:
     int msec = DEFAULT_MSEC;
     //    MOD BY)T.Osaki 2020.04.28
     float pixelRatio=1;
-    ExtendedParticleVolumeRenderer* m_renderer;
+    SwitchablePBR* m_renderer;
 
     int m_reset_count = 0;
 
@@ -170,7 +170,11 @@ protected:
     void onInitializeGL(  );
     void onResizeGL(int w, int h);
     void onPaintGL();
-
+public:
+    void animation_add();
+    void animation_del();
+    void animation_play();
+    void switch_gpu(bool f);
 
 };
 

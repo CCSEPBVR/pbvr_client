@@ -33,7 +33,7 @@ RenderArea::RenderArea( QWidget* parent_surface):
 
     Q_UNUSED( parent_surface);
     pixelRatio= QApplication::desktop()->devicePixelRatioF();
-
+     m_renderer= new SwitchablePBR();
     this->m_scene->background()->setColor( kvs::RGBAColor(0,0,22,1.0f) );
     this->i_w= 620;//Qthis->width();
     this->i_h= 620;//Qthis->height();
@@ -90,16 +90,14 @@ void RenderArea::restoreXForm()
  */
 void RenderArea::setRenderRepetitionLevel(int level)
 {
-#ifndef CPUMODE
-    level=level>1?level:1;
-    m_renderer=new ExtendedParticleVolumeRenderer(m_point_object, level);
-    m_renderer->setRepetitionLevel( level );
-    this->setShaderParams();
-    m_scene->replaceRenderer(m_obj_id_pair.second, m_renderer, true);
+//#ifndef CPUMODE
+//    if(m_renderer->uses_gpu()){
+        level=level>1?level:1;
+        m_renderer->setRepetitionLevel( level );
+        m_scene->replaceRenderer(m_obj_id_pair.second, m_renderer->selected(), false);
 
     // The lines below are a work around for m_initial_modelview problem
     // in kvs::glsl::ParticleBasedRenderer.
-
     makeCurrent();
     // Save current X form
     storeCurrentXForm();
@@ -112,7 +110,7 @@ void RenderArea::setRenderRepetitionLevel(int level)
     // Paint the frame again, to erase previous frame
     m_scene->paintFunction();
     doneCurrent();
-#endif
+//#endif
 }
 
 
@@ -179,7 +177,8 @@ void RenderArea::updateCommandInfo(ExtCommand* extCommand)
 
     // Setup Extended Particle Volume Renderer
     int sp_level= extCommand->m_parameter.m_detailed_subpixel_level;
-    m_renderer = new kvs::visclient::ExtendedParticleVolumeRenderer( *object1,sp_level);
+//    m_renderer = new kvs::visclient::ExtendedParticleVolumeRenderer( *object1,sp_level);
+//    m_renderer->recreateInstance(*object1,sp_level);
     setRenderSubPixelLevel(sp_level);
     if ( !m_renderer )
     {
@@ -187,11 +186,12 @@ void RenderArea::updateCommandInfo(ExtCommand* extCommand)
     }
 
     // Setup FPS Label
-    m_fpsLabel  =new QGlue::FPSLabel(this,*m_renderer);
+    m_fpsLabel  =new QGlue::FPSLabel(this,*(m_renderer->selected()));
     m_fpsLabel->setPosition(50*pixelRatio,50);
     m_labels.append(m_fpsLabel);
 
-    this->setShaderParams();
+//    this->setShaderParams();
+    m_renderer->setShaderString(shadinglevel);
     Screen::update();
     this->setFocus();
 }
@@ -312,16 +312,17 @@ void RenderArea::attachPointObject(const kvs::PointObject* point, int level)
     // Make sure context is current
     makeCurrent();
     // Update subpixel/renderrepetitoion level
-#ifdef CPU_MODE
-    this->setRenderSubPixelLevel(level);
-#else
+//#ifdef CPUMODE
+//    this->setRenderSubPixelLevel(level);
+//    m_renderer->setSubpixelLevel(level);
+//#else
     this->setRenderRepetitionLevel(level * level);
-#endif
+//#endif
     if (m_obj_id_pair.first ==-1 && m_obj_id_pair.second == -1){
-        m_obj_id_pair=this->m_scene->registerObject(m_point_object,m_renderer);
+        m_obj_id_pair=this->m_scene->registerObject(m_point_object,m_renderer->selected());
     }
     else if (m_obj_id_pair.first ==-1){
-        m_obj_id_pair = m_scene->registerObject(m_point_object,m_renderer);
+        m_obj_id_pair = m_scene->registerObject(m_point_object,m_renderer->selected());
     }
     else {
         this->m_scene->replaceObject(m_obj_id_pair.first,m_point_object,false);
@@ -331,7 +332,7 @@ void RenderArea::attachPointObject(const kvs::PointObject* point, int level)
     doneCurrent();
     // Trigger a paint event
     this->update();
-    //    std::cout<<"attachPointObject end"<<std::endl;
+//        std::cout<<"attachPointObject end"<<std::endl;
 }
 
 /**
@@ -412,48 +413,56 @@ void RenderArea::setShaderParams( )
     m_renderer->disableShading();
     // APPEND START BY)M.Tanaka 2015.03.11
     float sd_ka, sd_kd, sd_ks, sd_n;
-    if ( strcmp( shadinglevel, "L" ) == 0 )
-    {
-        printf( "***** shading : L\n" );
-        m_renderer->enableShading();
-        m_renderer->setShader( kvs::Shader::Lambert() );
-    }
-    else if ( strcmp( shadinglevel, "P" ) == 0 )
-    {
-        printf( "***** shading : P\n" );
-        m_renderer->enableShading();
-        m_renderer->setShader( kvs::Shader::Phong() );
-    }
-    else if ( strcmp( shadinglevel, "B" ) == 0 )
-    {
-        printf( "***** shading : B\n" );
-        m_renderer->enableShading();
-        m_renderer->setShader( kvs::Shader::BlinnPhong() );
-    }
-    else if ( strncmp( shadinglevel, "L,", 2 ) == 0 )
-    {
-        m_renderer->enableShading();
-        sscanf( &shadinglevel[2], "%f,%f", &sd_ka, &sd_kd );
-        printf( "***** shading : L %f %f\n", sd_ka, sd_kd );
-        m_renderer->setShader( kvs::Shader::Lambert( sd_ka, sd_kd ) );
-    }
-    else if ( strncmp( shadinglevel, "P,", 2 ) == 0 )
-    {
-        m_renderer->enableShading();
-        sscanf( &shadinglevel[2], "%f,%f,%f,%f", &sd_ka, &sd_kd, &sd_ks, &sd_n );
-        printf( "***** shading : P %f %f %f %f\n", sd_ka, sd_kd, sd_ks, sd_n );
-        m_renderer->setShader( kvs::Shader::Phong( sd_ka, sd_kd, sd_ks, sd_n ) );
-    }
-    else if ( strncmp( shadinglevel, "B,", 2 ) == 0 )
-    {
-        m_renderer->enableShading();
-        sscanf( &shadinglevel[2], "%f,%f,%f,%f", &sd_ka, &sd_kd, &sd_ks, &sd_n );
-        printf( "***** shading : B %f %f %f %f\n", sd_ka, sd_kd, sd_ks, sd_n );
-        m_renderer->setShader( kvs::Shader::BlinnPhong( sd_ka, sd_kd, sd_ks, sd_n ) );
-    }
-#ifndef CPUMODE
-    this->m_renderer->disableLODControl();
-#endif
+    char shaderType=shadinglevel[0];
+    bool hasParams=shadinglevel[1]==',';
+    sscanf( &shadinglevel[2], "%f,%f,%f,%f", &sd_ka, &sd_kd, &sd_ks, &sd_n );
+
+
+
+//    if ( strcmp( shadinglevel, "L" ) == 0 )
+//    {
+//        printf( "***** shading : L\n" );
+//        m_renderer->enableShading();
+//        m_renderer->setShader( kvs::Shader::Lambert() );
+//    }
+//    else if ( strcmp( shadinglevel, "P" ) == 0 )
+//    {
+//        printf( "***** shading : P\n" );
+//        m_renderer->enableShading();
+//        m_renderer->setShader( kvs::Shader::Phong() );
+//    }
+//    else if ( strcmp( shadinglevel, "B" ) == 0 )
+//    {
+//        printf( "***** shading : B\n" );
+//        m_renderer->enableShading();
+//        m_renderer->setShader( kvs::Shader::BlinnPhong() );
+//    }
+//    else if ( strncmp( shadinglevel, "L,", 2 ) == 0 )
+//    {
+//        m_renderer->enableShading();
+//        sscanf( &shadinglevel[2], "%f,%f", &sd_ka, &sd_kd );
+//        printf( "***** shading : L %f %f\n", sd_ka, sd_kd );
+//        m_renderer->setShader( kvs::Shader::Lambert( sd_ka, sd_kd ) );
+//    }
+//    else if ( strncmp( shadinglevel, "P,", 2 ) == 0 )
+//    {
+//        m_renderer->enableShading();
+//        sscanf( &shadinglevel[2], "%f,%f,%f,%f", &sd_ka, &sd_kd, &sd_ks, &sd_n );
+//        printf( "***** shading : P %f %f %f %f\n", sd_ka, sd_kd, sd_ks, sd_n );
+//        m_renderer->setShader( kvs::Shader::Phong( sd_ka, sd_kd, sd_ks, sd_n ) );
+//    }
+//    else if ( strncmp( shadinglevel, "B,", 2 ) == 0 )
+//    {
+//        m_renderer->enableShading();
+//        sscanf( &shadinglevel[2], "%f,%f,%f,%f", &sd_ka, &sd_kd, &sd_ks, &sd_n );
+//        printf( "***** shading : B %f %f %f %f\n", sd_ka, sd_kd, sd_ks, sd_n );
+//        m_renderer->setShader( kvs::Shader::BlinnPhong( sd_ka, sd_kd, sd_ks, sd_n ) );
+//    }
+
+//#ifndef CPUMODE
+    // LOD doesn't have any effect in glsl::ParticleBasedRenderer
+//        this->m_renderer->disableLODControl();
+//#endif
 }
 
 /**
@@ -484,16 +493,16 @@ void RenderArea::keyPressEvent(QKeyEvent *kbEvent){
         m_scene->controlTarget() = m_scene->TargetObject;
         break;
 
-    case kvs::Key::x:
-        //2020,11,27 T.Osaki sceneが持っているObjectManagerのXfromを使用する。
-        qInfo(" [debug] 'x' pressed. (add Xform)");
-//        KeyFrameAnimationAdd(this->getPointObjectXform());
-        KeyFrameAnimationAdd(this->scene()->objectManager()->xform());
-        break;
-    case kvs::Key::d:
-        qInfo(" [debug] 'd' pressed. (delete last Xform)");
-        KeyFrameAnimationErase();
-        break;
+//    case kvs::Key::x:
+//        //2020,11,27 T.Osaki sceneが持っているObjectManagerのXfromを使用する。
+//        qInfo(" [debug] 'x' pressed. (add Xform)");
+//        //        KeyFrameAnimationAdd(this->getPointObjectXform());
+//        KeyFrameAnimationAdd(this->scene()->objectManager()->xform());
+//        break;
+//    case kvs::Key::d:
+//        qInfo(" [debug] 'd' pressed. (delete last Xform)");
+//        KeyFrameAnimationErase();
+//        break;
     case kvs::Key::D:
         qInfo(" [debug] 'D' pressed. (delete all Xform)");
         KeyFrameAnimationDelete();
@@ -793,4 +802,29 @@ void RenderArea::setGeometry( QRect geom )
     this->setMaximumSize(geom.width(), geom.height());
     this->setSize( geom.width(), geom.height() );
     this->update();
+}
+
+
+void RenderArea::animation_add()
+{
+        KeyFrameAnimationAdd(this->scene()->objectManager()->xform());
+}
+void RenderArea::animation_del()
+{
+    KeyFrameAnimationErase();
+}
+void RenderArea::animation_play()
+{
+     KeyFrameAnimationStart();
+}
+void RenderArea::switch_gpu(bool f)
+{
+    if (f){
+        m_renderer->enable_gpu();
+    }
+    else{
+        m_renderer->disable_gpu();
+    }
+    m_scene->replaceRenderer(m_obj_id_pair.second, m_renderer->selected(),false);
+    update();
 }
