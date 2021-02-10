@@ -30,9 +30,9 @@ HEADERS += \
     ParamExTransFunc.h \
     VisualizationParameter.h \
     ReceivedMessage.h \
+    ExtendedParticleVolumeRenderer.h \
     ParameterFile.h \
-    ParticleMergeParameter.h \
-    PBRProxy.h
+    ParticleMergeParameter.h
 
 
 SOURCES += \
@@ -43,8 +43,7 @@ SOURCES += \
     ParticleMerger.cpp \
     TimerEvent.cpp \
     VizParameterFile.cpp \
-    ParameterFile.cpp \
-    PBRProxy.cpp
+    ParameterFile.cpp
 
 
 HEADERS += ExtendedTransferFunctionMessage_$${PBVR_MODE}.h

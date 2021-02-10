@@ -60,11 +60,6 @@ private:
     QGlue::Histogram*    m_color_histogram;     ///< color histogram
     QGlue::Histogram*    m_opacity_histogram;   ///< opacity histogram
 
-
-    double requested_opacity_min=0;
-    double requested_opacity_max=1;
-    double requested_color_min=0;
-    double requested_color_max=1;
     //ADD BY)T.Osaki 2020.02.05
     size_t m_resolution = 256;
 
@@ -80,9 +75,6 @@ private:
 
     void connectSignalsToSlots();
 private://Event Handlers
-
-    void onLockOpacityRange(bool changed);
-    void onLockColorRange(bool changed);
     void onResolutionChanged(int val);
     void onColorButtonClicked();
     void onOpacityButtonClicked();

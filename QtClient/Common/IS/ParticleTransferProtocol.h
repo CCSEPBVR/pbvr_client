@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <string>
 #include "Types.h"
@@ -27,7 +27,7 @@ public:
     {
         ss.write( reinterpret_cast<const char*>( &content ), sizeof( content ) );
     }
-    static const int32_t magicNumber;
+    static const int32_t m_magic_number;
     static bool isLittleEndian( void );
 };
 
@@ -36,53 +36,71 @@ class ParticleTransferClientMessage
 public:
     struct VolumeEquation
     {
-        std::string Name;
-        std::string Equation;
+        std::string m_name;
+        std::string m_equation;
+    };
+
+    //2019 kawamura
+    struct EquationToken
+    {
+        int exp_token[128];//æ•°å¼ã®ãƒˆãƒ¼ã‚¯ãƒ³é…åˆ—
+        int var_name[128];//æ•°å¼ã®å¤‰æ•°é…åˆ—
+        float value_array[128];//æ•°å¼ã®å€¤ã®é…åˆ—
     };
 
 public:
-    char header[11];
-    int32_t messageSize;
+    char m_header[11];
+    int32_t m_message_size;
 
-    int32_t initParam;
-    char samplingMethod;
-    int32_t subPixelLevel;
-    int32_t repeatLevel;
-    char shuffleMethod;
-    char nodeType;
-    float samplingStep;
-    int32_t renderingId;
-    kvs::Camera* camera;
+    int32_t m_initialize_parameter;
+    char m_sampling_method;
+    int32_t m_subpixel_level;
+    int32_t m_repeat_level;
+    char m_shuffle_method;
+    char m_node_type;
+    float m_sampling_step;
+    int32_t m_rendering_id;
+    kvs::Camera* m_camera;
 
-    int32_t timeParam;
-    int32_t beginTime;
-    int32_t endTime;
-    int32_t memorySize;
-    int32_t step;
+    int32_t m_time_parameter;
+    int32_t m_begin_time;
+    int32_t m_end_time;
+    int32_t m_memory_size;
+    int32_t m_step;
 
-    int32_t transParam;
-    int32_t levelIndex;
+    int32_t m_trans_Parameter;
+    int32_t m_level_index;
 
-    int32_t enable_crop_region;
-    float crop_region[6];
-    int32_t particle_limit;
-    float particle_density;
+    int32_t m_enable_crop_region;
+    float m_crop_region[6];
+    int32_t m_particle_limit;
+    float m_particle_density;
     float particle_data_size_limit;
-    std::string inputDir;
+    std::string m_input_directory;
 
-    std::vector<NamedTransferFunctionParameter> transfunc;
-    std::vector<VolumeEquation> voleqn;
+    std::vector<NamedTransferFunctionParameter> m_transfer_function;
+    std::vector<VolumeEquation> m_volume_equation;
+//    std::string m_transfer_function_synthesis;
+    std::string color_tf_synthesis;
+    std::string opacity_tf_synthesis;
 
-    std::string transferFunctionSynthesis;
+    //2019 kawamura
+    EquationToken opacity_func;//tfs_eq_token;
+    EquationToken color_func;//tfs_eq_token;
+    std::vector<EquationToken> opacity_var;//opacity_eq_token;
+    std::vector<EquationToken> color_var;//color_eq_token;
 
-    // message ‚ÌƒTƒCƒY‚ğŒvZ
+    // message ï¿½ÌƒTï¿½Cï¿½Yï¿½ï¿½ï¿½vï¿½Z
     int32_t byteSize( void ) const;
-    // ƒƒbƒZ[ƒW‚ğ byte —ñ‚É pack
+    // ï¿½ï¿½ï¿½bï¿½Zï¿½[ï¿½Wï¿½ï¿½ byte ï¿½ï¿½ï¿½ï¿½ pack
     size_t pack( char* buf ) const;
-    // byte —ñ‚©‚çƒƒbƒZ[ƒW‚É unpack
+    // byte ï¿½ñ‚©‚çƒï¿½bï¿½Zï¿½[ï¿½Wï¿½ï¿½ unpack
     size_t unpack( const char* buf );
 
     ParticleTransferClientMessage( void );
+
+    //2019 kawamura
+    void show( void ) const;
 };
 
 class ParticleTransferServerMessage
@@ -90,35 +108,35 @@ class ParticleTransferServerMessage
 public:
     struct VolumeEquation
     {
-        std::string Name;
-        std::string Equation;
+        std::string m_name;
+        std::string m_equation;
     };
 public:
-    char header[18];
-    int32_t messageSize;
-    int32_t timeStep;
-    int32_t subPixelLevel;
-    int32_t repeatLevel;
-    int32_t levelIndex;
-    int32_t numParticle;
-    int32_t numVolDiv;
-    int32_t staStep;
-    int32_t endStep;
-    int32_t numStep;
-    float* positions;
-    float* normals;
-    unsigned char* colors;
-    float minObjectCoord[3];
-    float maxObjectCoord[3];
-    float minValue;
-    float maxValue;
-    int32_t numNodes;
-    int32_t numElements;
-    int32_t elemType;
-    int32_t fileType;
-    int32_t numIngredients;
-    int32_t flag_send_bins;
-    int32_t tf_count;
+    char m_header[18];
+    int32_t m_message_size;
+    int32_t m_time_step;
+    int32_t m_subpixel_level;
+    int32_t m_repeat_level;
+    int32_t m_level_index;
+    int32_t m_number_particle;
+    int32_t m_number_volume_divide;
+    int32_t m_start_step;
+    int32_t m_end_step;
+    int32_t m_number_step;
+    float* m_positions;
+    float* m_normals;
+    unsigned char* m_colors;
+    float m_min_object_coord[3];
+    float m_max_object_coord[3];
+    float m_min_value;
+    float m_max_value;
+    int32_t m_number_nodes;
+    int32_t m_number_elements;
+    int32_t m_element_type;
+    int32_t m_file_type;
+    int32_t m_number_ingredients;
+    int32_t m_flag_send_bins;
+    int32_t m_transfer_function_count;
 
     int32_t particle_limit;
     float particle_density;
@@ -126,29 +144,34 @@ public:
     kvs::Camera* camera;
     std::vector<NamedTransferFunctionParameter> transfunc;
     std::vector<VolumeEquation> voleqn;
-    std::string transferFunctionSynthesis;
+//    std::string transferFunctionSynthesis;
+    std::string color_tf_synthesis;
+    std::string opacity_tf_synthesis;
 
-    kvs::UInt64* c_nbins;
-    kvs::UInt64* o_nbins;
-    std::vector<kvs::UInt64*> c_bins;
-    std::vector<kvs::UInt64*> o_bins;
+    kvs::UInt64* m_color_nbins;
+    kvs::UInt64* m_opacity_bins_number;
+    std::vector<kvs::UInt64*> m_color_bins;
+    std::vector<kvs::UInt64*> m_opacity_bins;
 
 
-    // message ‚ÌƒTƒCƒY‚ğŒvZ
+    // message ï¿½ÌƒTï¿½Cï¿½Yï¿½ï¿½ï¿½vï¿½Z
     int32_t byteSize( void ) const;
-    // ƒƒbƒZ[ƒW‚ğ byte —ñ‚É pack
+    // ï¿½ï¿½ï¿½bï¿½Zï¿½[ï¿½Wï¿½ï¿½ byte ï¿½ï¿½ï¿½ï¿½ pack
     size_t pack( char* buf ) const;
-    // byte —ñ‚©‚çƒƒbƒZ[ƒW‚É unpack
+    // byte ï¿½ñ‚©‚çƒï¿½bï¿½Zï¿½[ï¿½Wï¿½ï¿½ unpack
     size_t unpack_message( const char* buf );
     size_t unpack_particles( const char* buf );
     size_t unpack_bins( size_t index, const char* buf );
 
-    float transferFunctionMinValue;
-    float transferFunctionMaxValue;
+    float m_transfer_function_min_value;
+    float m_transfer_function_max_value;
 
-    VariableRange varRange;
+    VariableRange m_variable_range;
 
     ParticleTransferServerMessage( void );
+
+    //2019 kawamura
+    void show( void ) const;
 };
 
 }

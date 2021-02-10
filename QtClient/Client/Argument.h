@@ -78,7 +78,7 @@ public:
         addOption( "viewer", "resolution wxh", 1, false );
         addOption( "plimit", "particle_limit", 1, false );
 #ifdef IS_MODE
-        add_option( "pslimit", "particle data size limit", 1, false );
+        addOption( "pslimit", "particle data size limit", 1, false );
 #endif
         addOption( "pd", "particle_density", 1, false );
         addOption( "hn", "hostname", 1, false );
@@ -240,6 +240,7 @@ public:
         putenv( ( char* )m_pout_path_name.c_str() );
 #endif
 //      m_header = this->value<std::string>();
+#if 0
         int client_mode = 0;
 #ifdef IS_MODE
         if ( this->hasOption( "vin" ))
@@ -256,7 +257,10 @@ public:
         {
             m_header = "s";
         }
-
+#else
+        int client_mode = 1;
+        m_header = "";
+#endif
         // 初期化
         for ( int i = 0; i < 10; i++ )
         {

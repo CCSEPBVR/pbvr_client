@@ -31,7 +31,7 @@ extern size_t c_smemory;
 #define MEMORY_USE_RATE 0.9
 
 jpv::ParticleTransferClient::ParticleTransferClient( std::string _host, int _port )
-    : m_hostname( _host ), m_port( _port )
+    : hostname( _host ), port( _port )
 {
 }
 
@@ -49,20 +49,20 @@ int jpv::ParticleTransferClient::initClient( void )
     WSADATA data;
     WSAStartup( MAKEWORD( 2, 0 ), &data );
 #endif
-    servhost = gethostbyname( m_hostname.c_str() );
+    servhost = gethostbyname( hostname.c_str() );
     if ( servhost == NULL )
     {
-        std::cout << "resolv error: " << m_hostname << std::endl;
+        std::cout << "resolv error: " << hostname << std::endl;
                 exit(53);
         return -1;
     }
 
-    dest.sin_port = htons( m_port );
+    dest.sin_port = htons( port );
     dest.sin_family = AF_INET;
     memcpy( &dest.sin_addr, servhost->h_addr, servhost->h_length );
-    std::cout << "connecting to:"<<m_hostname<<":"<<m_port << std::endl;
-    m_sock = socket( AF_INET, SOCK_STREAM, IPPROTO_TCP );
-    if ( connect( m_sock, ( struct sockaddr* ) &dest, sizeof( dest ) ) == -1 )
+    std::cout << "connecting to:"<<hostname<<":"<<port << std::endl;
+    sock = socket( AF_INET, SOCK_STREAM, IPPROTO_TCP );
+    if ( connect( sock, ( struct sockaddr* ) &dest, sizeof( dest ) ) == -1 )
     {
         std::cout << "connection error" << std::endl;
         exit(55);
@@ -81,9 +81,9 @@ int jpv::ParticleTransferClient::termClient( void )
     std::cout << "close socket" << std::endl;
     WSACleanup();
 #else
-    shutdown( m_sock, SHUT_RDWR );
+    shutdown( sock, SHUT_RDWR );
     std::cout << "shutdown connection" << std::endl;
-    close( m_sock );
+    close( sock );
     std::cout << "close socket" << std::endl;
 #endif
     return 0;
@@ -109,7 +109,7 @@ int jpv::ParticleTransferClient::sendMessage( ParticleTransferClientMessage& mes
 //  }
 //  if (th == 0) {
         message.pack( buf );
-        send( m_sock, buf, size, 0 );
+        send( sock, buf, size, 0 );
 
 #ifdef _DEBUG
         std::ofstream output;
@@ -133,7 +133,7 @@ static char datafname[256];
 int jpv::ParticleTransferClient::recvMessage( ParticleTransferServerMessage& message )
 {
     // �T�[�o�[���b�Z�[�W�̎��M
-    const size_t hSize = sizeof( message.m_header ) + sizeof( message.m_message_size );
+    const size_t hSize = sizeof( message.header ) + sizeof( message.messageSize );
     char hsbuf[hSize];
     char* buf;
     std::stringstream ss;
@@ -142,16 +142,15 @@ int jpv::ParticleTransferClient::recvMessage( ParticleTransferServerMessage& mes
     size_t host_particle_limit; //HOST_PARTICLE_LIMIT
 
     // tantantan
-    fprintf( stdout, "message.timeStep : %d\n",  message.m_time_step );
+    fprintf( stdout, "message.timeStep : %d\n",  message.timeStep );
     fprintf( stdout, "transferType : %c\n", transferType );
 
 //  int th = omp_get_thread_num();
 //  if (th == 0) {
-        message.m_message_size = 0;
+        message.messageSize = 0;
         for ( rSize = 0; rSize < hSize; rSize += recvSize )
         {
-            fprintf( stdout,"ParticleTransferClient_Debug0");
-            recvSize = recv( m_sock, hsbuf, hSize - rSize, 0 );
+            recvSize = recv( sock, hsbuf, hSize - rSize, 0 );
 // MODIFIED START Fj 2015.03.04
             if ( recvSize < 0 )
             {
@@ -159,22 +158,19 @@ int jpv::ParticleTransferClient::recvMessage( ParticleTransferServerMessage& mes
             }
             else
             {
-                        fprintf( stdout,"ParticleTransferClient_Debug1");
                 ss.write( hsbuf, recvSize );
             }
 // MODIFIED END   Fj 2015.03.04
         }
-        fprintf( stdout,"ParticleTransferClient_Debug2");
-        ss.seekg( sizeof( message.m_header ) );
-                fprintf( stdout,"ParticleTransferClient_Debug3");
-        ss.read( reinterpret_cast<char*>( &message.m_message_size ), sizeof( message.m_message_size ) );
-        std::cout << "Receive Server Message Size = " << message.m_message_size << std::endl;
+        ss.seekg( sizeof( message.header ) );
+        ss.read( reinterpret_cast<char*>( &message.messageSize ), sizeof( message.messageSize ) );
+        std::cout << "Receive Server Message Size = " << message.messageSize << std::endl;
 
-        mSize = message.m_message_size - hSize;
+        mSize = message.messageSize - hSize;
         buf = new char[mSize];
         for ( rSize = 0; rSize < mSize; rSize += recvSize )
         {
-            recvSize = recv( m_sock, buf, mSize - rSize, 0 );
+            recvSize = recv( sock, buf, mSize - rSize, 0 );
 // MODIFIED START Fj 2015.03.04
             if ( recvSize < 0 )
             {
@@ -189,7 +185,7 @@ int jpv::ParticleTransferClient::recvMessage( ParticleTransferServerMessage& mes
         delete[] buf;
 
         message.unpack_message( ss.str().c_str() );
-        std::cout << "Receive Particle Size = " << message.m_number_particle << std::endl;
+        std::cout << "Receive Particle Size = " << message.numParticle << std::endl;
 //  }
 //  if (th == 1) {
 //	std::cout << "update_recieving update_smemory update_gmemory" << std::endl;
@@ -203,7 +199,7 @@ int jpv::ParticleTransferClient::recvMessage( ParticleTransferServerMessage& mes
 #ifndef OLD_CORD
 // MODIFIED START fp)m.tanaka 2014.03.11
 
-        numParticle = message.m_number_particle;
+        numParticle = message.numParticle;
         host_particle_limit = ( c_smemory * 1024 * 1024 ) / ( 12 + 12 + 3 );
 //std::cout << "host_particle_limit0 = " << host_particle_limit << std::endl;
         host_particle_limit = host_particle_limit * MEMORY_USE_RATE;
@@ -230,7 +226,7 @@ int jpv::ParticleTransferClient::recvMessage( ParticleTransferServerMessage& mes
                 buf = new char[pSize];
                 for ( rSize = 0; rSize < pSize; rSize += recvSize )
                 {
-                    recvSize = recv( m_sock, buf, pSize - rSize, 0 );
+                    recvSize = recv( sock, buf, pSize - rSize, 0 );
 
                     datatofile( 1, buf, recvSize );
                 }
@@ -247,7 +243,7 @@ int jpv::ParticleTransferClient::recvMessage( ParticleTransferServerMessage& mes
                 buf = new char[pSize];
                 for ( rSize = 0; rSize < pSize; rSize += recvSize )
                 {
-                    recvSize = recv( m_sock, buf, pSize - rSize, 0 );
+                    recvSize = recv( sock, buf, pSize - rSize, 0 );
 
                     datatofile( 1, buf, recvSize );
                 }
@@ -290,11 +286,11 @@ int jpv::ParticleTransferClient::recvMessage( ParticleTransferServerMessage& mes
             if ( data_output )
             {
                 //sprintf(datafname, "%s_%03d_%c_%03d.dat", data_filename, data_cnt++, transferType, message.timeStep);
-                sprintf( datafname, "%s_%c_%03d.dat", data_filename, transferType, message.m_time_step );
+                sprintf( datafname, "%s_%c_%03d.dat", data_filename, transferType, message.timeStep );
                 std::ofstream output;
                 //output.open( datafname, std::ios::out | std::ios::app);
                 output.open( datafname, std::ios::out );
-                output.write( ss.str().c_str(), message.m_message_size + ( 12 + 12 + 3 ) * message.m_number_particle );
+                output.write( ss.str().c_str(), message.messageSize + ( 12 + 12 + 3 ) * message.numParticle );
                 output.flush();
                 output.close();
             }
@@ -307,13 +303,13 @@ int jpv::ParticleTransferClient::recvMessage( ParticleTransferServerMessage& mes
 
             // orignal cording if numParticle <= plimitlevel
 
-            if ( message.m_number_particle > 0 )
+            if ( message.numParticle > 0 )
             {
-                const size_t pSize = ( 12 + 12 + 3 ) * message.m_number_particle;
+                const size_t pSize = ( 12 + 12 + 3 ) * message.numParticle;
                 buf = new char[pSize];
                 for ( rSize = 0; rSize < pSize; rSize += recvSize )
                 {
-                    recvSize = recv( m_sock, buf, pSize - rSize, 0 );
+                    recvSize = recv( sock, buf, pSize - rSize, 0 );
                     ss.write( buf, recvSize );
                 }
                 message.unpack_particles( ss.str().c_str() );
@@ -322,11 +318,11 @@ int jpv::ParticleTransferClient::recvMessage( ParticleTransferServerMessage& mes
                 if ( data_output )
                 {
                     //sprintf(datafname, "%s_%03d_%c_%03d.dat", data_filename, data_cnt++, transferType, message.timeStep);
-                    sprintf( datafname, "%s_%c_%03d.dat", data_filename, transferType, message.m_time_step );
+                    sprintf( datafname, "%s_%c_%03d.dat", data_filename, transferType, message.timeStep );
                     std::ofstream output;
                     //output.open( datafname, std::ios::out | std::ios::app);
                     output.open( datafname, std::ios::out );
-                    output.write( ss.str().c_str(), message.m_message_size + pSize );
+                    output.write( ss.str().c_str(), message.messageSize + pSize );
                     output.flush();
                     output.close();
                 }

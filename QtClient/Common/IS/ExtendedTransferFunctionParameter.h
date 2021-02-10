@@ -8,29 +8,29 @@ class ExtendedTransferFunctionParameter : public kvs::TransferFunction
 {
 
 public:
-    int32_t Resolution;
-    std::string EquationR;
-    std::string EquationG;
-    std::string EquationB;
-    std::string EquationA;
-    float ColorVarMin;
-    float ColorVarMax;
-    float OpacityVarMin;
-    float OpacityVarMax;
+    int32_t m_resolution;
+    std::string m_equation_red;
+    std::string m_equation_green;
+    std::string m_equation_blue;
+    std::string m_equation_opacity;
+    float m_color_variable_min;
+    float m_color_variable_max;
+    float m_opacity_variable_min;
+    float m_opacity_variable_max;
 
 public:
     ExtendedTransferFunctionParameter() :
-        Resolution( 256 ),
-        EquationR( "" ), EquationG( "" ),
-        EquationB( "" ), EquationA( "" ),
-        ColorVarMin( 0.0 ), ColorVarMax( 1.0 ),
-        OpacityVarMin( 0.0 ), OpacityVarMax( 1.0 )
+        m_resolution( 256 ),
+        m_equation_red( "" ), m_equation_green( "" ),
+        m_equation_blue( "" ), m_equation_opacity( "" ),
+        m_color_variable_min( 0.0 ), m_color_variable_max( 1.0 ),
+        m_opacity_variable_min( 0.0 ), m_opacity_variable_max( 1.0 )
     {
     }
 
     void setResolution( size_t resolution )
     {
-        Resolution = resolution;
+        m_resolution = resolution;
 
         kvs::ColorMap color_map( resolution, 0.0, 1.0 );
         kvs::OpacityMap opacity_map( resolution, 0.0, 1.0 );
@@ -81,19 +81,22 @@ public:
     };
 
 public:
-    Selection selection;
+    Selection m_selection;
 
-    std::string Name;
-    std::string ColorVar;
-    std::string OpacityVar;
+    std::string m_name;
+    std::string m_color_variable;
+    std::string m_opacity_variable;
+    bool m_range_initialized;
 
 public:
     NamedTransferFunctionParameter() :
-        selection( SelectTransferFunction ),
-        Name( "" ), ColorVar( "" ), OpacityVar( "" )
+        m_selection( SelectTransferFunction ),
+        m_name( "" ), m_color_variable( "" ), m_opacity_variable( "" )
     {
     }
     virtual bool operator==( const NamedTransferFunctionParameter& s ) const;
+    static bool compareName(const NamedTransferFunctionParameter& left, const NamedTransferFunctionParameter& right);
+    int getNameNumber() const;
 };
 
 

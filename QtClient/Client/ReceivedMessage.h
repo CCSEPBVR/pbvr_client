@@ -45,9 +45,10 @@ public:
 
 
 public:
+    //Osaki QTISPBVR update(2020/11/16) OpenGL版のISでは使用しているためifdefを無効にしました。
     const kvs::visclient::FrequencyTable* findColorFrequencyTable(const std::string &name)
     {
-#ifdef CS_MODE
+//#ifdef CS_MODE
         std::vector<kvs::visclient::FrequencyTable>::const_iterator itr;
         for (itr=m_color_bins.begin(); itr!=m_color_bins.end(); itr++) {
             const kvs::visclient::FrequencyTable *table = &(*itr);
@@ -55,13 +56,13 @@ public:
                 return table;
             }
         }
-#endif;
+//#endif;
         return NULL;
     }
-
+    //Osaki QTISPBVR update(2020/11/16) OpenGL版のISでは使用しているためifdefを無効にしました。
     const kvs::visclient::FrequencyTable* findOpacityFrequencyTable(const std::string &name)
     {
-#ifdef CS_MODE
+//#ifdef CS_MODE
         std::vector<kvs::visclient::FrequencyTable>::const_iterator itr;
         for (itr=m_opacity_bins.begin(); itr!=m_opacity_bins.end(); itr++) {
             const kvs::visclient::FrequencyTable *table = &(*itr);
@@ -69,7 +70,7 @@ public:
                 return table;
             }
         }
-#endif
+//#endif
         return NULL;
     }
 };

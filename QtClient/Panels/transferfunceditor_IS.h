@@ -5,7 +5,7 @@
 #include "Panels/coloreditor.h"
 #include "Panels/opacityeditor.h"
 #include "Panels/functionlisteditor.h"
-#include "Client/ParamExTransFunc_IS.h".h"
+#include "Client/ExtendedTransferFunctionMessage_IS.h"
 #include <QGlue/extCommand.h>
 
 namespace QGlue{
@@ -23,16 +23,16 @@ class TransferFuncEditor : public QDialog
     //    Q_OBJECT
 
 public:
-    explicit TransferFuncEditor(QWidget *parent = 0);
+    explicit TransferFuncEditor(QWidget *parent = nullptr);
 
-    kvs::visclient::ParamExTransFunc& doc();
-    const kvs::visclient::ParamExTransFunc& doc() const;
+    kvs::visclient::ExtendedTransferFunctionMessage& doc();
+    const kvs::visclient::ExtendedTransferFunctionMessage& doc() const;
 
     virtual void setCommandInstance(ExtCommand*);
 
     void exportFile( const std::string& fname, const bool addition);
     void importFile( const std::string& fname );
-    void importExtendTransferFunction(kvs::visclient::ParamExTransFunc doc);
+    void importExtendTransferFunction(const kvs::visclient::ExtendedTransferFunctionMessage& doc);
     void updateRangeView();
     void updateRangeEdit();
 
@@ -52,21 +52,25 @@ public:
 
 private:
 
-    kvs::visclient::ParamExTransFunc m_doc;
-    kvs::visclient::ParamExTransFunc m_doc_initial;
+    kvs::visclient::ExtendedTransferFunctionMessage m_doc;
+    kvs::visclient::ExtendedTransferFunctionMessage m_doc_initial;
 
     QGlue::ColorMapPalette*   m_color_map_palette;   ///< color map palette
     QGlue::OpacityMapPalette* m_opacity_map_palette; ///< opacity map palette
     QGlue::Histogram*    m_color_histogram;     ///< color histogram
     QGlue::Histogram*    m_opacity_histogram;   ///< opacity histogram
 
+    //ADD BY)T.Osaki 2020.02.05
+    size_t m_resolution = 256;
+
     /**
        * 伝達関数の表示を行う。
        */
     void displayTransferFunction();
     void clearTransferFunction();
-    void populateTransferFuncList(int n);
-    void updateParamExTransFuncDoc();
+    void populateOpacityFunctionLists(int n);
+    void populateColorFunctionLists(int n);
+
 
 
     void connectSignalsToSlots();
@@ -77,9 +81,9 @@ private://Event Handlers
     void onImportButtonClicked();
     void onExportButtonClicked();
     void onNumTransferChanged(int val);
-    void onTransferFunctionSelected(int index);
-//    void onOpacityMapFunctionChanged(int index);
-    void onFunctionSynthEdited(const QString &arg1);
+    void onColorMapFunctionChanged(int index);
+    void onOpacityMapFunctionChanged(int index);
+    void onColorFunctionSynthEdited(const QString &arg1);
     void onOpacityFunctionSynthEdited(const QString &arg1);
     void onCfuncClicked();
     void onOfuncClicked();
@@ -91,6 +95,8 @@ private://Event Handlers
     void onTFmaxOpacityChanged(double arg1);
     void onResetButtonClicked();
     void onApplyButtonClicked();
+    void onResolutionChangeButtonClicked();
+
 
 private:
     Ui::TransferFuncEditor *ui;

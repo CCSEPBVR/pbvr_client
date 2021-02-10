@@ -5,7 +5,7 @@
 #include "extCommand.h"
 
 #include <Client/v3defines.h>
-//#include "Client/PBRProxy.h"
+#include "Client/ExtendedParticleVolumeRenderer.h"
 
 #include <Panels/renderoptionpanel.h>
 #include <Panels/transformpanel.h>
@@ -149,33 +149,33 @@ void ExtCommand::inSituInit()
 #ifdef IS_MODE
     char buff_volumedata[100] = "/work/filter/binary08/binary";
 
-    if ( argument.server_subvol_dir != "" )
+    if ( argument.m_server_subvolume_directory != "" )
     {
-        param.inputdir = argument.server_subvol_dir;
+        m_parameter.m_input_directory  = argument.m_server_subvolume_directory;
     }
     else
     {
-        param.inputdir = buff_volumedata;
+        m_parameter.m_input_directory = buff_volumedata;
     }
     // APPEND START BY)M.Tanaka 2015.03.03
-    strcpy( pfi_path_server, param.inputdir.c_str() );
+    strcpy( pfi_path_server, m_parameter.m_input_directory.c_str() );
     // APPEND END   BY)M.Tanaka 2015.03.03
 
-    isImportTransferFunctionParam = true;
-    getServerParticleInfomation( param, &result );
-    isImportTransferFunctionParam = false;
+    m_is_import_transfer_function_parameter = true;
+    getServerParticleInfomation( &m_parameter, &m_result );
+    m_is_import_transfer_function_parameter = false;
 
-    if ( argument.particle_limit_f )
+    if ( argument.m_particle_limit_flag )
     {
-        RenderoptionPanel::plimitlevel = argument.particle_limit;
+        RenderoptionPanel::plimitlevel = argument.m_particle_limit;
     }
-    if ( argument.particle_density_f )
+    if ( argument.m_particle_density_flag )
     {
-        RenderoptionPanel::pdensitylevel = argument.particle_density;
+        RenderoptionPanel::pdensitylevel = argument.m_particle_density;
     }
-    if ( argument.viewer_f )
+    if ( argument.m_viewer_flag )
     {
-        sscanf( argument.viewer.c_str(), "%fx%f",
+        sscanf( argument.m_viewer.c_str(), "%fx%f",
                 &RenderoptionPanel::resolution_width_level,
                 &RenderoptionPanel::resolution_height_level );
     }
@@ -185,9 +185,9 @@ void ExtCommand::inSituInit()
         particle_data_size_limit_input = argument.particle_data_size_limit;
     }
 
-    param.particle_limit = RenderoptionPanel::plimitlevel;
-    param.particle_density = RenderoptionPanel::pdensitylevel;
-    param.particle_data_size_limit = RenderoptionPanel::data_size_limit;
+    m_parameter.m_particle_limit = RenderoptionPanel::plimitlevel;
+    m_parameter.m_particle_density = RenderoptionPanel::pdensitylevel;
+    m_parameter.particle_data_size_limit = RenderoptionPanel::data_size_limit;
 #endif
 }
 /*===========================================================================*/

@@ -66,10 +66,10 @@ void SliderControl::setRange(int min, int max)
 //    ui->maxSlider->setValue(max*stepSize);
 //    ui->minSlider->setValue(min*stepSize);
     //MOD BY)T.Osaki 2020.03.06
-//    this->min=min;
-//    this->max=max;
-    this->min = ui->minSlider->value()/100;
-    this->max = ui->maxSlider->value()/100;
+    this->min=min;
+    this->max=max;
+//    this->min = ui->minSlider->value()/100;
+//    this->max = ui->maxSlider->value()/100;
 }
 
 void SliderControl::setValue(int value)
@@ -136,8 +136,7 @@ void SliderControl::limitSliderToMin(QSlider* slider, int min)
 void SliderControl::on_timeSlider_valueChanged(int value)
 {
     qInfo("SliderControl::on_slider_valueChanged %d", value);
-    limitSliderToMax(ui->timeSlider,ui->maxSlider->value() );
-    limitSliderToMin(ui->timeSlider,ui->minSlider->value() );
+    limitSliderToMax(ui->timeSlider,ui->maxSlider->value()*(value/100));
     snapAllSlidersToTick();
 
     curTime=ui->timeSlider->value()/stepSize;
@@ -152,7 +151,7 @@ void SliderControl::on_timeSlider_valueChanged(int value)
  */
 void SliderControl::on_timeSlider_sliderMoved(int position)
 {
-    //    qInfo("SliderControl::on_slider_sliderMoved %d", position);
+    qInfo("SliderControl::on_slider_sliderMoved %d", position);
     int val=round((float)position/stepSize);
     ui->timeVal->setText(QString::number(val));
 }

@@ -118,7 +118,7 @@ void TimecontrolPanel::setProgress(int progress){
 void TimecontrolPanel::setStepValue(int value){
 #ifdef IS_MODE
     if (extCommand->lastStepCheckBoxState){
-        value=extCommand->param.maxServerTimeStep;
+        value=extCommand->m_parameter.m_max_server_time_step;
     }
 #endif
     ui->sliderControl->setValue(value);
@@ -167,7 +167,7 @@ void TimecontrolPanel::customEvent(QEvent * event)
         setStepValue(param_maxTimeStep);
     }
     else {
-        setStepValue(extCommand->param.timeStep);
+        setStepValue(extCommand->m_parameter.m_time_step);
     }
 #endif
     std::cout<<"@@####TimecontrolPanel::on_updateRequest ends"<<std::endl;
@@ -236,8 +236,7 @@ void TimecontrolPanel::onLastStepToggled(bool checked)
     extCommand->lastStepCheckBoxState=checked;
     ui->sliderControl->setDisabled(checked);
 //    MOD BY)T.Osaki 2020.03.05
-//    setStepValue(extCommand->m_parameter.m_max_server_time_step);
-    setStepValue(extCommand->m_parameter.m_min_server_time_step);
+    setStepValue(extCommand->m_parameter.m_max_server_time_step);
     blockEventHandling=false;
     extCommand->m_glut_timer->startSingleShot();
 }

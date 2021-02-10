@@ -39,7 +39,7 @@ public:
     static std::string param_y_synthesis;
     static std::string param_z_synthesis;
 
-     bool m_use_particle_side_coords = false;
+    bool m_use_particle_side_coords = false;
 
 protected:
      bool m_coordinate_for_store_particle; // 座標式に変更があった場合(粒子保存機能用)

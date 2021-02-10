@@ -22,9 +22,14 @@ ParticlePanel::ParticlePanel(QWidget *parent) :
     m_keep_initial_value[0]->setChecked(false);
     m_keep_final_value[0]->setChecked(false);
     m_particle_value[0]->setEnabled(true);
+    //Osaki QTISPBVR update(2020/11/16) IS版ではServer側のkeep_initialとfinalは操作できないはずなので非活性にしました。
+#ifdef IS_MODE
+    m_keep_initial_value[0]->setEnabled(false);
+    m_keep_final_value[0]->setEnabled(false);
+#else
     m_keep_initial_value[0]->setEnabled(true);
     m_keep_final_value[0]->setEnabled(true);
-
+#endif
     for ( int i = 0; i < 11; i++ )
     {
         if ( m_file_path_strings[i].empty() != false )

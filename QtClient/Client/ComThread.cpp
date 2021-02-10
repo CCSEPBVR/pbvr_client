@@ -24,7 +24,7 @@ bool kvs::visclient::ComThread::start()
     ret = kvs::Thread::start();
 
 #ifdef IS_MODE
-     if ( ret ) setStatus( Running );
+     if ( ret ) set_status( Running );
 #else
     // >> modify by @hira at 2017/05/22
     // if ( ret ) set_status( Running );

@@ -3,7 +3,7 @@
 
 #include "screen.h"
 
-#include "Client/PBRProxy.h"
+#include "Client/ExtendedParticleVolumeRenderer.h"
 #include <QGlue/labelbase.h>
 #include <QGlue/legendbar.h>
 #include <QGlue/timer.h>
@@ -93,7 +93,7 @@ private:
 public:
 
     explicit RenderArea( QWidget* parent_surface);
-
+    virtual ~RenderArea( void );
     //MOD BY)T.Osaki 2020.06.29
     //static void ScreenShot( kvs::ScreenBase* screen, const int tstep );
     //static void ScreenShotKeyFrame( kvs::ScreenBase* screen, const int tstep );
@@ -110,7 +110,7 @@ public:
     void setLabelFont(const QFont& f);
     void setSize( const int width, const int height );
 
-//    void setShaderParams( );
+    void setShaderParams( );
     void setupEventHandlers( );
     void updateCommandInfo(ExtCommand* command_q);
 
@@ -118,13 +118,12 @@ public:
     void enableRendererShading();
     void setRenderSubPixelLevel(int level);
     void setRenderRepetitionLevel(int level);
-//    void recreateRenderImageBuffer(int level);
+    void recreateRenderImageBuffer(int level);
 
     // Public access methods for interacting with private point object.
     kvs::Xform getPointObjectXform();
     void setPointObjectXform(kvs::Xform xf);
-    void attachPointObject(const kvs::PointObject *point, int sp_level);
-
+    void attachPointObject(const kvs::PointObject *point, int level);
 
 public:
     static char shadinglevel[256];
@@ -148,19 +147,16 @@ public:
     }
 private:
     std::pair<int, int> m_obj_id_pair;
-    kvs::Xform m_stored_xf;
     int i_w=0;
     int i_h=0;
     //    int yl0=0;
     int msec = DEFAULT_MSEC;
     //    MOD BY)T.Osaki 2020.04.28
     float pixelRatio=1;
-    SwitchablePBRProxy m_renderer;
+    ExtendedParticleVolumeRenderer* m_renderer;
 
     int m_reset_count = 0;
 
-    void storeCurrentXForm();
-    void restoreXForm();
 protected:
 
     void mouseReleaseEvent(QMouseEvent *event);
@@ -170,17 +166,7 @@ protected:
     void onInitializeGL(  );
     void onResizeGL(int w, int h);
     void onPaintGL();
-public:
-    void animation_add();
-    void animation_del();
-    void animation_play();
-    void switch_gpu(bool f);
 
-    void switch_shader(char st){
-        this->shadinglevel[0]=st;
-        m_renderer.setShadingString(shadinglevel);
-
-    }
 
 };
 

@@ -103,29 +103,10 @@ PBVRGUI::PBVRGUI(ExtCommand* command) :
             this, &PBVRGUI::onAnimation_ControlsMenuAction);
     connect(ui->actionViewer_Controls,&QAction::triggered,
             this, &PBVRGUI::onViewer_ControlsMenuAction);
-    connect(ui->actionZoomIn,&QAction::triggered,
-            this,&PBVRGUI::on_actionZoomIn_triggered);
-    connect(ui->actionZoomOut,&QAction::triggered,
-            this,&PBVRGUI::on_actionZoomOut_triggered);
-    connect(ui->actionXpos,&QAction::triggered,
-            this,&PBVRGUI::on_actionXpos_triggered);
-    connect(ui->actionXneg,&QAction::triggered,
-            this,&PBVRGUI::on_actionXneg_triggered);
-    connect(ui->actionYpos,&QAction::triggered,
-            this,&PBVRGUI::on_actionYpos_triggered);
-    connect(ui->actionYneg,&QAction::triggered,
-            this,&PBVRGUI::on_actionYneg_triggered);
-    connect(ui->actionCPU,&QAction::triggered,
-            this,&PBVRGUI::on_actionCPU_triggered);
-    connect(ui->actionGPU,&QAction::triggered,
-            this,&PBVRGUI::on_actionGPU_triggered);
+// Fullscreen disabled, as Qt seems buggy.
+//    connect(ui->actionFull_Screen,&QAction::triggered,
+//            this, &PBVRGUI::onFull_ScreenMenuAction);
 
-    connect(ui->actionAddFrame,&QAction::triggered,
-            this,&PBVRGUI::on_actionAddFrame_triggered);
-    connect(ui->actionRemoveFrame,&QAction::triggered,
-            this,&PBVRGUI::on_actionRemoveFrame_triggered);
-    connect(ui->actionPlayFrames,&QAction::triggered,
-            this,&PBVRGUI::on_actionPlayFrames_triggered);
 }
 
 
@@ -230,9 +211,8 @@ void PBVRGUI::restoreDefaultLayout()
     timecontrolPanel.setFloating(false);
 
     addDockWidget(systemstatusPanel.default_area, &systemstatusPanel);
-    addDockWidget(filterinfoPanel.default_area, &filterinfoPanel);
-    addDockWidget(timecontrolPanel.default_area, &timecontrolPanel);
-
+    addDockWidget(  filterinfoPanel.default_area, &filterinfoPanel);
+    addDockWidget( timecontrolPanel.default_area, &timecontrolPanel);
     systemstatusPanel.setVisible(true);
     filterinfoPanel.setVisible(true);
     timecontrolPanel.setVisible(true);
@@ -293,7 +273,7 @@ void PBVRGUI::load_parameter_file(kvs::visclient::Argument& argument)
     }
 #ifdef IS_MODE
     else{
-        tf_editor.importExtendTransferFunction( extCommand->param.paramExTransFunc );
+        tf_editor.importExtendTransferFunction( extCommand->m_parameter.m_parameter_extend_transfer_function );
     }
 #endif
     // Import Transfer Function File
@@ -556,81 +536,3 @@ void PBVRGUI::mousePressEvent(QMouseEvent *event)
 {
     QWidget::setFocus();
 }
-
-void PBVRGUI::on_actionZoomIn_triggered()
-{
-    std::cout<<" Zoom  in button"<<std::endl;
-    //    kvs::Xform xf= kvs_renderarea->scene()->objectManager()->xform();
-    kvs::Vec3 scale(1.25,1.25,1.25);
-    kvs_renderarea->scene()->objectManager()->scale( scale);
-    kvs_renderarea->update();
-}
-
-void PBVRGUI::on_actionZoomOut_triggered()
-{
-    std::cout<<" Zoom  Out button"<<std::endl;
-    kvs::Vec3 scale(0.8,0.8,0.8);
-    kvs_renderarea->scene()->objectManager()->scale(scale);
-    kvs_renderarea->update();
-}
-
-void PBVRGUI::on_actionXpos_triggered()
-{
-    std::cout<<" X pos button"<<std::endl;
-    kvs::Vec3 xlate(0.2,0.0,0.0);
-    kvs::Xform xf= kvs_renderarea->scene()->objectManager()->xform();
-    kvs_renderarea->scene()->objectManager()->translate(xf.scaling()* xlate);
-    kvs_renderarea->update();
-}
-
-void PBVRGUI::on_actionYpos_triggered()
-{
-    std::cout<<"  Y pos  button"<<std::endl;
-    kvs::Vec3 xlate(0.0,0.2,0.0);
-    kvs::Xform xf= kvs_renderarea->scene()->objectManager()->xform();
-    kvs_renderarea->scene()->objectManager()->translate(xf.scaling()* xlate);
-    kvs_renderarea->update();
-}
-void PBVRGUI::on_actionXneg_triggered()
-{
-    std::cout<<" X neg  button"<<std::endl;
-    //    kvs::Xform xf= kvs_renderarea->scene()->objectManager()->xform();
-    kvs::Vec3 xlate(-0.2,0.0,0.0);
-    kvs::Xform xf= kvs_renderarea->scene()->objectManager()->xform();
-    kvs_renderarea->scene()->objectManager()->translate(xf.scaling()* xlate);
-    kvs_renderarea->update();
-}
-
-void PBVRGUI::on_actionYneg_triggered()
-{
-    std::cout<<" Y neg  button"<<std::endl;
-    kvs::Vec3 xlate(0.0,-0.2,0.0);
-    kvs::Xform xf= kvs_renderarea->scene()->objectManager()->xform();
-    kvs_renderarea->scene()->objectManager()->translate(xf.scaling()* xlate);
-    kvs_renderarea->update();
-}
-
-void PBVRGUI::on_actionCPU_triggered()
-{
-    kvs_renderarea->switch_gpu(false);
-}
-
-void PBVRGUI::on_actionGPU_triggered()
-{
-    kvs_renderarea->switch_gpu(true);
-}
-
-void PBVRGUI::on_actionAddFrame_triggered()
-{
-    kvs_renderarea->animation_add();
-
-}
-void PBVRGUI::on_actionRemoveFrame_triggered()
-{
-    kvs_renderarea->animation_del();
-}
-void PBVRGUI::on_actionPlayFrames_triggered()
-{
-    kvs_renderarea->animation_play();
-}
-

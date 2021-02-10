@@ -41,7 +41,7 @@ private:
     ComThread* m_comthread;
     bool oneShot=true;
 
-//    kvs::visclient::PBRProxy* m_renderer;
+    kvs::visclient::ExtendedParticleVolumeRenderer* m_renderer;
 
     int m_interpolation_counter;
     int m_ninterpolation;

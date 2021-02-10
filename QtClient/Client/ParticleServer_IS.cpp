@@ -9,7 +9,7 @@
 #include <kvs/PointExporter>
 #include <kvs/PointObject>
 
-#include "PBVRParam.h"
+#include "VisualizationParameter.h"
 
 //#include "Profiler.h"
 
@@ -52,42 +52,42 @@ char transferType; // 'A':abstruct 'D':detail
 // APPEND END fp)m.takizawa 2014.05.20
 
 
-kvs::PointObject* ParticleServer::getPointObjectFromServer( const PBVRParam& param, PBVRResult* result, const int numvol )
+kvs::PointObject* ParticleServer::getPointObjectFromServer( const VisualizationParameter& param, ReceivedMessage* result, const int numvol, const int stepno )
 {
 
-    const ParamExTransFunc& paramExTransFunc = param.paramExTransFunc;
+    const ExtendedTransferFunctionMessage& paramExTransFunc = param.m_parameter_extend_transfer_function;
 //    const CropParam& paramCrop = param.paramCrop;
 
-    TIMER_STA( 100 );
+    PBVR_TIMER_STA( 100 );
     //if (nrep == 0) paramExTransFunc.ExTransFuncParaSet();
-    nrep++;
-    std::cout << " ### nrep = " <<  nrep << std::endl;
-    std::cout << " getPointObjectFromServer param.timeStep " <<  param.timeStep << std::endl;
+    m_number_repeat++;
+    std::cout << " ### nrep = " <<  m_number_repeat << std::endl;
+    std::cout << " getPointObjectFromServer param.timeStep " <<  param.m_time_step << std::endl;
 //#if 0
-    jpv::ParticleTransferClient client( param.hostname, param.port );
+    jpv::ParticleTransferClient client( param.m_hostname, param.m_port );
     jpv::ParticleTransferServerMessage reply;
     jpv::ParticleTransferClientMessage message;
 
     reply.camera = new kvs::Camera();
 
     setStatus( Sending );
-    if ( param.CSmode == 1 )
+    if ( param.m_client_server_mode == 1 )
     {
         client.initClient();
-        strncpy( message.header, "JPTP /1.0\r\n", 11 );
-        message.initParam = 1;
-        message.renderingId = param.renderingId;
-        if ( param.samplingType == PBVRParam::UniformSampling )
+        strncpy( message.m_header, "JPTP /1.0\r\n", 11 );
+        message.m_initialize_parameter = 1;
+        message.m_rendering_id = param.m_rendering_id;
+        if ( param.m_sampling_type == VisualizationParameter::UniformSampling )
         {
-            message.samplingMethod = 'u';
+            message.m_sampling_method = 'u';
         }
-        else if ( param.samplingType == PBVRParam::RejectionSampling )
+        else if ( param.m_sampling_type == VisualizationParameter::RejectionSampling )
         {
-            message.samplingMethod = 'r';
+            message.m_sampling_method = 'r';
         }
-        else if ( param.samplingType == PBVRParam::MetropolisSampling )
+        else if ( param.m_sampling_type == VisualizationParameter::MetropolisSampling )
         {
-            message.samplingMethod = 'm';
+            message.m_sampling_method = 'm';
         }
         else
         {
@@ -95,70 +95,70 @@ kvs::PointObject* ParticleServer::getPointObjectFromServer( const PBVRParam& par
         }
 
         // APPEND START fp)m.tanaka 2014.03.11
-        transferType = ( ( param.transferType == PBVRParam::Abstract ) ? 'A' : 'D' );
+        transferType = ( ( param.m_transfer_type == VisualizationParameter::Abstract ) ? 'A' : 'D' );
         // APPEND END   fp)m.tanaka 2014.03.11
 
-        message.subPixelLevel = ( param.transferType == PBVRParam::Abstract ) ? param.abstractSubpixelLevel : param.detailedSubpixelLevel;
-        message.repeatLevel = ( param.transferType == PBVRParam::Abstract ) ? param.abstractRepeatLevel : param.detailedRepeatLevel;
-        if ( param.shuffleType == PBVRParam::RandomBased )
+        message.m_subpixel_level = ( param.m_transfer_type == VisualizationParameter::Abstract ) ? param.m_abstract_subpixel_level : param.m_detailed_subpixel_level;
+        message.m_repeat_level = ( param.m_transfer_type == VisualizationParameter::Abstract ) ? param.m_abstract_repeat_level : param.m_detailed_repeat_level;
+        if ( param.m_shuffle_type == VisualizationParameter::RandomBased )
         {
-            message.shuffleMethod = 'r';
+            message.m_shuffle_method = 'r';
         }
-        else if ( param.shuffleType == PBVRParam::SingleShuffleBased )
+        else if ( param.m_shuffle_type == VisualizationParameter::SingleShuffleBased )
         {
-            message.shuffleMethod = 's';
+            message.m_shuffle_method = 's';
         }
-        else if ( param.shuffleType == PBVRParam::CPUShuffleBased )
+        else if ( param.m_shuffle_type == VisualizationParameter::CPUShuffleBased )
         {
-            message.shuffleMethod = 'o';
+            message.m_shuffle_method = 'o';
         }
-        else if ( param.shuffleType == PBVRParam::GPUShffleBased )
+        else if ( param.m_shuffle_type == VisualizationParameter::GPUShffleBased )
         {
-            message.shuffleMethod = 'c';
+            message.m_shuffle_method = 'c';
         }
-        else if ( param.shuffleType == PBVRParam::None )
+        else if ( param.m_shuffle_type == VisualizationParameter::None )
         {
-            message.shuffleMethod = 'n';
+            message.m_shuffle_method = 'n';
         }
         else
         {
             assert( false );
         }
 
-        message.timeParam = 2;
-        message.transParam = 0;
-        if ( param.transferType == PBVRParam::Detailed )
+        message.m_time_parameter = 2;
+        message.m_trans_Parameter = 0;
+        if ( param.m_transfer_type == VisualizationParameter::Detailed )
         {
-            if ( param.detailedTransferType == PBVRParam::Summalized )
+            if ( param.m_detailed_transfer_type == VisualizationParameter::Summalized )
             {
-                message.transParam = 2;
+                message.m_trans_Parameter = 2;
             }
-            else if ( param.detailedTransferType == PBVRParam::Divided )
+            else if ( param.m_detailed_transfer_type == VisualizationParameter::Divided )
             {
-                message.transParam = 1;
-                message.levelIndex = param.repeatLevel;
+                message.m_trans_Parameter = 1;
+                message.m_level_index = param.m_repeat_level;
             }
         }
-        message.step = param.timeStep;
-        if ( param.nodeType == PBVRParam::AllNodes )
+        message.m_step = param.m_time_step;
+        if ( param.m_node_type == VisualizationParameter::AllNodes )
         {
-            message.nodeType = 'a';
+            message.m_node_type = 'a';
         }
-        else if ( param.nodeType == PBVRParam::SlaveNodes )
+        else if ( param.m_node_type == VisualizationParameter::SlaveNodes )
         {
-            message.nodeType = 's';
+            message.m_node_type = 's';
         }
         else
         {
             assert( false );
         }
-        message.particle_limit = param.particle_limit;
-        message.particle_density = param.particle_density;
+        message.m_particle_limit = param.m_particle_limit;
+        message.m_particle_density = param.m_particle_density;
         message.particle_data_size_limit = param.particle_data_size_limit;
-        message.camera = param.camera;
+        message.m_camera = param.m_camera;
 //      message.transfunc = const_cast<TransferFunction*>(&param.transferFunction);
-        message.messageSize = message.byteSize();
-        message.samplingStep = 1.0f;
+        message.m_message_size = message.byteSize();
+        message.m_sampling_step = 1.0f;
 
 
 //        switch ( paramCrop.cropType )
@@ -216,18 +216,18 @@ kvs::PointObject* ParticleServer::getPointObjectFromServer( const PBVRParam& par
 //        default:
 //            message.enable_crop_region = 0;
 //        }
-        message.enable_crop_region = 0;
+        message.m_enable_crop_region = 0;
         //
         paramExTransFunc.applyToClientMessage( &message );
 
         //
-        message.messageSize = message.byteSize();
+        message.m_message_size = message.byteSize();
 
 //      kvs::visclient::Profiler::get()->start( "send time" );
-        TIMER_STA( 120 );
-        TIMER_STA( 121 );
+        PBVR_TIMER_STA( 120 );
+        PBVR_TIMER_STA( 121 );
         client.sendMessage( message );
-        TIMER_END( 121 );
+        PBVR_TIMER_END( 121 );
 //      kvs::visclient::Profiler::get()->end( "send time" );
     }
 
@@ -242,26 +242,26 @@ kvs::PointObject* ParticleServer::getPointObjectFromServer( const PBVRParam& par
     kvs::PointObject* object;
 
     // Loop for sub volumes.
-    *result = PBVRResult();
+    *result = ReceivedMessage();
 
     int serve_numvol = numvol;
-    if ( param.CSmode == 1 )
+    if ( param.m_client_server_mode == 1 )
     {
         setStatus( Recieving );
         client.recvMessage( reply );
-        serve_numvol = reply.numVolDiv;
+        serve_numvol = reply.m_number_volume_divide;
     }
 
 //  for ( int n = 0; n < serve_numvol; n++ )
 //  {
-        if ( param.CSmode == 1 )
+        if ( param.m_client_server_mode == 1 )
         {
             setStatus( Recieving );
 //          kvs::visclient::Profiler::get()->start( "receive time" );
-            TIMER_STA( 130 );
+            PBVR_TIMER_STA( 130 );
             client.recvMessage( reply );
-            TIMER_END( 130 );
-            if( reply.flag_send_bins )
+            PBVR_TIMER_END( 130 );
+            if( reply.m_flag_send_bins )
             {
                 if( m_point_object != NULL ) delete m_point_object;
                 m_point_object = new kvs::PointObject();
@@ -274,27 +274,27 @@ kvs::PointObject* ParticleServer::getPointObjectFromServer( const PBVRParam& par
             }
 
 //          kvs::visclient::Profiler::get()->end( "receive time" );
-            std::cout << reply.numParticle << " received." <<  std::endl;
+            std::cout << reply.m_number_particle << " received." <<  std::endl;
 
-            result->varRange.merge( reply.varRange );
+            result->m_var_range.merge( reply.m_variable_range );
 
             /* 140319 for client stop by server Ctrl+c */
-            if ( reply.numParticle == 0 )
+            if ( reply.m_number_particle == 0 )
             {
                 //  client.termClient();
                 //  exit(1);
             }
             /* 140319 for client stop by server Ctrl+c */
 
-            int nmemb = reply.numParticle * 3;
+            int nmemb = reply.m_number_particle * 3;
 //            std::cout<<"Particle Server 290" <<  std::endl;
-            if( reply.flag_send_bins )
+            if( reply.m_flag_send_bins )
             {
                 if ( nmemb != 0 )
                 {
-                    kvs::ValueArray<kvs::Real32> positions ( reply.positions, nmemb );
-                    kvs::ValueArray<kvs::Real32> normals ( reply.normals, nmemb );
-                    kvs::ValueArray<kvs::UInt8>  colors ( reply.colors, nmemb );
+                    kvs::ValueArray<kvs::Real32> positions ( reply.m_positions, nmemb );
+                    kvs::ValueArray<kvs::Real32> normals ( reply.m_normals, nmemb );
+                    kvs::ValueArray<kvs::UInt8>  colors ( reply.m_colors, nmemb );
                     kvs::PointObject obj;
                     obj.setCoords( positions );
                     obj.setNormals( normals );
@@ -303,19 +303,19 @@ kvs::PointObject* ParticleServer::getPointObjectFromServer( const PBVRParam& par
                     ( *object ) += obj;
                     obj.clear();
 
-                    allParticle = allParticle + reply.numParticle;
+                    allParticle = allParticle + reply.m_number_particle;
                 }
                 result->isUnderAnimation = true;
             }
 //            std::cout<<"Particle Server 310" <<  std::endl;
             if (nmemb !=0){
-            if( reply.colors    != NULL ){ delete[] reply.colors;     reply.colors    = NULL; }
-            if( reply.normals   != NULL ){ delete[] reply.normals;    reply.normals   = NULL; }
-            if( reply.positions != NULL ){ delete[] reply.positions;  reply.positions = NULL; }
+            if( reply.m_colors    != NULL ){ delete[] reply.m_colors;     reply.m_colors    = NULL; }
+            if( reply.m_normals   != NULL ){ delete[] reply.m_normals;    reply.m_normals   = NULL; }
+            if( reply.m_positions != NULL ){ delete[] reply.m_positions;  reply.m_positions = NULL; }
             }
-            result->minServerTimeStep = reply.staStep;
-            result->maxServerTimeStep = reply.endStep;
-            result->serverTimeStep = reply.timeStep;
+            result->minServerTimeStep = reply.m_start_step;
+            result->maxServerTimeStep = reply.m_end_step;
+            result->serverTimeStep = reply.m_time_step;
         }	//		std::cout<<"Particle Server 318" <<  std::endl;
 /*
         else
@@ -355,63 +355,63 @@ kvs::PointObject* ParticleServer::getPointObjectFromServer( const PBVRParam& par
     std::cout << allParticle << " allParticle" <<  std::endl;
 
     kvs::PointObject* pointObject = object;
-    TIMER_END( 120 );
+    PBVR_TIMER_END( 120 );
 
-    if ( param.CSmode == 1 )
+    if ( param.m_client_server_mode == 1 )
     {
 //      setStatus( Recieving );
 //      client.recvMessage( reply );
-        result->c_bins.resize( reply.tf_count );
-        result->o_bins.resize( reply.tf_count );
-        for ( int tf = 0; tf < reply.tf_count; tf++ )
+        result->m_color_bins.resize( reply.m_transfer_function_count );
+        result->m_opacity_bins.resize( reply.m_transfer_function_count );
+        for ( int tf = 0; tf < reply.m_transfer_function_count; tf++ )
         {
-            if ( reply.c_nbins[tf] > 0 )
+            if ( reply.m_color_nbins[tf] > 0 )
             {
-                result->c_bins[tf] = kvs::visclient::FrequencyTable( 0.0, 1.0, reply.c_nbins[tf], reply.c_bins[tf] );
+                result->m_color_bins[tf] = kvs::visclient::FrequencyTable( 0.0, 1.0, reply.m_color_nbins[tf], reply.m_color_bins[tf] );
             }
-            if ( reply.o_nbins[tf] )
+            if ( reply.m_opacity_bins_number[tf] )
             {
-                result->o_bins[tf] = kvs::visclient::FrequencyTable( 0.0, 1.0, reply.o_nbins[tf], reply.o_bins[tf] );
+                result->m_opacity_bins[tf] = kvs::visclient::FrequencyTable( 0.0, 1.0, reply.m_opacity_bins_number[tf], reply.m_opacity_bins[tf] );
             }
         }
 
-        result->subPixelLevel = reply.subPixelLevel;
-        TimecontrolPanel::lavel_time_step       = reply.timeStep;
+        result->m_subpixel_level = reply.m_subpixel_level;
+        TimecontrolPanel::lavel_time_step       = reply.m_time_step;
 
-        result->maxObjectCoord[0] = reply.maxObjectCoord[0];
-        result->maxObjectCoord[1] = reply.maxObjectCoord[1];
-        result->maxObjectCoord[2] = reply.maxObjectCoord[2];
+        result->maxObjectCoord[0] = reply.m_max_object_coord[0];
+        result->maxObjectCoord[1] = reply.m_max_object_coord[1];
+        result->maxObjectCoord[2] = reply.m_max_object_coord[2];
 
-        result->minObjectCoord[0] = reply.minObjectCoord[0];
-        result->minObjectCoord[1] = reply.minObjectCoord[1];
-        result->minObjectCoord[2] = reply.minObjectCoord[2];
+        result->minObjectCoord[0] = reply.m_min_object_coord[0];
+        result->minObjectCoord[1] = reply.m_min_object_coord[1];
+        result->minObjectCoord[2] = reply.m_min_object_coord[2];
 
-        for ( int tf = 0; tf < reply.tf_count; tf++ )
+        for ( int tf = 0; tf < reply.m_transfer_function_count; tf++ )
         {
-            delete[] reply.c_bins[tf];
-            delete[] reply.o_bins[tf];
+            delete[] reply.m_color_bins[tf];
+            delete[] reply.m_opacity_bins[tf];
         }
-        delete[] reply.c_nbins;
-        delete[] reply.o_nbins;
+        delete[] reply.m_color_nbins;
+        delete[] reply.m_opacity_bins_number;
     }
-    result->numParticle=reply.numParticle;
-    result->numVolDiv=reply.numVolDiv;
-    result->staStep=reply.staStep;
-    result->endStep=reply.endStep;
-    result->numStep=reply.endStep-reply.staStep;
-    result->minValue=reply.minValue;
-    result->maxValue=reply.maxValue;
-    result->numNodes=reply.numNodes;
-    result->numElements=reply.numElements;
-    result->elemType=reply.elemType;
-    result->fileType=reply.fileType;
-    result->numIngredients=reply.numIngredients;
-    result->flag_send_bins=reply.flag_send_bins;
-    result->tf_count=reply.tf_count;
+    result->numParticle=reply.m_number_particle;
+    result->numVolDiv=reply.m_number_volume_divide;
+    result->staStep=reply.m_start_step;
+    result->endStep=reply.m_end_step;
+    result->numStep=reply.m_end_step-reply.m_start_step;
+    result->minValue=reply.m_min_value;
+    result->maxValue=reply.m_max_value;
+    result->numNodes=reply.m_number_nodes;
+    result->numElements=reply.m_number_elements;
+    result->elemType=reply.m_element_type;
+    result->fileType=reply.m_file_type;
+    result->numIngredients=reply.m_number_ingredients;
+    result->flag_send_bins=reply.m_flag_send_bins;
+    result->tf_count=reply.m_transfer_function_count;
 
 
     //サイズの代わりにサブピクセルレベルを代入.
-    object->setSize( static_cast<kvs::Real32>( result->subPixelLevel ) );
+    object->setSize( static_cast<kvs::Real32>( result->m_subpixel_level ) );
 
     setStatus( Exit );
 // particle output
@@ -437,16 +437,19 @@ kvs::PointObject* ParticleServer::getPointObjectFromServer( const PBVRParam& par
 
                 if ( getenv( prfx.c_str() ) != NULL ) prefix = std::string( getenv( prfx.c_str() ) );
                 std::stringstream suffix;
-                suffix << std::setw( 5 ) << std::setfill( '0' ) << ( param.timeStep )
+                suffix << std::setw( 5 ) << std::setfill( '0' ) << ( param.m_time_step )
                        << '_' << std::setw( 7 ) << std::setfill( '0' ) << 1
                        << '_' << std::setw( 7 ) << std::setfill( '0' ) << 1;
                 std::string filename = outdir + prefix + suffix.str() + ".kvsml";
                 std::cout << filename << std::endl;
                 const kvs::File file( filename );
-                kvs::KVSMLObjectPoint* kvsml = new kvs::PointExporter<kvs::KVSMLObjectPoint>( object );
-                kvsml->setWritingDataType( kvs::KVSMLObjectPoint::ExternalBinary );
+                //kvs::KVSMLObjectPoint* kvsml = new kvs::PointExporter<kvs::KVSMLObjectPoint>( object );
+                //kvsml->setWritingDataType( kvs::KVSMLObjectPoint::ExternalBinary );
+                kvs::KVSMLPointObject* kvsml = new kvs::PointExporter<kvs::KVSMLPointObject>(object);
+                kvsml->setWritingDataType( kvs::KVSMLPointObject::ExternalBinary );
                 kvsml->write( filename );
-                std::cout << *kvsml << std::endl << std::endl;
+                //std::cout << *kvsml << std::endl << std::endl;
+                kvsml->print( std::cout );
                 delete kvsml;
             }
             else
@@ -478,17 +481,17 @@ kvs::PointObject* ParticleServer::getPointObjectFromServer( const PBVRParam& par
     if( pointObject ) pointObject->setMinMaxObjectCoords( min, max );
     if( pointObject ) pointObject->setMinMaxExternalCoords( min, max );
 
-    if ( param.CSmode == 1 )
+    if ( param.m_client_server_mode == 1 )
     {
-        message.initParam = -1;
-        message.messageSize = message.byteSize();
+        message.m_initialize_parameter = -1;
+        message.m_message_size = message.byteSize();
         client.sendMessage( message );
         client.recvMessage( reply );
         client.termClient();
     }
     setStatus( Idle );
     delete reply.camera;
-    TIMER_END( 100 );
+    PBVR_TIMER_END( 100 );
     return pointObject;
 }
 
@@ -508,17 +511,17 @@ kvs::PointObject* ParticleServer::getPointObjectFromLocal()
     return pointObject;
 }
 
-void ParticleServer::close( const PBVRParam& param )
+void ParticleServer::close( const VisualizationParameter& param )
 {
     setStatus( Exit );
 
-    jpv::ParticleTransferClient client( param.hostname, param.port );
+    jpv::ParticleTransferClient client( param.m_hostname, param.m_port );
     jpv::ParticleTransferServerMessage reply;
     jpv::ParticleTransferClientMessage message;
 
-    strncpy( message.header, "JPTP /1.0\r\n", 11 );
-    message.initParam = -2;
-    message.messageSize = message.byteSize();
+    strncpy( message.m_header, "JPTP /1.0\r\n", 11 );
+    message.m_initialize_parameter = -2;
+    message.m_message_size = message.byteSize();
 
     client.initClient();
     client.sendMessage( message );

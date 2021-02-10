@@ -122,7 +122,8 @@ void LegendPanel::populateColormapFunctions(const Command* command)
             m_doc->m_color_transfer_function;
 #else
     const std::vector<NamedTransferFunctionParameter> m_color_transfer_function =
-            m_doc->transferFunction;
+//            m_doc->m_transfer_function;
+            m_doc->m_color_transfer_function;
 #endif
     int max_color = 0;
     std::vector<NamedTransferFunctionParameter>::const_iterator itr;
@@ -149,7 +150,8 @@ void LegendPanel::setColorMapFunction(const kvs::visclient::Command* command)
             m_doc->m_color_transfer_function;
 #else
     const std::vector<NamedTransferFunctionParameter> m_color_transfer_function =
-            m_doc->transferFunction;
+//            m_doc->m_transfer_function;
+            m_doc->m_color_transfer_function;
 #endif
     int max_color = 0;
     std::vector<NamedTransferFunctionParameter>::const_iterator itr;

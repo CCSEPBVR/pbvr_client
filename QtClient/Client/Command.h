@@ -28,7 +28,7 @@ namespace visclient
 {
 //struct VisualizationParameter; /* add 20140123 */
 class ParticleServer;
-//class PBRProxy;
+class ExtendedParticleVolumeRenderer;
 struct Controller;
 //class TimerEvent;
 class ProgressBar;
@@ -96,9 +96,7 @@ public:
 
     void closeServer();
 #ifdef IS_MODE
-    void getServerParticleInfomation( PBVRParam& param, PBVRResult* result );
-    void initializeAbstractParticles( PBVRParam& param, PBVRResult* result, int localminstep, int localmaxstep );
-    void generateAbstractParticles( PBVRParam& param, PBVRResult* result);
+    void getServerParticleInfomation( VisualizationParameter* param, ReceivedMessage* result );
 #else
     int getServerParticleInfomation( VisualizationParameter* param, ReceivedMessage* result );
 #endif

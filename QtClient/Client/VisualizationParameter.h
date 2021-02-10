@@ -87,7 +87,8 @@ public:
 
     bool m_shading_type_flag;
 #ifdef IS_MODE
-    ParamExTransFunc paramExTransFunc;
+//    ParamExTransFunc paramExTransFunc;
+    ExtendedTransferFunctionMessage m_parameter_extend_transfer_function;
 #else
     ExtendedTransferFunctionMessage m_parameter_extend_transfer_function;
 #endif

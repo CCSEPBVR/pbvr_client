@@ -181,10 +181,10 @@ void StepLabel::contentUpdate()
         step = "time step:" + QString::number( TimecontrolPanel::g_curStep,'G',4);
 #else
     QString step;
-    if ( extCommand->result.serverTimeStep < 0 )
+    if ( extCommand->m_result.serverTimeStep < 0 )
         step="---";
     else
-        step = "time step:" + QString::number( extCommand->result.serverTimeStep,'G',4);
+        step = "time step:" + QString::number( extCommand->m_result.serverTimeStep,'G',4);
 #endif
     Label::setText(step, Qt::white );
 }

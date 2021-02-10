@@ -333,7 +333,7 @@ kvs::PointObject* ParticleMerger::doMerge(
 
         //サーバ側のmix max coordsを書き記したテキストファイルを生成する。
         std::string fileName = m_parameter.m_export_file_path +".minMax";
-       FILE* serverMinMaxCoords_file = fopen(fileName.c_str(), "w");
+        FILE* serverMinMaxCoords_file = fopen(fileName.c_str(), "w");
         fprintf(serverMinMaxCoords_file,"%f,%f,%f,%f,%f,%f",obj->minObjectCoord().x(),obj->minObjectCoord().y(),obj->minObjectCoord().z(),obj->maxObjectCoord().x(),obj->maxObjectCoord().y(),obj->maxObjectCoord().z());
         fclose(serverMinMaxCoords_file);
     }

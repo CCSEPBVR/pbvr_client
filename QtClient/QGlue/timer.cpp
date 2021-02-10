@@ -15,7 +15,7 @@
 #include "Panels/systemstatuspanel.h"
 
 #include "QGlue/renderarea.h"
-//#include "Client/PBRProxy.h"
+#include "Client/ExtendedParticleVolumeRenderer.h"
 //KVS2.7.0
 //MOD BY)T.Osaki 2020.06.04
 #include <kvs/Quaternion>

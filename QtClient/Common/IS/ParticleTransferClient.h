@@ -18,12 +18,12 @@ namespace jpv
 class ParticleTransferClient
 {
 protected:
-    std::string hostname;
-    int port;
+    std::string m_hostname;
+    int m_port;
 #if defined WIN32
     SOCKET sock;
 #else
-    int sock;
+    int m_sock;
 #endif
 
 
