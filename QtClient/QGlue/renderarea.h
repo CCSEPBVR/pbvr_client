@@ -3,7 +3,7 @@
 
 #include "screen.h"
 
-#include "Client/ExtendedParticleVolumeRenderer.h"
+#include "Client/PBRProxy.h"
 #include <QGlue/labelbase.h>
 #include <QGlue/legendbar.h>
 #include <QGlue/timer.h>
@@ -110,7 +110,7 @@ public:
     void setLabelFont(const QFont& f);
     void setSize( const int width, const int height );
 
-    void setShaderParams( );
+//    void setShaderParams( );
     void setupEventHandlers( );
     void updateCommandInfo(ExtCommand* command_q);
 
@@ -118,12 +118,12 @@ public:
     void enableRendererShading();
     void setRenderSubPixelLevel(int level);
     void setRenderRepetitionLevel(int level);
-    void recreateRenderImageBuffer(int level);
+//    void recreateRenderImageBuffer(int level);
 
     // Public access methods for interacting with private point object.
     kvs::Xform getPointObjectXform();
     void setPointObjectXform(kvs::Xform xf);
-    void attachPointObject(const kvs::PointObject *point, int level);
+    void attachPointObject(const kvs::PointObject *point, int sp_level);
 
 
 public:
@@ -155,7 +155,7 @@ private:
     int msec = DEFAULT_MSEC;
     //    MOD BY)T.Osaki 2020.04.28
     float pixelRatio=1;
-    SwitchablePBR* m_renderer;
+    SwitchablePBRProxy m_renderer;
 
     int m_reset_count = 0;
 
