@@ -176,6 +176,12 @@ public:
     void animation_play();
     void switch_gpu(bool f);
 
+    void switch_shader(char st){
+        this->shadinglevel[0]=st;
+        m_renderer.setShadingString(shadinglevel);
+
+    }
+
 };
 
 #endif // KVSQScreen_H

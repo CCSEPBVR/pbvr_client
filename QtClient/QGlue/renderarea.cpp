@@ -740,5 +740,20 @@ void RenderArea::switch_gpu(bool f)
         m_renderer.use_cpu();
     }
     m_scene->replaceRenderer(m_obj_id_pair.second, m_renderer.pbr_pointer(),false);
+    // The lines below are a work around for m_initial_modelview problem
+    // in kvs::glsl::ParticleBasedRenderer.
+    makeCurrent();
+    // Save current X form
+    storeCurrentXForm();
+    // Reset object Manager's XForm
+    m_scene->objectManager()->resetXform();
+    // Manually call  paint function, to set m_initial_xform in Renderer
+    m_scene->paintFunction();
+    // Restore xform to original scene xform
+    restoreXForm();
+    // Paint the frame again, to erase previous frame
+    m_scene->paintFunction();
+    doneCurrent();
     update();
 }
+
