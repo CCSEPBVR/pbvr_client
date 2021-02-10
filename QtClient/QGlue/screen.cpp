@@ -1,4 +1,4 @@
-#include <GL/glew.h>
+//#include <GL/glew.h>
 #include "screen.h"
 #include <kvs/FrameBufferObject>>
 #include <kvs/OpenGL>
