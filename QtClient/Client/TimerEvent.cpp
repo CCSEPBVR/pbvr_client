@@ -8,7 +8,7 @@
 #include "KeyFrameAnimation.h"
 #include "ParticleMerger.h"
 #include "ParticleServer.h"
-#include "ExtendedParticleVolumeRenderer.h"
+//#include "PBRProxy.h"
 
 #include "Panels/animationcontrols.h"
 #include "Panels/particlepanel.h"

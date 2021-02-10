@@ -28,7 +28,7 @@ namespace visclient
 {
 //struct VisualizationParameter; /* add 20140123 */
 class ParticleServer;
-class ExtendedParticleVolumeRenderer;
+//class PBRProxy;
 struct Controller;
 //class TimerEvent;
 class ProgressBar;

@@ -2,7 +2,7 @@
 //ADD BY)T.Osaki 2020.06.08
 #include <QOpenGLContext>
 
-#include "ExtendedParticleVolumeRenderer.h"
+//#include "PBRProxy.h"
 
 #include <QThread>
 #include <algorithm>
