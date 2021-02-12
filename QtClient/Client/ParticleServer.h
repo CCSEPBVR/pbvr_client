@@ -32,7 +32,7 @@ private:
     int m_number_repeat;
     Status m_status;
     kvs::Mutex m_status_mutex;
-    kvs::PointObject* m_point_object;
+//    kvs::PointObject* m_point_object;
 
 public:
 

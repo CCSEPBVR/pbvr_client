@@ -240,15 +240,12 @@ public:
         putenv( ( char* )m_pout_path_name.c_str() );
 #endif
 //      m_header = this->value<std::string>();
-#if 0
+#if CS_MODE
         int client_mode = 0;
-#ifdef IS_MODE
-        if ( this->hasOption( "vin" ))
-#else
+
         // mofify by @hira at 2016/12/01
         // if ( this->hasOption( "vin" ))
         if ( this->hasOption( "vin" ) || this->hasOption( "fin" ))
-#endif
         {
             m_header = "";
             client_mode = 1;

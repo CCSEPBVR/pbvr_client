@@ -161,61 +161,6 @@ kvs::PointObject* ParticleServer::getPointObjectFromServer( const VisualizationP
         message.m_sampling_step = 1.0f;
 
 
-//        switch ( paramCrop.cropType )
-//        {
-//        case CropParam::Crop:
-//            message.enable_crop_region = CROP;
-//            message.crop_region[0] = paramCrop.rgcxminlevel;
-//            message.crop_region[1] = paramCrop.rgcyminlevel;
-//            message.crop_region[2] = paramCrop.rgczminlevel;
-//            message.crop_region[3] = paramCrop.rgcxmaxlevel;
-//            message.crop_region[4] = paramCrop.rgcymaxlevel;
-//            message.crop_region[5] = paramCrop.rgczmaxlevel;
-//            break;
-
-//        case CropParam::Sphere:
-//            message.enable_crop_region = SPHERE;
-//            message.crop_region[0] = paramCrop.rgscenterx;
-//            message.crop_region[1] = paramCrop.rgscentery;
-//            message.crop_region[2] = paramCrop.rgscenterz;
-//            message.crop_region[3] = paramCrop.rgsradius;
-//            message.crop_region[4] = 0.0F;
-//            message.crop_region[5] = 0.0F;
-//            break;
-
-//        case CropParam::Pillar:
-//            message.enable_crop_region = PILLAR;
-//            message.crop_region[0] = paramCrop.rgpcenterx;
-//            message.crop_region[1] = paramCrop.rgpcentery;
-//            message.crop_region[2] = paramCrop.rgpcenterz;
-//            message.crop_region[3] = paramCrop.rgpradius;
-//            message.crop_region[4] = paramCrop.rgpheight;
-//            message.crop_region[5] = 0.0F;
-//            break;
-
-//        case CropParam::PillarYZ:
-//            message.enable_crop_region = PILLARYZ;
-//            message.crop_region[0] = paramCrop.rgpcenterx;
-//            message.crop_region[1] = paramCrop.rgpcentery;
-//            message.crop_region[2] = paramCrop.rgpcenterz;
-//            message.crop_region[3] = paramCrop.rgpradius;
-//            message.crop_region[4] = paramCrop.rgpheight;
-//            message.crop_region[5] = 0.0F;
-//            break;
-
-//        case CropParam::PillarXZ:
-//            message.enable_crop_region = PILLARXZ;
-//            message.crop_region[0] = paramCrop.rgpcenterx;
-//            message.crop_region[1] = paramCrop.rgpcentery;
-//            message.crop_region[2] = paramCrop.rgpcenterz;
-//            message.crop_region[3] = paramCrop.rgpradius;
-//            message.crop_region[4] = paramCrop.rgpheight;
-//            message.crop_region[5] = 0.0F;
-//            break;
-
-//        default:
-//            message.enable_crop_region = 0;
-//        }
         message.m_enable_crop_region = 0;
         //
         paramExTransFunc.applyToClientMessage( &message );
@@ -239,7 +184,7 @@ kvs::PointObject* ParticleServer::getPointObjectFromServer( const VisualizationP
     float maxZ = -FLT_MAX;
     size_t allParticle = 0;
 //  sleep (1);
-    kvs::PointObject* object;
+    kvs::PointObject* object=new kvs::PointObject();;
 
     // Loop for sub volumes.
     *result = ReceivedMessage();
@@ -263,14 +208,14 @@ kvs::PointObject* ParticleServer::getPointObjectFromServer( const VisualizationP
             PBVR_TIMER_END( 130 );
             if( reply.m_flag_send_bins )
             {
-                if( m_point_object != NULL ) delete m_point_object;
-                m_point_object = new kvs::PointObject();
-                object = m_point_object;
+//                if( m_point_object != NULL ) delete m_point_object;
+//                m_point_object = new kvs::PointObject();
+//                object = m_point_object;
             }
             else
             {
-                if( m_point_object == NULL ) m_point_object = new kvs::PointObject();
-                object = m_point_object;
+//                if( m_point_object == NULL ) m_point_object = new kvs::PointObject();
+//                object = m_point_object;
             }
 
 //          kvs::visclient::Profiler::get()->end( "receive time" );

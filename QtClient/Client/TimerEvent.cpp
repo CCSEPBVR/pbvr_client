@@ -8,7 +8,7 @@
 #include "KeyFrameAnimation.h"
 #include "ParticleMerger.h"
 #include "ParticleServer.h"
-#include "ExtendedParticleVolumeRenderer.h"
+//#include "PBRProxy.h"
 
 #include "Panels/animationcontrols.h"
 #include "Panels/particlepanel.h"
@@ -277,6 +277,9 @@ void TimerEvent::update( kvs::TimeEvent* event )
             m_command->m_is_key_frame_animation = false;
             m_command->m_step_key_frame = 0;
             m_command->m_previous_key_frame = 0;
+//            this->disableKeyFrameAnimation();
+            KeyFrameAnimationStop();
+
         }
     }
 
