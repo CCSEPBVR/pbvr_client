@@ -9,6 +9,7 @@ message (Building PBVR:$${TARGET} -  Mode:$${PBVR_MODE}  - Platform: $${PLATFORM
 CONFIG += warn_off
 QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.14
 
+
 HEADERS += \
     function.h   \
     function_op.h  \
@@ -25,14 +26,8 @@ HEADERS += \
 
 SOURCES += \
     function.cpp \
-    function_parser.cpp \
-    main.cpp
+    function_parser.cpp
 
-contains(DEFINES, IS_MODE) {
-SOURCES += \
-    ExpressionConverter.cpp \
-    ExpressionTokenizer.cpp \
-    ReversePolishNotation.cpp
 
 contains(DEFINES, IS_MODE) {
 SOURCES += \
@@ -42,5 +37,6 @@ SOURCES += \
     ReversePolishNotation.cpp
 
 }
+
 
 
