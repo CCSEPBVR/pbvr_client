@@ -61,6 +61,10 @@ RenderArea::RenderArea( QWidget* parent_surface):
 
 }
 
+RenderArea::~RenderArea( void ){
+    m_scene->removeObject(m_obj_id_pair.first,false,false);
+}
+
 /**
  * @brief RenderArea::enableRendererShading, enable render shading
  */
@@ -327,7 +331,9 @@ void RenderArea::setCoordinateBoundaries(float  crd[6])
     if(m_reset_count == 0){
         m_reset_count++;
     }else{
+#ifdef CS_MODE
         this->m_scene->reset();
+#endif
     }
     std::cout << " !!!!!!!!!!!!!!!!!!! Reset Viewer Scale !!!!!!!!!!!!!!!!!!!!!!!! " << std::endl;
 }

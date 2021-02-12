@@ -46,7 +46,8 @@ FunctionListEditor::~FunctionListEditor()
  */
 void FunctionListEditor::initalize(FUNCTION_DIALOG_TYPE dialogtype,  kvs::visclient::ExtendedTransferFunctionMessage& m_doc, int i)
 {
-#ifdef CS_MODE
+    //Osaki QTISPBVR update(2020/11/16) IS版でfunctionListEditorを使用する際に必要となるためifdefを無効にしました。
+//#ifdef CS_MODE
     this->m_dialogtype=dialogtype;
     if (dialogtype == COLOR_FUNCTION_DIALOG) {
         setWindowTitle(COLOR_FUNCTION_TITLE);
@@ -59,7 +60,7 @@ void FunctionListEditor::initalize(FUNCTION_DIALOG_TYPE dialogtype,  kvs::viscli
         setTransferFunctionParameterList(&m_doc.m_opacity_transfer_function);
     }
     ui->functionList->setCurrentRow(i);
-#endif
+//#endif
 }
 
 /**
@@ -82,7 +83,7 @@ int FunctionListEditor::save()
     }
 
 
-//    *m_original_transfer_function = m_edit_transfer_function
+//    *m_original_transfer_function = m_edit_transfer_function;
 
     // Changed by Martin - oct 13 2020
     //

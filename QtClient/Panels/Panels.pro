@@ -61,7 +61,7 @@ FORMS += \
     coloreditdialog.ui \
     coloreditor.ui \
     opacityeditor.ui \
-    transferfunceditor.ui \
+    transferfunceditor_$${PBVR_MODE}.ui \
     animationcontrols.ui \
     functionlisteditor.ui \
     filterinfopanel.ui \

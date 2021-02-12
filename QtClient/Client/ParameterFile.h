@@ -26,6 +26,7 @@ public:
     size_t getSubpixelLevel();
     size_t getRepeatLevel();
 
+    //Osaki QTISPBVR update(2020/11/16) std::stringの&を削除
     int         getInt( const std::string& name );
     float       getFloat( const std::string& name );
     std::string getString( const std::string& name );
@@ -33,11 +34,12 @@ public:
 public:
     bool   loadIN( const std::string& filename );
 
-#ifdef CS_MODE
+    //Osaki QTISPBVR update(2020/11/16) OpenGL版のISでは使用しているためifdefを無効にしました。
+//#ifdef CS_MODE
     int getTfnameSize();
     std::string getTfnamePrefix(int index);
     int getTfnameNumber(int index);
-    #endif
+//#endif
 
     bool        hasParam( const std::string& name );
 

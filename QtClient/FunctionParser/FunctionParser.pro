@@ -14,10 +14,27 @@ HEADERS += \
     function_op.h  \
     function_parser.h
 
+contains(DEFINES, IS_MODE) {
+HEADERS += \
+    ExpressionConverter.h \
+    ExpressionTokenizer.h \
+    ReversePolishNotation.h \
+    Token.h
+}
+
+
 SOURCES += \
     function.cpp \
     function_parser.cpp
 
 
+contains(DEFINES, IS_MODE) {
+SOURCES += \
+    main.cpp \
+    ExpressionConverter.cpp \
+    ExpressionTokenizer.cpp \
+    ReversePolishNotation.cpp
+
+}
 
 

@@ -32,13 +32,14 @@ bool ParameterFile::loadIN( const std::string& filename )
     m_param_state.insert( std::map<std::string, bool>::value_type( "crop_region_4"   , false ) );
     m_param_state.insert( std::map<std::string, bool>::value_type( "crop_region_5"   , false ) );
 
-#ifdef IS_MODE
-    param_state.insert( std::map<std::string, bool>::value_type( "t1"   , false ) );
-    param_state.insert( std::map<std::string, bool>::value_type( "t2"   , false ) );
-    param_state.insert( std::map<std::string, bool>::value_type( "t3"   , false ) );
-    param_state.insert( std::map<std::string, bool>::value_type( "t4"   , false ) );
-    param_state.insert( std::map<std::string, bool>::value_type( "t5"   , false ) );
-#endif
+    //Osaki QTISPBVR update(2020/11/16) OpenGL版では使用されていないため削除
+//#ifdef IS_MODE
+//    m_param_state.insert( std::map<std::string, bool>::value_type( "t1"   , false ) );
+//    m_param_state.insert( std::map<std::string, bool>::value_type( "t2"   , false ) );
+//    m_param_state.insert( std::map<std::string, bool>::value_type( "t3"   , false ) );
+//    m_param_state.insert( std::map<std::string, bool>::value_type( "t4"   , false ) );
+//    m_param_state.insert( std::map<std::string, bool>::value_type( "t5"   , false ) );
+//#endif
     while ( std::getline( fin, line ) )
     {
         size_t pos;
@@ -69,51 +70,52 @@ bool ParameterFile::loadIN( const std::string& filename )
         else if ( !strcmp( name.c_str(), "CROP_CYMAX" ) )            key = "crop_region_4";
         else if ( !strcmp( name.c_str(), "CROP_CZMAX" ) )            key = "crop_region_5";
         else if ( !strcmp( name.c_str(), "TF_RESOLUTION" ) )         key = "tf_resolution";
-#ifdef IS_MODE
-        else if ( !strcmp( name.c_str(), "TF_SYNTH" ) )              key = "tf_synthesis";
-        else if ( name == "TF_NAME1_VAR_C"   ) key = name;
-        else if ( name == "TF_NAME1_MIN_C"   ) key = name;
-        else if ( name == "TF_NAME1_MAX_C"   ) key = name;
-        else if ( name == "TF_NAME1_VAR_O"   ) key = name;
-        else if ( name == "TF_NAME1_MIN_O"   ) key = name;
-        else if ( name == "TF_NAME1_MAX_O"   ) key = name;
-        else if ( name == "TF_NAME1_TABLE_C" ) key = name;
-        else if ( name == "TF_NAME1_TABLE_O" ) key = name;
-        else if ( name == "TF_NAME2_VAR_C"   ) key = name;
-        else if ( name == "TF_NAME2_MIN_C"   ) key = name;
-        else if ( name == "TF_NAME2_MAX_C"   ) key = name;
-        else if ( name == "TF_NAME2_VAR_O"   ) key = name;
-        else if ( name == "TF_NAME2_MIN_O"   ) key = name;
-        else if ( name == "TF_NAME2_MAX_O"   ) key = name;
-        else if ( name == "TF_NAME2_TABLE_C" ) key = name;
-        else if ( name == "TF_NAME2_TABLE_O" ) key = name;
-        else if ( name == "TF_NAME3_VAR_C"   ) key = name;
-        else if ( name == "TF_NAME3_MIN_C"   ) key = name;
-        else if ( name == "TF_NAME3_MAX_C"   ) key = name;
-        else if ( name == "TF_NAME3_VAR_O"   ) key = name;
-        else if ( name == "TF_NAME3_MIN_O"   ) key = name;
-        else if ( name == "TF_NAME3_MAX_O"   ) key = name;
-        else if ( name == "TF_NAME3_TABLE_C" ) key = name;
-        else if ( name == "TF_NAME3_TABLE_O" ) key = name;
-        else if ( name == "TF_NAME4_VAR_C"   ) key = name;
-        else if ( name == "TF_NAME4_MIN_C"   ) key = name;
-        else if ( name == "TF_NAME4_MAX_C"   ) key = name;
-        else if ( name == "TF_NAME4_VAR_O"   ) key = name;
-        else if ( name == "TF_NAME4_MIN_O"   ) key = name;
-        else if ( name == "TF_NAME4_MAX_O"   ) key = name;
-        else if ( name == "TF_NAME4_TABLE_C" ) key = name;
-        else if ( name == "TF_NAME4_TABLE_O" ) key = name;
-        else if ( name == "TF_NAME5_VAR_C"   ) key = name;
-        else if ( name == "TF_NAME5_MIN_C"   ) key = name;
-        else if ( name == "TF_NAME5_MAX_C"   ) key = name;
-        else if ( name == "TF_NAME5_VAR_O"   ) key = name;
-        else if ( name == "TF_NAME5_MIN_O"   ) key = name;
-        else if ( name == "TF_NAME5_MAX_O"   ) key = name;
-        else if ( name == "TF_NAME5_TABLE_C" ) key = name;
-        else if ( name == "TF_NAME5_TABLE_O" ) key = name;
-#else
+        //Osaki QTISPBVR update(2020/11/16) OpenGL版では使用されていないため削除
+//#ifdef IS_MODE
+//        else if ( !strcmp( name.c_str(), "TF_SYNTH" ) )              key = "tf_synthesis";
+//        else if ( name == "TF_NAME1_VAR_C"   ) key = name;
+//        else if ( name == "TF_NAME1_MIN_C"   ) key = name;
+//        else if ( name == "TF_NAME1_MAX_C"   ) key = name;
+//        else if ( name == "TF_NAME1_VAR_O"   ) key = name;
+//        else if ( name == "TF_NAME1_MIN_O"   ) key = name;
+//        else if ( name == "TF_NAME1_MAX_O"   ) key = name;
+//        else if ( name == "TF_NAME1_TABLE_C" ) key = name;
+//        else if ( name == "TF_NAME1_TABLE_O" ) key = name;
+//        else if ( name == "TF_NAME2_VAR_C"   ) key = name;
+//        else if ( name == "TF_NAME2_MIN_C"   ) key = name;
+//        else if ( name == "TF_NAME2_MAX_C"   ) key = name;
+//        else if ( name == "TF_NAME2_VAR_O"   ) key = name;
+//        else if ( name == "TF_NAME2_MIN_O"   ) key = name;
+//        else if ( name == "TF_NAME2_MAX_O"   ) key = name;
+//        else if ( name == "TF_NAME2_TABLE_C" ) key = name;
+//        else if ( name == "TF_NAME2_TABLE_O" ) key = name;
+//        else if ( name == "TF_NAME3_VAR_C"   ) key = name;
+//        else if ( name == "TF_NAME3_MIN_C"   ) key = name;
+//        else if ( name == "TF_NAME3_MAX_C"   ) key = name;
+//        else if ( name == "TF_NAME3_VAR_O"   ) key = name;
+//        else if ( name == "TF_NAME3_MIN_O"   ) key = name;
+//        else if ( name == "TF_NAME3_MAX_O"   ) key = name;
+//        else if ( name == "TF_NAME3_TABLE_C" ) key = name;
+//        else if ( name == "TF_NAME3_TABLE_O" ) key = name;
+//        else if ( name == "TF_NAME4_VAR_C"   ) key = name;
+//        else if ( name == "TF_NAME4_MIN_C"   ) key = name;
+//        else if ( name == "TF_NAME4_MAX_C"   ) key = name;
+//        else if ( name == "TF_NAME4_VAR_O"   ) key = name;
+//        else if ( name == "TF_NAME4_MIN_O"   ) key = name;
+//        else if ( name == "TF_NAME4_MAX_O"   ) key = name;
+//        else if ( name == "TF_NAME4_TABLE_C" ) key = name;
+//        else if ( name == "TF_NAME4_TABLE_O" ) key = name;
+//        else if ( name == "TF_NAME5_VAR_C"   ) key = name;
+//        else if ( name == "TF_NAME5_MIN_C"   ) key = name;
+//        else if ( name == "TF_NAME5_MAX_C"   ) key = name;
+//        else if ( name == "TF_NAME5_VAR_O"   ) key = name;
+//        else if ( name == "TF_NAME5_MIN_O"   ) key = name;
+//        else if ( name == "TF_NAME5_MAX_O"   ) key = name;
+//        else if ( name == "TF_NAME5_TABLE_C" ) key = name;
+//        else if ( name == "TF_NAME5_TABLE_O" ) key = name;
+//#else
         else if ( name.find(TF_NAME) == 0 ) key = name;
-#endif
+//#endif
         else
         {
             for ( int i = 1; i <= 5; i++ )
@@ -179,7 +181,7 @@ float ParameterFile::getCropRegion( const int index )
 
     return value;
 }
-
+    //Osaki QTISPBVR update(2020/11/16) std::stringの&を削除
 int ParameterFile::getInt( const std::string& name )
 {
     return std::atoi( m_param[name].c_str() );
@@ -212,8 +214,8 @@ bool ParameterFile::isTfnameNvalc(const std::string& item)
 }
 
 
-
-#ifdef CS_MODE
+//Osaki QTISPBVR update(2020/11/16) OpenGL版のISでは使用しているためifdefを無効にしました。
+//#ifdef CS_MODE
 /**
  * TF_NAME[NN]_XXXXの項目数を取得する
  * TF_NAME[NN]_VAR_Cの項目を検索する
@@ -286,18 +288,19 @@ int ParameterFile::getTfnameNumber(int index)
 }
 
 
-#endif
+//#endif
 /**
  * 読込パラメータが存在しているかチェックする
  * @param name		パラメータ項目名
  * @return			true=存在している
  */
+//Osaki QTISPBVR update(2020/11/16) OpenGL版のISでは使用しているためifdefを無効にしました。
 bool ParameterFile::hasParam( const std::string& name )
 {
-#ifdef IS_MODE
-    qInfo("We shouldn't get here in INSITU MODE");
-    exit(0);
-#endif
+//#ifdef IS_MODE
+//    qInfo("We shouldn't get here in INSITU MODE");
+//    exit(0);
+//#endif
     if (this->m_param.find(name) == this->m_param.end()) return false;
     return true;
 }

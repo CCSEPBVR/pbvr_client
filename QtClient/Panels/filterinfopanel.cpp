@@ -125,9 +125,9 @@ void FilterinfoPanel::updateFilterInfo(kvs::visclient::ReceivedMessage* result)
     filterInfoParams.numNodes   = result->numNodes;
     filterInfoParams.numElements= result->numElements;
     filterInfoParams.elemType   = result->elemType;
-    filterInfoParams.numStep    = result->fileType;
+    filterInfoParams.fileType    = result->fileType;
     filterInfoParams.numStep    = result->numStep;
-    filterInfoParams.numStep    = result->numVolDiv;
+    filterInfoParams.numVolDiv    = result->numVolDiv;
 
     filterInfoParams.minObjectCoord[0] = result->minObjectCoord[0];
     filterInfoParams.minObjectCoord[1] = result->minObjectCoord[1];

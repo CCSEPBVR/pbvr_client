@@ -53,7 +53,7 @@ void LegendBar::screenUpdated()
 #ifdef CS_MODE
     NamedTransferFunctionParameter* color_trans = m_doc.getColorTransferFunction(m_selected_transfer_function);
 #else
-    NamedTransferFunctionParameter* color_trans = m_doc.getTransferFunction(m_selected_transfer_function);
+    NamedTransferFunctionParameter* color_trans = m_doc.getColorTransferFunction(m_selected_transfer_function);
 #endif
     if (color_trans == NULL) {
         return;

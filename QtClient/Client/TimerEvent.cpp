@@ -172,7 +172,7 @@ void TimerEvent::update( kvs::TimeEvent* event )
 			#ifdef CS_MODE
                 m_command->m_parameter.m_min_time_step = m_command->m_timectrl_panel->minValue();
 			#else
-                m_command->m_parameter.minTimeStep = m_command->m_timectrl_panel->minValue();
+                m_command->m_parameter.m_min_time_step = m_command->m_timectrl_panel->minValue();
 			#endif
             }
             else
@@ -180,7 +180,7 @@ void TimerEvent::update( kvs::TimeEvent* event )
 			#ifdef CS_MODE
                 m_command->m_parameter.m_min_time_step = m_command->m_parameter.m_min_time_step;
 			#else
-               m_command->m_parameter.minTimeStep =m_command->m_parameter.minTimeStep;
+               m_command->m_parameter.m_min_time_step =m_command->m_parameter.m_min_time_step;
 			#endif
             }
         }
@@ -189,7 +189,7 @@ void TimerEvent::update( kvs::TimeEvent* event )
 #ifdef IS_MODE
         if( m_command->lastStepCheckBoxState )
         {
-           m_command->m_parameter.timeStep =m_command->m_parameter.maxTimeStep;
+           m_command->m_parameter.m_time_step =m_command->m_parameter.m_max_time_step;
 //            m_command->m_timectrl_panel->setStepValue(m_command->m_parameter.timeStep);
         }
 #endif

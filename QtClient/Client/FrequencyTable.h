@@ -30,7 +30,8 @@ public:
         initialize(min, max, nbins, bins);
 
     }
-#ifdef CS_MODE
+    //Osaki QTISPBVR update(2020/11/16) OpenGL版のISでは使用しているためifdefを無効にしました。
+//#ifdef CS_MODE
     FrequencyTable( const float min, const float max,
                     const int nbins, const size_t* bins,
                     const std::string &function_name)
@@ -38,7 +39,7 @@ public:
         initialize(min, max, nbins, bins);
         this->m_function_name = function_name;
     }
-#endif
+//#endif
 
     void initialize(const float min, const float max,
                     const int nbins, const size_t* bins )
@@ -73,10 +74,11 @@ public:
         }
         std::cout << std::endl;
     }
-#ifdef CS_MODE
+    //Osaki QTISPBVR update(2020/11/16) OpenGL版のISでは使用しているためifdefを無効にしました。
+//#ifdef CS_MODE
 public:
     std::string m_function_name;
-#endif
+//#endif
 };
 
 }

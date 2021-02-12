@@ -93,7 +93,7 @@ private:
 public:
 
     explicit RenderArea( QWidget* parent_surface);
-
+    ~RenderArea(void);
     //MOD BY)T.Osaki 2020.06.29
     //static void ScreenShot( kvs::ScreenBase* screen, const int tstep );
     //static void ScreenShotKeyFrame( kvs::ScreenBase* screen, const int tstep );

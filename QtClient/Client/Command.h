@@ -96,9 +96,7 @@ public:
 
     void closeServer();
 #ifdef IS_MODE
-    void getServerParticleInfomation( PBVRParam& param, PBVRResult* result );
-    void initializeAbstractParticles( PBVRParam& param, PBVRResult* result, int localminstep, int localmaxstep );
-    void generateAbstractParticles( PBVRParam& param, PBVRResult* result);
+    void getServerParticleInfomation( VisualizationParameter* param, ReceivedMessage* result );
 #else
     int getServerParticleInfomation( VisualizationParameter* param, ReceivedMessage* result );
 #endif

@@ -66,10 +66,14 @@ void SliderControl::setRange(int min, int max)
 //    ui->maxSlider->setValue(max*stepSize);
 //    ui->minSlider->setValue(min*stepSize);
     //MOD BY)T.Osaki 2020.03.06
-//    this->min=min;
-//    this->max=max;
+
+#ifdef IS_MODE
+    this->min=min;
+    this->max=max;
+#else
     this->min = ui->minSlider->value()/100;
     this->max = ui->maxSlider->value()/100;
+#endif
 }
 
 void SliderControl::setValue(int value)
@@ -136,8 +140,12 @@ void SliderControl::limitSliderToMin(QSlider* slider, int min)
 void SliderControl::on_timeSlider_valueChanged(int value)
 {
     qInfo("SliderControl::on_slider_valueChanged %d", value);
+#ifdef IS_MODE
+    limitSliderToMax(ui->timeSlider,ui->maxSlider->value()*(value/100));
+#else
     limitSliderToMax(ui->timeSlider,ui->maxSlider->value() );
     limitSliderToMin(ui->timeSlider,ui->minSlider->value() );
+#endif
     snapAllSlidersToTick();
 
     curTime=ui->timeSlider->value()/stepSize;

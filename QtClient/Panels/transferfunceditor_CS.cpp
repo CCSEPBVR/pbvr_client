@@ -1,5 +1,5 @@
 ﻿#include "transferfunceditor_CS.h"
-#include "ui_transferfunceditor.h"
+#include "ui_transferfunceditor_CS.h"
 
 #include <QMessageBox>
 #include <QFileDialog>

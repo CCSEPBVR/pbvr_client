@@ -230,9 +230,8 @@ void PBVRGUI::restoreDefaultLayout()
     timecontrolPanel.setFloating(false);
 
     addDockWidget(systemstatusPanel.default_area, &systemstatusPanel);
-    addDockWidget(filterinfoPanel.default_area, &filterinfoPanel);
-    addDockWidget(timecontrolPanel.default_area, &timecontrolPanel);
-
+    addDockWidget(  filterinfoPanel.default_area, &filterinfoPanel);
+    addDockWidget( timecontrolPanel.default_area, &timecontrolPanel);
     systemstatusPanel.setVisible(true);
     filterinfoPanel.setVisible(true);
     timecontrolPanel.setVisible(true);
@@ -293,7 +292,7 @@ void PBVRGUI::load_parameter_file(kvs::visclient::Argument& argument)
     }
 #ifdef IS_MODE
     else{
-        tf_editor.importExtendTransferFunction( extCommand->param.paramExTransFunc );
+        tf_editor.importExtendTransferFunction( extCommand->m_parameter.m_parameter_extend_transfer_function );
     }
 #endif
     // Import Transfer Function File
