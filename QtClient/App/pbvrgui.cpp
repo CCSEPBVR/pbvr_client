@@ -103,10 +103,29 @@ PBVRGUI::PBVRGUI(ExtCommand* command) :
             this, &PBVRGUI::onAnimation_ControlsMenuAction);
     connect(ui->actionViewer_Controls,&QAction::triggered,
             this, &PBVRGUI::onViewer_ControlsMenuAction);
-// Fullscreen disabled, as Qt seems buggy.
-//    connect(ui->actionFull_Screen,&QAction::triggered,
-//            this, &PBVRGUI::onFull_ScreenMenuAction);
+    connect(ui->actionZoomIn,&QAction::triggered,
+            this,&PBVRGUI::on_actionZoomIn_triggered);
+    connect(ui->actionZoomOut,&QAction::triggered,
+            this,&PBVRGUI::on_actionZoomOut_triggered);
+    connect(ui->actionXpos,&QAction::triggered,
+            this,&PBVRGUI::on_actionXpos_triggered);
+    connect(ui->actionXneg,&QAction::triggered,
+            this,&PBVRGUI::on_actionXneg_triggered);
+    connect(ui->actionYpos,&QAction::triggered,
+            this,&PBVRGUI::on_actionYpos_triggered);
+    connect(ui->actionYneg,&QAction::triggered,
+            this,&PBVRGUI::on_actionYneg_triggered);
+    connect(ui->actionCPU,&QAction::triggered,
+            this,&PBVRGUI::on_actionCPU_triggered);
+    connect(ui->actionGPU,&QAction::triggered,
+            this,&PBVRGUI::on_actionGPU_triggered);
 
+    connect(ui->actionAddFrame,&QAction::triggered,
+            this,&PBVRGUI::on_actionAddFrame_triggered);
+    connect(ui->actionRemoveFrame,&QAction::triggered,
+            this,&PBVRGUI::on_actionRemoveFrame_triggered);
+    connect(ui->actionPlayFrames,&QAction::triggered,
+            this,&PBVRGUI::on_actionPlayFrames_triggered);
 }
 
 
@@ -369,23 +388,23 @@ void PBVRGUI::onDisconnect_From_ServerMenuAction()
 {
     showStatusMessage( "Disconnecting from server....\nNot implemented\n");
 }
-//#define PBVR_VERSION "OST"
+
 #define QUOTE(name) #name
 #define STR(macro) QUOTE(macro)
 
 void PBVRGUI::onAbout_PBVR_ClientMenuAction()
 {
-#ifdef CPUMODE
-    const char* graphics_mode="CPU";
-#else
-    const char* graphics_mode="GPU";
-#endif
+//#ifdef CPUMODE
+//    const char* graphics_mode="CPU";
+//#else
+//    const char* graphics_mode="GPU";
+//#endif
 #ifdef CS_MODE
-    const char* render_mode="CS";
+    const char* server_mode="CS";
 #else
-    const char* render_mode="IS";
+    const char* server_mode="IS";
 #endif
-    QString message=QString("\n\n\nPBVR QtClient \n\nRender mode:%1 \nServer mode:%2 \n\nVersion: %4").arg(graphics_mode, render_mode ,STR(PBVR_VERSION));
+    QString message=QString("\n\n\nPBVR QtClient \n\nServer mode:%2 \n\nVersion: %4").arg( server_mode ,STR(PBVR_VERSION));
     QMessageBox::aboutQt(this,  tr("About Qt"));
     QMessageBox::about(this,tr("About PBVR"), tr(message.toStdString().c_str()));
 }
@@ -536,3 +555,81 @@ void PBVRGUI::mousePressEvent(QMouseEvent *event)
 {
     QWidget::setFocus();
 }
+
+void PBVRGUI::on_actionZoomIn_triggered()
+{
+    std::cout<<" Zoom  in button"<<std::endl;
+    //    kvs::Xform xf= kvs_renderarea->scene()->objectManager()->xform();
+    kvs::Vec3 scale(1.25,1.25,1.25);
+    kvs_renderarea->scene()->objectManager()->scale( scale);
+    kvs_renderarea->update();
+}
+
+void PBVRGUI::on_actionZoomOut_triggered()
+{
+    std::cout<<" Zoom  Out button"<<std::endl;
+    kvs::Vec3 scale(0.8,0.8,0.8);
+    kvs_renderarea->scene()->objectManager()->scale(scale);
+    kvs_renderarea->update();
+}
+
+void PBVRGUI::on_actionXpos_triggered()
+{
+    std::cout<<" X pos button"<<std::endl;
+    kvs::Vec3 xlate(0.2,0.0,0.0);
+    kvs::Xform xf= kvs_renderarea->scene()->objectManager()->xform();
+    kvs_renderarea->scene()->objectManager()->translate(xf.scaling()* xlate);
+    kvs_renderarea->update();
+}
+
+void PBVRGUI::on_actionYpos_triggered()
+{
+    std::cout<<"  Y pos  button"<<std::endl;
+    kvs::Vec3 xlate(0.0,0.2,0.0);
+    kvs::Xform xf= kvs_renderarea->scene()->objectManager()->xform();
+    kvs_renderarea->scene()->objectManager()->translate(xf.scaling()* xlate);
+    kvs_renderarea->update();
+}
+void PBVRGUI::on_actionXneg_triggered()
+{
+    std::cout<<" X neg  button"<<std::endl;
+    //    kvs::Xform xf= kvs_renderarea->scene()->objectManager()->xform();
+    kvs::Vec3 xlate(-0.2,0.0,0.0);
+    kvs::Xform xf= kvs_renderarea->scene()->objectManager()->xform();
+    kvs_renderarea->scene()->objectManager()->translate(xf.scaling()* xlate);
+    kvs_renderarea->update();
+}
+
+void PBVRGUI::on_actionYneg_triggered()
+{
+    std::cout<<" Y neg  button"<<std::endl;
+    kvs::Vec3 xlate(0.0,-0.2,0.0);
+    kvs::Xform xf= kvs_renderarea->scene()->objectManager()->xform();
+    kvs_renderarea->scene()->objectManager()->translate(xf.scaling()* xlate);
+    kvs_renderarea->update();
+}
+
+void PBVRGUI::on_actionCPU_triggered()
+{
+    kvs_renderarea->switch_gpu(false);
+}
+
+void PBVRGUI::on_actionGPU_triggered()
+{
+    kvs_renderarea->switch_gpu(true);
+}
+
+void PBVRGUI::on_actionAddFrame_triggered()
+{
+    kvs_renderarea->animation_add();
+
+}
+void PBVRGUI::on_actionRemoveFrame_triggered()
+{
+    kvs_renderarea->animation_del();
+}
+void PBVRGUI::on_actionPlayFrames_triggered()
+{
+    kvs_renderarea->animation_play();
+}
+

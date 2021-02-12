@@ -24,5 +24,13 @@
         <file>Resources/images/viewclose.png</file>
         <file>Resources/images/viewgroup.png</file>
         <file>Resources/images/windowmenu.png</file>
+        <file>Resources/images/unlocked.png</file>
+        <file>Resources/images/locked.png</file>
+        <file>Resources/cpu_icon.png</file>
+        <file>Resources/gpu_icon.png</file>
+        <file>Resources/xpos.png</file>
+        <file>Resources/ypos.png</file>
+        <file>Resources/yneg.png</file>
+        <file>Resources/xneg.png</file>
     </qresource>
 </RCC>
