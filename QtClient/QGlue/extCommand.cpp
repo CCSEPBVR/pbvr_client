@@ -5,7 +5,7 @@
 #include "extCommand.h"
 
 #include <Client/v3defines.h>
-#include "Client/ExtendedParticleVolumeRenderer.h"
+//#include "Client/PBRProxy.h"
 
 #include <Panels/renderoptionpanel.h>
 #include <Panels/transformpanel.h>
