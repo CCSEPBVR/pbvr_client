@@ -156,12 +156,12 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:1.0, fx:0.5
    </property>
    <property name="iconSize">
     <size>
-     <width>64</width>
-     <height>64</height>
+     <width>24</width>
+     <height>24</height>
     </size>
    </property>
    <property name="toolButtonStyle">
-    <enum>Qt::ToolButtonTextOnly</enum>
+    <enum>Qt::ToolButtonIconOnly</enum>
    </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
@@ -172,10 +172,10 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:1.0, fx:0.5
    <addaction name="actionZoomIn"/>
    <addaction name="actionZoomOut"/>
    <addaction name="separator"/>
-   <addaction name="actionXpos"/>
    <addaction name="actionXneg"/>
-   <addaction name="actionYpos"/>
    <addaction name="actionYneg"/>
+   <addaction name="actionYpos"/>
+   <addaction name="actionXpos"/>
   </widget>
   <widget class="QToolBar" name="AnimationToolBar">
    <property name="windowTitle">
@@ -190,6 +190,7 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:1.0, fx:0.5
    <addaction name="actionAddFrame"/>
    <addaction name="actionRemoveFrame"/>
    <addaction name="actionPlayFrames"/>
+   <addaction name="separator"/>
   </widget>
   <widget class="QToolBar" name="DebugToolbar">
    <property name="windowTitle">
@@ -201,7 +202,6 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:1.0, fx:0.5
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionRrep"/>
    <addaction name="actionGPU"/>
    <addaction name="actionCPU"/>
   </widget>
@@ -362,8 +362,21 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:1.0, fx:0.5
    </property>
   </action>
   <action name="actionXpos">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/Resources/xpos.png</normaloff>:/Resources/xpos.png</iconset>
+   </property>
    <property name="text">
-    <string>X +</string>
+    <string>x+</string>
+   </property>
+   <property name="iconText">
+    <string>x+</string>
    </property>
    <property name="toolTip">
     <string>Move model in X+ direction [ x ]</string>
@@ -376,10 +389,20 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:1.0, fx:0.5
    <property name="shortcut">
     <string>X</string>
    </property>
+   <property name="visible">
+    <bool>true</bool>
+   </property>
   </action>
   <action name="actionXneg">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/Resources/xneg.png</normaloff>:/Resources/xneg.png</iconset>
+   </property>
    <property name="text">
-    <string>X -</string>
+    <string>x-</string>
+   </property>
+   <property name="iconText">
+    <string>x-</string>
    </property>
    <property name="toolTip">
     <string>Move model in X- direction [ Shift + x ]</string>
@@ -394,8 +417,12 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:1.0, fx:0.5
    </property>
   </action>
   <action name="actionYpos">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/Resources/ypos.png</normaloff>:/Resources/ypos.png</iconset>
+   </property>
    <property name="text">
-    <string>Y +</string>
+    <string>y⬇</string>
    </property>
    <property name="toolTip">
     <string>Move model in Y direction [  y ]</string>
@@ -410,8 +437,12 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:1.0, fx:0.5
    </property>
   </action>
   <action name="actionYneg">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/Resources/yneg.png</normaloff>:/Resources/yneg.png</iconset>
+   </property>
    <property name="text">
-    <string>Y -</string>
+    <string>y⬆</string>
    </property>
    <property name="toolTip">
     <string>Move model in X- direction [ Shift + y ]</string>
@@ -434,15 +465,12 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:1.0, fx:0.5
     <string>GPU</string>
    </property>
    <property name="toolTip">
-    <string>Increase Render Repetition Level</string>
+    <string>Enable GPU Rendering</string>
    </property>
    <property name="font">
     <font>
      <pointsize>16</pointsize>
     </font>
-   </property>
-   <property name="shortcut">
-    <string>R</string>
    </property>
   </action>
   <action name="actionCPU">
@@ -454,15 +482,12 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:1.0, fx:0.5
     <string>CPU</string>
    </property>
    <property name="toolTip">
-    <string>Increase Render Repetition Level</string>
+    <string>Enable CPU Rendering </string>
    </property>
    <property name="font">
     <font>
      <pointsize>16</pointsize>
     </font>
-   </property>
-   <property name="shortcut">
-    <string>R</string>
    </property>
   </action>
   <action name="actionAddFrame">
@@ -515,7 +540,7 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:1.0, fx:0.5
   </action>
   <action name="actionRrep">
    <property name="enabled">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="text">
     <string>Rrep =</string>
@@ -529,7 +554,7 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:1.0, fx:0.5
     </font>
    </property>
    <property name="visible">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
   </action>
  </widget>

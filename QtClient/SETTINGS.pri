@@ -15,8 +15,9 @@ CONFIG(release, debug|release) :RELTYPE=release
 include(SETTINGS_$${PLATFORM}.pri)
 
 ## DETERMINE PBVR_MODE MODE ##
+
 !contains(DEFINES, IS_MODE):!contains(DEFINES, CS_MODE){
-  DEFINES += CS_MODE
+  DEFINES += IS_MODE
 }
 contains(DEFINES, IS_MODE):PBVR_MODE=IS
 contains(DEFINES, CS_MODE):PBVR_MODE=CS
@@ -46,5 +47,5 @@ DEFINES += USING_PCH
 INCLUDEPATH += ../
 INCLUDEPATH += $(KVS_DIR)/include
 INCLUDEPATH += ../Common/$${PBVR_MODE}
-INCLUDEPATH += $${PBVR_PATH}/FunctionParser
+INCLUDEPATH += ../FunctionParser
 INCLUDEPATH += $(GLEW_DIR)/include

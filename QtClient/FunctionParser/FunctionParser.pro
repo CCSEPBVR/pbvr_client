@@ -25,8 +25,14 @@ HEADERS += \
 
 SOURCES += \
     function.cpp \
-    function_parser.cpp
+    function_parser.cpp \
+    main.cpp
 
+contains(DEFINES, IS_MODE) {
+SOURCES += \
+    ExpressionConverter.cpp \
+    ExpressionTokenizer.cpp \
+    ReversePolishNotation.cpp
 
 contains(DEFINES, IS_MODE) {
 SOURCES += \
