@@ -236,7 +236,12 @@ void TimecontrolPanel::onLastStepToggled(bool checked)
     extCommand->lastStepCheckBoxState=checked;
     ui->sliderControl->setDisabled(checked);
 //    MOD BY)T.Osaki 2020.03.05
+
+#ifdef IS_MODE
     setStepValue(extCommand->m_parameter.m_max_server_time_step);
+#else
+    setStepValue(extCommand->m_parameter.m_min_server_time_step);
+#endif
     blockEventHandling=false;
     extCommand->m_glut_timer->startSingleShot();
 }
