@@ -397,11 +397,6 @@ void PBVRGUI::onDisconnect_From_ServerMenuAction()
 
 void PBVRGUI::onAbout_PBVR_ClientMenuAction()
 {
-#ifdef CPUMODE
-    const char* graphics_mode="CPU";
-#else
-    const char* graphics_mode="GPU";
-#endif
 #ifdef CS_MODE
     const char* render_mode="CS";
 #else
@@ -614,11 +609,17 @@ void PBVRGUI::on_actionYneg_triggered()
 
 void PBVRGUI::on_actionCPU_triggered()
 {
+    ui->actionGPU->setChecked(false);
+    ui->actionGPU->setDisabled(false);
+    ui->actionCPU->setDisabled(true);
     kvs_renderarea->switch_gpu(false);
 }
 
 void PBVRGUI::on_actionGPU_triggered()
 {
+    ui->actionCPU->setChecked(false);
+    ui->actionCPU->setDisabled(false);
+    ui->actionGPU->setDisabled(true);
     kvs_renderarea->switch_gpu(true);
 }
 

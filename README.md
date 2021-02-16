@@ -1,5 +1,5 @@
 # pbvr_client
-PBVR QtClient for PBVR, a Particle Based Volume Rendering framework for Client-Server or  Insitu use in HPC environments.
+PBVR QtClient for PBVR, a Particle Based Volume Rendering framework for Client-Server or Insitu use in HPC environments.
 
 
 # Build KVS 
