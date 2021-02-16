@@ -34,6 +34,6 @@ INCLUDEPATH += ../Common/$${PBVR_MODE}
 INCLUDEPATH += ../FunctionParser
 
 !isEmpty(KVS_GLEW_DIR){
-    DEFINES += KVS_SUPPORT_GLEW
+    DEFINES += KVS_ENABLE_GLEW
     INCLUDEPATH += $(GLEW_DIR)/include
 }

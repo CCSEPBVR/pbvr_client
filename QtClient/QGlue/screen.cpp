@@ -1,4 +1,4 @@
-#ifdef KVS_SUPPORT_GLEW
+#ifdef KVS_ENABLE_GLEW
 #include <GL/glew.h>
 #endif
 #include "screen.h"
@@ -119,7 +119,7 @@ void Screen::initializeGL()
         qWarning("Screen::initalizeGL while surface still not valid ");
         return;
     }
-#ifdef KVS_SUPPORT_GLEW
+#ifdef KVS_ENABLE_GLEW
     // If KVS is compiled with glew support, it is important that we init glew before
     // we initalize OpenGLFunctions.
     GLenum result = glewInit();
