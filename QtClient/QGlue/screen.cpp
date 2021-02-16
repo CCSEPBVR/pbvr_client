@@ -1,4 +1,6 @@
-//#include <GL/glew.h>
+#ifdef KVS_SUPPORT_GLEW
+#include <GL/glew.h>
+#endif
 #include "screen.h"
 #include <kvs/FrameBufferObject>>
 #include <kvs/OpenGL>
@@ -117,12 +119,14 @@ void Screen::initializeGL()
         qWarning("Screen::initalizeGL while surface still not valid ");
         return;
     }
-//    GLenum result = glewInit();
-//    if ( result != GLEW_OK )
-//    {
-//        const GLubyte* message = glewGetErrorString( result );
-//        qFatal("GLEW initialization failed. ");
-//    }
+#ifdef KVS_SUPPORT_GLEW
+    GLenum result = glewInit();
+    if ( result != GLEW_OK )
+    {
+        const GLubyte* message = glewGetErrorString( result );
+        qFatal("GLEW initialization failed. ");
+    }
+#endif
     initializeOpenGLFunctions();
     onInitializeGL();
     m_gl_initialized=true;

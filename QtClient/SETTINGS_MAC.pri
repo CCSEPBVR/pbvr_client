@@ -14,7 +14,6 @@ PBVR_LPATH=$${PBVR_PATH}/x64/$${RELTYPE}
 LIB_PREFIX = lib
 LIB_SUFFIX = .a
 
-
 KVS_DIR = ../../QtClient/KVS/
 FP_DIR  = ../../FunctionParser
 
