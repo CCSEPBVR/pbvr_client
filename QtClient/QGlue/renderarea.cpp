@@ -87,6 +87,7 @@ void RenderArea::restoreXForm()
     m_scene->objectManager()->scale(m_stored_xf.scaling());
     m_scene->objectManager()->rotate(m_stored_xf.rotation());
 }
+
 /**
  * @brief RenderArea::setRenderRepetitionLevel, set render repetition level.
  * @param level
@@ -96,10 +97,14 @@ void RenderArea::setRenderRepetitionLevel(int level)
     level=level>1?level:1;
     if(level != m_renderer.getRepetitionLevel()){
         m_renderer.setRepetitionLevel( level );
+        // Replacement of renderer is required to get correct output with
+        // kvs::glsl::ParticleBasedRenderer when changing repetition level after the
+        // the renderers first render function call. (kvs 2.9.0)
         m_scene->replaceRenderer(m_obj_id_pair.second, m_renderer.pbr_pointer(), false);
 
-        // The lines below are a work around for m_initial_modelview problem
-        // in kvs::glsl::ParticleBasedRenderer.
+        // The lines below are a work around for m_initial_modelview problem that occurs
+        // when replacing the renderer while zoom is applied.
+        // in kvs::glsl::ParticleBasedRenderer.  (kvs 2.9.0)
         makeCurrent();
         // Save current X form
         storeCurrentXForm();

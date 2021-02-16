@@ -120,6 +120,8 @@ void Screen::initializeGL()
         return;
     }
 #ifdef KVS_SUPPORT_GLEW
+    // If KVS is compiled with glew support, it is important that we init glew before
+    // we initalize OpenGLFunctions.
     GLenum result = glewInit();
     if ( result != GLEW_OK )
     {
