@@ -74,6 +74,9 @@ set to the same location as the when building KVS
       #KVS_GLEW_DIR - Path to GLEW, Only if KVS was compiled with option KVS_ENABLE_GLEW
       #KVS_GLEW_DIR =  /Users/jaea/pbvr_dev/OpenGL
 
+
+## Building QtPBVR
+
       cd ~/pbvr_dev
       git clone https://github.com/CCSEPBVR/pbvr_client.git
       cd pbvr_client
