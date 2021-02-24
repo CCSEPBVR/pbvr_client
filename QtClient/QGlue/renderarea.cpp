@@ -95,7 +95,7 @@ void RenderArea::restoreXForm()
 void RenderArea::setRenderRepetitionLevel(int level)
 {
     level=level>1?level:1;
-    if(level != m_renderer.getRepetitionLevel()){
+//    if(level != m_renderer.getRepetitionLevel()){
         m_renderer.setRepetitionLevel( level );
         // Replacement of renderer is required to get correct output with
         // kvs::glsl::ParticleBasedRenderer when changing repetition level after the
@@ -117,7 +117,7 @@ void RenderArea::setRenderRepetitionLevel(int level)
         // Paint the frame again, to erase previous frame
         m_scene->paintFunction();
         doneCurrent();
-    }
+//    }
 }
 
 
@@ -417,9 +417,9 @@ void RenderArea::keyPressEvent(QKeyEvent *kbEvent){
         m_scene->controlTarget() = m_scene->TargetObject;
         break;
 
-    case kvs::Key::a:
+    case kvs::Key::x:
         //2020,11,27 T.Osaki sceneが持っているObjectManagerのXfromを使用する。
-        qInfo(" [debug] 'a' pressed. (add Xform)");
+        qInfo(" [debug] 'x' pressed. (add Xform)");
         //        KeyFrameAnimationAdd(this->getPointObjectXform());
         KeyFrameAnimationAdd(this->scene()->objectManager()->xform());
         break;

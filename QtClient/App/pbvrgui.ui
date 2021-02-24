@@ -387,7 +387,7 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:1.0, fx:0.5
     </font>
    </property>
    <property name="shortcut">
-    <string>X</string>
+    <string>Right</string>
    </property>
    <property name="visible">
     <bool>true</bool>
@@ -413,7 +413,7 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:1.0, fx:0.5
     </font>
    </property>
    <property name="shortcut">
-    <string>Shift+X</string>
+    <string>Left</string>
    </property>
   </action>
   <action name="actionYpos">
@@ -433,7 +433,7 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:1.0, fx:0.5
     </font>
    </property>
    <property name="shortcut">
-    <string>Y</string>
+    <string>Up</string>
    </property>
   </action>
   <action name="actionYneg">
@@ -453,7 +453,7 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:1.0, fx:0.5
     </font>
    </property>
    <property name="shortcut">
-    <string>Shift+Y</string>
+    <string>Down</string>
    </property>
   </action>
   <action name="actionGPU">

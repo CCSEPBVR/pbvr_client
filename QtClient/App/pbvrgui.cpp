@@ -235,6 +235,9 @@ void PBVRGUI::restoreDefaultLayout()
     systemstatusPanel.setVisible(true);
     filterinfoPanel.setVisible(true);
     timecontrolPanel.setVisible(true);
+    ui->AnimationToolBar->setVisible(true);
+    ui->RenderModeToolBar->setVisible(true);
+    ui->XformToolBar->setVisible(true);
 }
 /**
  * @brief PBVRClient::showMessage, show a simple modal message box
