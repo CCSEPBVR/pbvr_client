@@ -5,12 +5,17 @@
 #include <QGlue/extCommand.h>
 #include <QGlue/renderarea.h>
 
+LegendPanel* LegendPanel::instance = 0;
 LegendPanel::LegendPanel(QWidget *parent) :
     QDockWidget(parent),
     ui(new Ui::LegendPanel)
 {
     ui->setupUi(this);
-
+    if(instance!=0){
+        qWarning("LegendPanel:: allows only one instance");
+        delete instance;
+    }
+    instance=this;
     m_legend_display_value[0] = 0;
     m_divisionision_rgb_color.set( 0, 0, 0 );
     m_franeline_rgb_color.set( 0, 0, 0 );
@@ -508,4 +513,35 @@ void LegendPanel::onDisplayLegendChanged(int val)
 {
     m_legend->setVisible(val);
     extCommand->m_screen->update();
+}
+
+void LegendPanel::changeTFValue()
+{
+    qInfo(">>>>functionName");
+    if(!instance) return;
+    Ui::LegendPanel* ui=instance->ui;
+
+    int currentIndex = ui->colormapFunction->currentIndex();
+    ui->colormapFunction->clear();
+    if (extCommand == NULL) return;
+    const kvs::visclient::ExtendedTransferFunctionMessage *m_doc =
+            &extCommand->m_parameter.m_parameter_extend_transfer_function;
+#ifdef CS_MODE
+    const std::vector<NamedTransferFunctionParameter> m_color_transfer_function =
+            m_doc->m_color_transfer_function;
+#else
+    const std::vector<NamedTransferFunctionParameter> m_color_transfer_function =
+            //            m_doc->m_transfer_function;
+            m_doc->m_color_transfer_function;
+#endif
+
+    int max_color = 0;
+    std::vector<NamedTransferFunctionParameter>::const_iterator itr;
+    for (itr=m_color_transfer_function.begin(); itr!=m_color_transfer_function.end(); itr++) {
+        const char *name = itr->m_name.c_str();
+        int n_color = atoi(name+1);
+        if (max_color < n_color) max_color = n_color;
+        ui->colormapFunction->addItem(name,(int)NULL);
+    }
+    ui->colormapFunction->setCurrentIndex(currentIndex);
 }

@@ -25,10 +25,10 @@ LIBS += -L$$(KVS_DIR)/lib -lkvsCore
 
 !isEmpty(KVS_GLEW_DIR){
     win32{
-        LIBS += -L$$(GLEW_DIR)/lib -lglew32
+        LIBS += -L$$(KVS_GLEW_DIR)/lib -lglew32
     }
     else {
-        LIBS += -L$$(GLEW_DIR)/lib
+        LIBS += -L$$(KVS_GLEW_DIR)/lib
     }
     unix:macx:LIBS +=  -lglew
     unix:!macx:LIBS += -lGLEW -lGLU

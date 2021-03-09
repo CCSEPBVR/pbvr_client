@@ -21,10 +21,11 @@ KVSMLObjectPointWriter::KVSMLObjectPointWriter( const kvs::PointObject& object, 
 void KVSMLObjectPointWriter::write_main_tag()
 {
     const std::string basename_wo_dir = m_basename.substr( m_basename.rfind( kvs::Directory::Separator() ) + 1 );
+    std::string basefilename = basename_wo_dir.substr(basename_wo_dir.find_last_of('/') + 1);
     std::string kvsml_filename    = m_basename + ".kvsml";
-    std::string coords_filename   = basename_wo_dir + "_coords.dat";
-    std::string colors_filename   = basename_wo_dir + "_colors.dat";
-    std::string normals_filename  = basename_wo_dir + "_normals.dat";
+    std::string coords_filename   = basefilename + "_coords.dat";
+    std::string colors_filename   = basefilename + "_colors.dat";
+    std::string normals_filename  = basefilename + "_normals.dat";
 
     FILE* kvsml_file = fopen( kvsml_filename.c_str(), "w" );
 

@@ -1,6 +1,5 @@
 ## VERSION
 DEFINES += PBVR_VERSION="1.15-UF"
-
 ## DETERMINE PLATFORM  ##
 win32:PLATFORM=WIN
 unix:!macx:PLATFORM=UNX
@@ -29,11 +28,15 @@ DEFINES += USING_PCH
 
 #PBVR INCLUDE PATHS
 INCLUDEPATH += ../
-INCLUDEPATH += $(KVS_DIR)/include
+INCLUDEPATH += $$(KVS_DIR)/include
 INCLUDEPATH += ../Common/$${PBVR_MODE}
 INCLUDEPATH += ../FunctionParser
 
+message(KVS_GLEW_DIR :: $${KVS_GLEW_DIR})
 !isEmpty(KVS_GLEW_DIR){
+    message("KVS_GLEW_DIR in configured. defining KVS_ENABLE_GLEW")
     DEFINES += KVS_ENABLE_GLEW
-    INCLUDEPATH += $(GLEW_DIR)/include
+    INCLUDEPATH += $(KVS_GLEW_DIR)/include
 }
+
+message("INCLUDE PATH IS::"$${INCLUDEPATH})

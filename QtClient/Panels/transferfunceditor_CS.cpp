@@ -10,6 +10,8 @@
 #include <fstream>
 #include <QGlue/typedSignalConnect.h>
 
+#include "Panels/legendpanel.h"
+
 static bool blockEventHandling=false;
 static kvs::visclient::FrequencyTable ft;
 static kvs::visclient::ExtendedTransferFunctionMessage importdoc;
@@ -89,6 +91,7 @@ void TransferFuncEditor::apply()
 
     extCommand->m_parameter.m_parameter_extend_transfer_function = m_doc;
     extCommand->m_screen->update();
+    LegendPanel::changeTFValue();
 }
 
 

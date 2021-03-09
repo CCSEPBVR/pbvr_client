@@ -33,6 +33,7 @@ public:
     ~LegendPanel();
 
 private:
+    static LegendPanel* instance;
     //        void createPanel( QGlue::LegendBar* legend, kvs::ScreenBase* parent );
     void setColorMapFunction(const kvs::visclient::Command* command);
     void populateColormapFunctions(const Command* command);
@@ -66,6 +67,8 @@ private:     // Event handlers
     void onFrameColorBtnClicked();
     void onSetBtnClicked();
 
+public:
+    static void changeTFValue();
 private:
     Ui::LegendPanel *ui;
 
