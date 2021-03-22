@@ -517,7 +517,6 @@ void LegendPanel::onDisplayLegendChanged(int val)
 
 void LegendPanel::changeTFValue()
 {
-    qInfo(">>>>functionName");
     if(!instance) return;
     Ui::LegendPanel* ui=instance->ui;
 

@@ -150,7 +150,7 @@ int jpv::ParticleTransferClient::recvMessage( ParticleTransferServerMessage& mes
         message.m_message_size = 0;
         for ( rSize = 0; rSize < hSize; rSize += recvSize )
         {
-            fprintf( stdout,"ParticleTransferClient_Debug0");
+//            fprintf( stdout,"ParticleTransferClient_Debug0");
             recvSize = recv( m_sock, hsbuf, hSize - rSize, 0 );
 // MODIFIED START Fj 2015.03.04
             if ( recvSize < 0 )
@@ -159,14 +159,14 @@ int jpv::ParticleTransferClient::recvMessage( ParticleTransferServerMessage& mes
             }
             else
             {
-                        fprintf( stdout,"ParticleTransferClient_Debug1");
+//                        fprintf( stdout,"ParticleTransferClient_Debug1");
                 ss.write( hsbuf, recvSize );
             }
 // MODIFIED END   Fj 2015.03.04
         }
-        fprintf( stdout,"ParticleTransferClient_Debug2");
+//        fprintf( stdout,"ParticleTransferClient_Debug2");
         ss.seekg( sizeof( message.m_header ) );
-                fprintf( stdout,"ParticleTransferClient_Debug3");
+//                fprintf( stdout,"ParticleTransferClient_Debug3");
         ss.read( reinterpret_cast<char*>( &message.m_message_size ), sizeof( message.m_message_size ) );
         std::cout << "Receive Server Message Size = " << message.m_message_size << std::endl;
 
