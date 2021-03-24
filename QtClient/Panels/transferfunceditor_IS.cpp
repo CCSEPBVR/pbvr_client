@@ -436,7 +436,10 @@ void TransferFuncEditor::displayTransferFunction()
     this->populateOpacityFunctionLists(m_doc.m_transfer_function_number);
     ui->transfer_function_var_color->setText(m_doc.m_color_transfer_function[n].m_color_variable.c_str());
     ui->transfer_function_var_opacity->setText(m_doc.m_opacity_transfer_function[n].m_opacity_variable.c_str());
-
+    ui->transfer_function_min_color->setValue( m_doc.m_color_transfer_function[n].m_color_variable_min);
+    ui->transfer_function_max_color->setValue( m_doc.m_color_transfer_function[n].m_color_variable_max);
+    ui->transfer_function_min_opacity->setValue( m_doc.m_opacity_transfer_function[n].m_opacity_variable_min);
+    ui->transfer_function_max_opacity->setValue( m_doc.m_opacity_transfer_function[n].m_opacity_variable_max);
 
 
     if ( extCommand->m_result.m_color_bins.size() > n )
@@ -907,12 +910,12 @@ void TransferFuncEditor::onTransferFunctionVarColorEdited(const QString &arg1)
     // 更新：存在しなければ追加
     m_doc.setColorTransferFunction(fName, variable);
     // 既存の場合は最小値、最大値を設定する。（新規の場合は、[0]のコピーを作成済み
-//    if (exists) {
-//        // 最小値、最大値
-//        this->m_doc.setColorTransferRange(fName,
-//                                          ui->transfer_function_min_color->value(),
-//                                          ui->transfer_function_max_color->value());
-//    }
+    if (exists) {
+        // 最小値、最大値
+        this->m_doc.setColorTransferRange(fName,
+                                          ui->transfer_function_min_color->value(),
+                                          ui->transfer_function_max_color->value());
+    }
 }
 
 /**
@@ -929,11 +932,11 @@ void TransferFuncEditor::onTransferFunctionVarOpacityEdited(const QString &arg1)
     // 更新：存在しなければ追加
     m_doc.setOpacityTransferFunction(fName, variable);
     // 最小値、最大値
-//    if (exists) {
-//        // MODIFIED BY)T.Osaki 2019.12.20
-//        m_doc.setOpacityTransferRange(fName, ui->transfer_function_min_opacity->value(),
-//                                      ui->transfer_function_max_opacity->value());
-//    }
+    if (exists) {
+        // MODIFIED BY)T.Osaki 2019.12.20
+        m_doc.setOpacityTransferRange(fName, ui->transfer_function_min_opacity->value(),
+                                      ui->transfer_function_max_opacity->value());
+    }
 }
 
 /**
