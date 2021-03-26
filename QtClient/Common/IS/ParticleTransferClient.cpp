@@ -75,9 +75,9 @@ int jpv::ParticleTransferClient::termClient( void )
 {
 
 #if defined WIN32
-    shutdown( sock, SD_BOTH );
+    shutdown( m_sock, SD_BOTH );
     std::cout << "shutdown connection" << std::endl;
-    closesocket( sock );
+    closesocket( m_sock );
     std::cout << "close socket" << std::endl;
     WSACleanup();
 #else

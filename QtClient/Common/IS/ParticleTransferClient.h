@@ -21,7 +21,7 @@ protected:
     std::string m_hostname;
     int m_port;
 #if defined WIN32
-    SOCKET sock;
+    SOCKET m_sock;
 #else
     int m_sock;
 #endif
