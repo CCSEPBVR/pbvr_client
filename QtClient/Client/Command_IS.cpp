@@ -272,12 +272,14 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
                     {
 #endif
                         //delete detailedParticles[param.timeStep];
-                        m_detailed_particles[param->m_time_step] = m_server->getPointObjectFromServer( *param, result, numvol, param->m_time_step );
+                        m_detailed_particles[param->m_time_step] = m_server->getPointObjectFromServer(*param, result, numvol, param->m_time_step ,PBVRmincoords,PBVRmaxcoords);
+//                        m_detailed_particles[param->m_time_step] = m_server->getPointObjectFromServer(*param, result, numvol, param->m_time_step);
 #ifndef CPUMODE
                     }
                     else if (  param->m_repeat_level < param->m_detailed_repeat_level )
                     {
-                        PointObject* dividedObject = m_server->getPointObjectFromServer( *param, result, numvol,param->m_time_step  );
+                        PointObject* dividedObject = m_server->getPointObjectFromServer(*param, result, numvol, param->m_time_step ,PBVRmincoords,PBVRmaxcoords);
+//                        PointObject* dividedObject = m_server->getPointObjectFromServer(*param, result, numvol, param->m_time_step);
                         m_detailed_particles[param->m_time_step]->add( *dividedObject );
                         delete dividedObject;
                     }
@@ -289,7 +291,8 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
                 }
                 else if ( param->m_detailed_transfer_type == VisualizationParameter::Summalized ) //jupiter_branch
                 {
-                    kvs::PointObject* tmp_po = m_server->getPointObjectFromServer( *param, result, numvol, param->m_time_step );
+                    kvs::PointObject* tmp_po = m_server->getPointObjectFromServer(*param, result, numvol, param->m_time_step ,PBVRmincoords,PBVRmaxcoords);
+//                    kvs::PointObject* tmp_po = m_server->getPointObjectFromServer(*param, result, numvol, param->m_time_step);
                     if ( result->serverTimeStep > -1 ) param->m_time_step = result->serverTimeStep;
                     param->m_min_server_time_step = result->minServerTimeStep ;
                     param->m_max_server_time_step = result->maxServerTimeStep ;
