@@ -219,11 +219,7 @@ kvs::PointObject* ParticleServer::getPointObjectFromServer( const VisualizationP
             }
 
 //          kvs::visclient::Profiler::get()->end( "receive time" );
-            std::cout << reply.m_number_particle << " received." <<  std::endl;
-            std::cout << "hist_debug" << std::endl;
-            for(int i = 0; i < 256; i++){
-            std::cout << reply.m_color_bins[0][i] << "," << std::endl;
-            }
+
             result->m_var_range.merge( reply.m_variable_range );
 
             /* 140319 for client stop by server Ctrl+c */
@@ -311,7 +307,6 @@ kvs::PointObject* ParticleServer::getPointObjectFromServer( const VisualizationP
 //      client.recvMessage( reply );
         result->m_color_bins.resize( reply.m_transfer_function_count );
         result->m_opacity_bins.resize( reply.m_transfer_function_count );
-
         for ( int tf = 0; tf < reply.m_transfer_function_count; tf++ )
         {
             if ( reply.m_color_nbins[tf] > 0 )
@@ -611,11 +606,7 @@ kvs::PointObject* ParticleServer::getPointObjectFromServer( const VisualizationP
             }
 
 //          kvs::visclient::Profiler::get()->end( "receive time" );
-            std::cout << reply.m_number_particle << " received." <<  std::endl;
-            std::cout << "hist_debug" << std::endl;
-            for(int i = 0; i < 256; i++){
-            std::cout << reply.m_color_bins[0][i] << "," << std::endl;
-            }
+
             result->m_var_range.merge( reply.m_variable_range );
 
             /* 140319 for client stop by server Ctrl+c */
