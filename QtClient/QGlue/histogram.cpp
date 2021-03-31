@@ -8,7 +8,7 @@
 
 #include <QApplication>
 #include <QDesktopWidget>
-std::vector<size_t> s_table( 1024 );
+std::vector<size_t> s_table( 256 );
 
 namespace QGlue
 {
