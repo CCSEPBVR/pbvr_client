@@ -6,7 +6,7 @@ QT       += core gui opengl widgets
 PRECOMPILED_HEADER=stable.h
 
 CONFIG += warn_off
-QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.14
+QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.15
 
 include( ../SETTINGS.pri)
 message (Building PBVR:$${TARGET}  Mode:$${PBVR_MODE}  Platform: $${PLATFORM} Release: $${RELTYPE})
