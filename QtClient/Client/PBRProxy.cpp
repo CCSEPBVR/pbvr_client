@@ -1,4 +1,5 @@
 #include "PBRProxy.h"
+#include <assert.h>
 using namespace  kvs::visclient;
 
 
