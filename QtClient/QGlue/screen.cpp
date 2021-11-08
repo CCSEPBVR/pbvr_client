@@ -2,11 +2,17 @@
 #include <GL/glew.h>
 #endif
 #include "screen.h"
-#include <kvs/FrameBufferObject>>
+#include <kvs/FrameBufferObject>
 #include <kvs/OpenGL>
 #include <kvs/Camera>
 #include <QElapsedTimer>
 #include <QMutex>
+
+#include <kvs/ObjectBase>
+#include <kvs/ObjectManager>
+#include <kvs/IDManager>
+#include <kvs/RendererManager>
+#include <kvs/RendererBase>
 
 extern QMutex paint_mutex;
 /**
@@ -67,7 +73,8 @@ void Screen::paintGL()
     p.loadIdentity();
     {
         timer.start();
-        m_scene->paintFunction();
+//        m_scene->paintFunction();
+        m_compositor->update();
         m_fps = 1.0 / ((double)timer.elapsed()/1000.0);
     }
     glPopAttrib();
@@ -131,6 +138,16 @@ void Screen::initializeGL()
 #endif
     initializeOpenGLFunctions();
     onInitializeGL();
+
+    m_compositor = new kvs::StochasticRenderingCompositor( m_scene );
+//    m_compositor->setRepetitionLevel( 16 );
+    std::cout << __LINE__ <<  m_compositor->repetitionLevel() << std::endl;
+    //m_compositor->enableLODControl();
+    m_compositor->disableLODControl();
+    BaseClass::eventHandler()->attach( m_compositor );
+    m_compositor->initializeEvent();
+    this->m_enable_default_paint_event = false;
+
     m_gl_initialized=true;
 }
 

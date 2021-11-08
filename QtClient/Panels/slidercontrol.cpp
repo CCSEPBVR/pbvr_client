@@ -173,9 +173,11 @@ void SliderControl::on_timeSlider_sliderMoved(int position)
 void SliderControl::on_maxSlider_valueChanged(int value)
 {
     qInfo("SliderControl::on_maxSlider_valueChanged %d" ,value);
-    limitSliderToMax(ui->minSlider , value-stepSize);
+//    limitSliderToMax(ui->minSlider , value-stepSize);
+    limitSliderToMax(ui->minSlider , value);
     limitSliderToMax(ui->timeSlider, value);
-    limitSliderToMin(ui->maxSlider , ui->minSlider->minimum() + stepSize);
+//    limitSliderToMin(ui->maxSlider , ui->minSlider->minimum() + stepSize);
+    limitSliderToMin(ui->maxSlider , ui->minSlider->minimum());
     snapAllSlidersToTick();
     max=ui->maxSlider->value()/stepSize;
     //ADD BY)T.Osaki 2020.03.06
@@ -189,7 +191,8 @@ void SliderControl::on_maxSlider_valueChanged(int value)
  */
 void SliderControl::on_maxSlider_sliderMoved(int position)
 {
-    limitSliderToMax(ui->minSlider,position-stepSize);
+//    limitSliderToMax(ui->minSlider,position-stepSize);
+    limitSliderToMax(ui->minSlider,position);
     limitSliderToMax(ui->timeSlider,position);
 }
 
@@ -201,9 +204,11 @@ void SliderControl::on_maxSlider_sliderMoved(int position)
 void SliderControl::on_minSlider_valueChanged(int value)
 {
     qInfo("SliderControl::on_minSlider_valueChanged %d", value);
-    limitSliderToMin(ui->maxSlider, value+stepSize);
+//    limitSliderToMin(ui->maxSlider, value+stepSize);
+    limitSliderToMin(ui->maxSlider, value);
     limitSliderToMin(ui->timeSlider,value);
-    limitSliderToMax(ui->minSlider,  ui->maxSlider->maximum() - stepSize);
+//    limitSliderToMax(ui->minSlider,  ui->maxSlider->maximum() - stepSize);
+    limitSliderToMax(ui->minSlider,  ui->maxSlider->maximum());
     snapAllSlidersToTick();
     min=ui->minSlider->value()/stepSize;
     //ADD BY)T.Osaki 2020.03.06
@@ -217,6 +222,7 @@ void SliderControl::on_minSlider_valueChanged(int value)
  */
 void SliderControl::on_minSlider_sliderMoved(int position)
 {
-    limitSliderToMin(ui->maxSlider, position+stepSize);
+//    limitSliderToMin(ui->maxSlider, position+stepSize);
+    limitSliderToMin(ui->maxSlider, position);
     limitSliderToMin(ui->timeSlider,position);
 }

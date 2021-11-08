@@ -8,6 +8,7 @@
 #include <kvs/ScreenBase>
 #include <kvs/Scene>
 
+#include <kvs/StochasticRenderingCompositor>
 
 /**
  * @brief The Screen class, this class is designed as a combined and simplified version
@@ -36,7 +37,7 @@ private:
 protected:
     kvs::Scene* m_scene;
     bool m_gl_initialized;
-
+    kvs::StochasticRenderingCompositor *m_compositor;
 
 public:
     Screen( QWidget* parent_surface = NULL);

@@ -104,6 +104,10 @@ public:
     bool m_hasfin;
 #endif
 
+    //OSAKI
+    std::string m_polygon_model_filename;
+    //OSAKI
+
     VisualizationParameter() :
         m_time_step( 0 ),
         m_abstract_subpixel_level( 2 ),
@@ -121,7 +125,10 @@ public:
         m_client_server_mode( 1 ),
         m_rendering_id( 0 ),
         m_shading_type_flag( false ),
-        m_no_repsampling( 0 )
+        m_no_repsampling( 0 ),
+        //OSAKI
+        m_polygon_model_filename("")
+        //OSAKI
     {
         m_repeat_level = m_detailed_repeat_level;
         m_shuffle_type = RandomBased;

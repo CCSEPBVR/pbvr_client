@@ -97,6 +97,7 @@ void RenderArea::setRenderRepetitionLevel(int level)
     level=level>1?level:1;
 //    if(level != m_renderer.getRepetitionLevel()){
         m_renderer.setRepetitionLevel( level );
+        m_compositor->setRepetitionLevel( level );
         // Replacement of renderer is required to get correct output with
         // kvs::glsl::ParticleBasedRenderer when changing repetition level after the
         // the renderers first render function call. (kvs 2.9.0)
@@ -111,11 +112,13 @@ void RenderArea::setRenderRepetitionLevel(int level)
         // Reset object Manager's XForm
         m_scene->objectManager()->resetXform();
         // Manually call  paint function, to set m_initial_xform in Renderer
-        m_scene->paintFunction();
+//        m_scene->paintFunction();
+//        m_compositor->update();
         // Restore xform to original scene xform
         restoreXForm();
         // Paint the frame again, to erase previous frame
-        m_scene->paintFunction();
+//        m_scene->paintFunction();
+        m_compositor->update();
         doneCurrent();
 //    }
 }
@@ -759,11 +762,13 @@ void RenderArea::switch_gpu(bool f)
     // Reset object Manager's XForm
     m_scene->objectManager()->resetXform();
     // Manually call  paint function, to set m_initial_xform in Renderer
-    m_scene->paintFunction();
+//    m_scene->paintFunction();
+    m_compositor->update();
     // Restore xform to original scene xform
     restoreXForm();
     // Paint the frame again, to erase previous frame
-    m_scene->paintFunction();
+//    m_scene->paintFunction();
+    m_compositor->update();
     doneCurrent();
     update();
 }

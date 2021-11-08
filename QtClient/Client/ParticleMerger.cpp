@@ -154,7 +154,7 @@ void ParticleMerger::setParam( const ParticleMergeParameter& param, const size_t
                     std::cout << prefix << std::endl;
                     FILE* serverMinMaxCoords_file = fopen(filename_minMax.c_str(),"r");
                     if(serverMinMaxCoords_file == NULL)
-                    {
+                    {                    
                         const kvs::Vector3f& min_t = impobj->minObjectCoord();
                         const kvs::Vector3f& max_t = impobj->maxObjectCoord();
                         m_parameter.m_particles[n].m_x_min = min_t[0];
@@ -289,12 +289,52 @@ kvs::PointObject* ParticleMerger::doMerge(
         //== start
         //size_t filestep = std::max( std::min( step, m_final_step[n] ), m_initial_step[n] );
         size_t filestep  = step;
-        if (m_parameter.m_particles[n].m_keep_initial_step)
-            filestep = m_initial_step[n];
-        else if (m_parameter.m_particles[n].m_keep_final_step)
-            filestep = m_final_step[n];
-        if (filestep < m_initial_step[n] || filestep > m_final_step[n]) continue;
+//        if (m_parameter.m_particles[n].m_keep_initial_step)
+//            filestep = m_initial_step[n];
+//        else if (m_parameter.m_particles[n].m_keep_final_step)
+//            filestep = m_final_step[n];
+//        if (filestep < m_initial_step[n] || filestep > m_final_step[n]) continue;
+
+        if(m_parameter.m_particles[n].m_keep_final_step == false && m_parameter.m_particles[n].m_keep_initial_step == false){
+            if(m_final_step[n] < filestep){
+            }else if(m_initial_step[n] <= filestep){
+            }else{
+            }
+        }
+
+        if(m_parameter.m_particles[n].m_keep_final_step == true && m_parameter.m_particles[n].m_keep_initial_step == false){
+            if(m_final_step[n] < filestep){
+                filestep = m_final_step[n];
+            }else if(m_initial_step[n] <= filestep){
+            }else{
+            }
+        }
+
+        if(m_parameter.m_particles[n].m_keep_final_step == false && m_parameter.m_particles[n].m_keep_initial_step == true){
+            if(m_initial_step[n] > filestep){
+                filestep = m_initial_step[n];
+            }else if(m_final_step[n] >= filestep){
+            }else{
+            }
+        }
+
+        if(m_parameter.m_particles[n].m_keep_final_step == true && m_parameter.m_particles[n].m_keep_initial_step == true){
+            if(m_final_step[n] < filestep){
+                filestep = m_final_step[n];
+            }else if(m_initial_step[n] <= filestep){
+            }else if(m_initial_step[n] > filestep){
+                filestep = m_initial_step[n];
+            }else{
+            }
+        }
+
         //== end
+        std::cout << __func__ << ":" << __LINE__ << std::endl;
+        std::cout << "filestep:" << filestep << std::endl;
+        std::cout << "m_parameter.m_particles[" << n << "].m_keep_initial_step):" << m_parameter.m_particles[n].m_keep_initial_step << std::endl;
+        std::cout << "m_final_step[" << n << "]:" << m_final_step[n] << std::endl;
+        std::cout << "m_initial_step[" << n << "]:" << m_initial_step[n] << std::endl;
+
         for ( size_t m = 0; m < m_division[n]; m++ )
         {
             std::string prefix = m_file_prefix[n];

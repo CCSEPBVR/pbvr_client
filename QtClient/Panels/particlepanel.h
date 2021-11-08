@@ -5,6 +5,8 @@
 #include "QGlue/extCommand.h"
 #include <QCheckBox>
 #include <QGroupBox>
+
+#include "coloreditdialog.h"
 namespace Ui {
 class ParticlePanel;
 }
@@ -38,6 +40,9 @@ private:
     void onSetButtonClick();
     void onCloseButtonClick();
 
+    void onDivColorChanged();
+    void changeOpacityValue();
+
 private:
 
     int m_total_item;
@@ -49,6 +54,11 @@ private:
     bool m_file_path_changed[11];
     bool m_do_export;
     bool m_changed;
+    bool m_polygon_changed[5];
+    bool m_color_opacity_changed[5] = {false,false,false,false,false};
+//    kvs::UInt8 m_polygon_opacity[5]= {128,128,128,128,128};
+    double m_polygon_opacity[5]= {0.5,0.5,0.5,0.5,0.5};
+    kvs::RGBColor m_polygon_color[5];
     int m_start_export_time;
 
 //    QFileDialog* m_file_dialog_file;
@@ -61,6 +71,8 @@ private:
     QString m_text_output_file_path;
     kvs::visclient::ParticleMergeParameter* m_param;
     Ui::ParticlePanel *ui;
+
+    ColorEditDialog* m_polygon_color_edit;
 };
 
 #endif // PARTICLEPANEL_H

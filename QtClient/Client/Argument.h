@@ -57,6 +57,12 @@ public:
     std::string m_filter_parameter_filename;
     bool m_hasfin;
 #endif
+
+    //OSAKI
+    std::string m_polygon_model;
+    bool m_polygon_model_flag;
+    //OSAKI
+
     Argument( const int argc, char** argv ):
         kvs::CommandLine( argc, argv )
     {
@@ -102,6 +108,11 @@ public:
 #ifdef CS_MODE
         addOption( "fin", "filter parameter filename", 1, false );
 #endif
+
+        //OSAKI
+        addOption("polygon_model", "background Polygon model file", 1, false);
+        //OSAKI
+
         if ( !this->parse() ) exit( EXIT_FAILURE );
 
         m_subpixel_level_abstract = 2;
@@ -133,6 +144,12 @@ public:
         m_filter_parameter_filename  = "";
         m_hasfin = false;
 #endif
+
+        //OSAKI
+        m_polygon_model = "";
+        m_polygon_model_flag = false;
+        //OSAKI
+
         if ( this->hasOption( "tf" ) )
         {
             m_transfer_function_file_flag = true;
@@ -258,6 +275,14 @@ public:
         int client_mode = 1;
         m_header = "";
 #endif
+
+        //OSAKI
+        if(hasOption("polygon_model")){
+            m_polygon_model = this->optionValue<std::string>("polygon_model");
+            m_polygon_model_flag = true;
+        }
+        //OSAKI
+
         // 初期化
         for ( int i = 0; i < 10; i++ )
         {

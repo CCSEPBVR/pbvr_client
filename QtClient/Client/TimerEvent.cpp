@@ -71,7 +71,9 @@ void TimerEvent::update( kvs::TimeEvent* event )
            int sp_level=1;
            if ( m_command->m_parameter.m_transfer_type == VisualizationParameter::Detailed )
             {
-                *m_front_object = *( m_command->m_detailed_particles[m_command->m_parameter.m_time_step] );
+               //全タイムステップの配列確保廃止に伴う変更
+//                *m_front_object = *( m_command->m_detailed_particles[m_command->m_parameter.m_time_step] );
+               *m_front_object = *( m_command->m_detailed_particles[m_command->m_detailed_particles.size()-1] );
                 sp_level= m_command->m_parameter.m_detailed_subpixel_level;
             }
             else
@@ -141,14 +143,14 @@ void TimerEvent::update( kvs::TimeEvent* event )
             if ( m_command->m_parameter.m_transfer_type == VisualizationParameter::Detailed )
             {
                     TimecontrolPanel::g_curStep = m_command->m_parameter.m_time_step;
-					#ifdef CS_MODE
+                    #ifdef CS_MODE
                     m_command->m_parameter.m_time_step++;
 					#endif
             }
             else if ( m_command->m_parameter.m_transfer_type == VisualizationParameter::Abstract )
             {
                     TimecontrolPanel::g_curStep = m_command->m_parameter.m_time_step;
-					#ifdef CS_MODE
+                    #ifdef CS_MODE
                     m_command->m_parameter.m_time_step++;
 					#endif
             }
@@ -171,7 +173,7 @@ void TimerEvent::update( kvs::TimeEvent* event )
             {
 			#ifdef CS_MODE
                 m_command->m_parameter.m_min_time_step = m_command->m_timectrl_panel->minValue();
-			#else
+            #else
                 m_command->m_parameter.m_min_time_step = m_command->m_timectrl_panel->minValue();
 			#endif
             }

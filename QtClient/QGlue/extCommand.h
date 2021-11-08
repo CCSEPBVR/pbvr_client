@@ -19,8 +19,19 @@ public:
     void clientServerInit();
     void parseArguments();
     void CallBackApply( const int i );
+    //OSAKI
+//    void registerPolygonModel(std::string,int currentIndex,kvs::UInt8 opacity,kvs::RGBColor color);
+    void registerPolygonModel(std::string,int currentIndex,double opacity,kvs::RGBColor color);
+    void deletePolygonModel(int currentIndex);
+    //OSAKI
 //    int  getServerParticleInfomation();
 
+protected:
+    //OSAKI
+    void registerPolygonModel();
+    //OSAKI
+private:
+    std::pair<int,int> m_polygon_pair[5];
 };
 extern ExtCommand* extCommand;
 

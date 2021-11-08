@@ -15,6 +15,13 @@
 
 #include <kvs/RotationMatrix33>
 
+#include <kvs/FileFormatBase>
+//OSAKI
+#include <kvs/Stl>
+#include <kvs/PolygonImporter>
+//OSAKI
+#include <kvs/StochasticPolygonRenderer>
+
 int g_i_w_v2foot = PBVR_SIZE;
 int g_i_h_v2foot = PBVR_SIZE;
 
@@ -38,6 +45,10 @@ int detailed_particle_transfer_typelevel = 1;
 #define TIMER_MAX_COUNT 9
 static int timer_count = 0;
 #endif
+
+//OSAKI
+static bool polygon_model_registered = true;
+//OSAKI
 
 extern char pfi_path_server[256];
 extern char filter_parameter_filename[256];
@@ -290,6 +301,13 @@ void ExtCommand::initCommand()
             this->m_parameter.m_particle_merge_param.m_particles[i + 1].m_file_path.append( argument.m_pin_option_directory[i] );
         }
     }
+
+    //OSAKI
+    if(argument.m_polygon_model_flag) {
+        this->m_parameter.m_polygon_model_filename = argument.m_polygon_model;
+        polygon_model_registered = false;
+    }
+    //OSAKI
 }
 /*===========================================================================*/
 /**
@@ -581,7 +599,211 @@ void ExtCommand::CallBackApply( const int i )
     this->m_parameter.m_no_repsampling = SystemstatusPanel::m_no_repsampling;
     this->m_glut_timer->setInterval( SystemstatusPanel::interval_msec );
 
+    //OSAKI
+    //if (!cgmodel_registered) {
+    std::cout << "ExtCommand::CallBackApply() : register polygon model : " << m_parameter.m_polygon_model_filename << std::endl;
+    if (this->m_parameter.m_polygon_model_filename != "") {
+        this->registerPolygonModel();
+        polygon_model_registered = true;
+    }
+    //OSAKI
+
     return;
 
 }
 
+//OSAKI
+void ExtCommand::registerPolygonModel () {
+    const std::string filePath = this->m_parameter.m_polygon_model_filename;
+    const std::string extension = filePath.substr(filePath.length()-4, 4);
+
+    kvs::FileFormatBase* io = nullptr;
+
+    // select importer
+    if(extension == ".stl"){
+        io = new kvs::Stl;
+    }else{
+        std::cerr << "Unknown file format:" << filePath << std::endl;
+        return;
+    }
+
+    io->read(filePath);
+
+//    kvs::jaea::TexturedPolygonImporter* importer = nullptr;
+    kvs::PolygonImporter* importer = nullptr;
+    if(io->isSuccess()){
+        std::cout << "loading " << io->filename() << " succeed." << std::endl;
+//        importer = new kvs::jaea::TexturedPolygonImporter();
+        importer = new kvs::PolygonImporter();
+        importer->exec(io);
+        importer->setOpacity(100);
+        importer->setName ("POLYGON_MODEL");
+
+        //bug調査
+        importer->updateMinMaxCoords();
+
+//#ifdef ENABLE_CGMODEL_EXT_COORD_MODE
+        //CGモデルを、粒子モデル同レベルのサイズ、位置で表示するための座標値を計算する
+
+        //粒子モデルのデータ
+        const kvs::Vec3 particleMin = kvs::Vector3f(4.06067, 0, -8.67);
+        const kvs::Vec3 particleMax = kvs::Vector3f(10,6.94658, 0.725);
+//        const kvs::Vec3 particleMin = kvs::Vector3f(-179.542, -109.5, 0.0);
+//        const kvs::Vec3 particleMax = kvs::Vector3f(388.83, 109.5, 388.83);
+        const kvs::Vec3 particleBoxLength = particleMax - particleMin;
+        const kvs::Vec3 particleCenter = (particleMax + particleMin) / 2.0f;
+
+        //CGモデルのデータ
+        const kvs::Vec3 modelMin = importer->minObjectCoord();
+        const kvs::Vec3 modelMax = importer->maxObjectCoord();
+        const kvs::Vec3 modelBoxLength = modelMax - modelMin;
+        const kvs::Vec3 modelCenter = (modelMax + modelMin) / 2.0f;
+
+        float scale = particleBoxLength.length() / modelBoxLength.length();
+
+        const kvs::Vec3 coordMin = (modelMin - modelCenter) * scale + particleCenter;
+        const kvs::Vec3 coordMax = (modelMax - modelCenter) * scale + particleCenter;
+        importer->setMinMaxExternalCoords(coordMin, coordMax);
+//#endif
+        std::cout << "Object###" << importer->minObjectCoord() << "," << importer->maxObjectCoord() << std::endl;
+        std::cout << "External###" << importer->minExternalCoord() << "," << importer->maxExternalCoord() << std::endl;
+
+#ifdef ENABLE_BENCHMARK_POLYGON
+        int nDuplicate = 15;
+        kvs::ValueArray<kvs::UInt32> connections = importer->connections();
+        int nPolygonsOld = connections.size() / 3;
+        int nPolygonsNew = nPolygonsOld * nDuplicate;
+
+        kvs::ValueArray<kvs::UInt32> connectionsNew(nPolygonsNew * 3);
+        for(int j=0;j<nDuplicate;j++){
+            for(int i=0;i<connections.size();i++){
+                int p = connections[i];
+                connectionsNew[i + j * connections.size()] = p;
+            }
+        }
+
+        kvs::jaea::TexturedPolygonObject* texturedPolygonOut = new kvs::jaea::TexturedPolygonObject();
+        texturedPolygonOut->deepCopy(*importer);
+        texturedPolygonOut->setConnections(connectionsNew);
+
+        std::cout << "registerCGModel() : benchmark mode (nDuplicate=" << nDuplicate << ")" << std::endl;
+        std::cout << "       nvertices=" << (texturedPolygonOut->coords().size() / 3) << std::endl;
+        std::cout << "       npolygons=" << nPolygonsNew << std::endl;
+
+        kvs::jaea::StochasticTexturedPolygonRenderer* renderer = new kvs::jaea::StochasticTexturedPolygonRenderer ();
+        this->m_screen->scene()->registerObject(texturedPolygonOut, renderer);
+
+#else // ENABLE_BENCHMARK_POLYGON
+        kvs::StochasticPolygonRenderer* renderer = new kvs::StochasticPolygonRenderer();
+        this->m_screen->scene()->registerObject(importer, renderer);
+#endif // ENABLE_BENCHMARK_POLYGON
+
+    }else{
+        std::cerr << "ERROR : loading " << io->filename() << " failed." << std::endl;
+    }
+
+    delete io;
+}
+//OSAKI
+
+//OSAKI
+void ExtCommand::registerPolygonModel (std::string str,int currentIndex,double opacity,kvs::RGBColor color) {
+    const std::string filePath = str;
+    const std::string extension = filePath.substr(filePath.length()-4, 4);
+
+    kvs::FileFormatBase* io = nullptr;
+
+    // select importer
+    if(extension == ".stl"){
+        io = new kvs::Stl;
+    }else{
+        std::cerr << "Unknown file format:" << filePath << std::endl;
+        return;
+    }
+
+    io->read(filePath);
+
+//    kvs::jaea::TexturedPolygonImporter* importer = nullptr;
+    kvs::PolygonImporter* importer = nullptr;
+    if(io->isSuccess()){
+        std::cout << "loading " << io->filename() << " succeed." << std::endl;
+//        importer = new kvs::jaea::TexturedPolygonImporter();
+        importer = new kvs::PolygonImporter();
+        importer->exec(io);
+        importer->setOpacity(opacity*255);//*255(kvs::UInt8)
+//        importer->setOpacity(opacity);//*255(kvs::UInt8)
+        importer->setColor(color);
+//        importer->setColor()
+        importer->setName ("POLYGON_MODEL");
+
+        //bug調査
+        importer->updateMinMaxCoords();
+
+//#ifdef ENABLE_CGMODEL_EXT_COORD_MODE
+        //CGモデルを、粒子モデル同レベルのサイズ、位置で表示するための座標値を計算する
+
+        //粒子モデルのデータ
+        const kvs::Vec3 particleMin = kvs::Vector3f(4.06067, 0, -8.67);
+        const kvs::Vec3 particleMax = kvs::Vector3f(10,6.94658, 0.725);
+//        const kvs::Vec3 particleMin = kvs::Vector3f(-179.542, -109.5, 0.0);
+//        const kvs::Vec3 particleMax = kvs::Vector3f(388.83, 109.5, 388.83);
+        const kvs::Vec3 particleBoxLength = particleMax - particleMin;
+        const kvs::Vec3 particleCenter = (particleMax + particleMin) / 2.0f;
+
+        //CGモデルのデータ
+        const kvs::Vec3 modelMin = importer->minObjectCoord();
+        const kvs::Vec3 modelMax = importer->maxObjectCoord();
+        const kvs::Vec3 modelBoxLength = modelMax - modelMin;
+        const kvs::Vec3 modelCenter = (modelMax + modelMin) / 2.0f;
+
+        float scale = particleBoxLength.length() / modelBoxLength.length();
+
+        const kvs::Vec3 coordMin = (modelMin - modelCenter) * scale + particleCenter;
+        const kvs::Vec3 coordMax = (modelMax - modelCenter) * scale + particleCenter;
+        importer->setMinMaxExternalCoords(coordMin, coordMax);
+//#endif
+        std::cout << "Object###" << importer->minObjectCoord() << "," << importer->maxObjectCoord() << std::endl;
+        std::cout << "External###" << importer->minExternalCoord() << "," << importer->maxExternalCoord() << std::endl;
+
+#ifdef ENABLE_BENCHMARK_POLYGON
+        int nDuplicate = 15;
+        kvs::ValueArray<kvs::UInt32> connections = importer->connections();
+        int nPolygonsOld = connections.size() / 3;
+        int nPolygonsNew = nPolygonsOld * nDuplicate;
+
+        kvs::ValueArray<kvs::UInt32> connectionsNew(nPolygonsNew * 3);
+        for(int j=0;j<nDuplicate;j++){
+            for(int i=0;i<connections.size();i++){
+                int p = connections[i];
+                connectionsNew[i + j * connections.size()] = p;
+            }
+        }
+
+        kvs::jaea::TexturedPolygonObject* texturedPolygonOut = new kvs::jaea::TexturedPolygonObject();
+        texturedPolygonOut->deepCopy(*importer);
+        texturedPolygonOut->setConnections(connectionsNew);
+
+        std::cout << "registerCGModel() : benchmark mode (nDuplicate=" << nDuplicate << ")" << std::endl;
+        std::cout << "       nvertices=" << (texturedPolygonOut->coords().size() / 3) << std::endl;
+        std::cout << "       npolygons=" << nPolygonsNew << std::endl;
+
+        kvs::jaea::StochasticTexturedPolygonRenderer* renderer = new kvs::jaea::StochasticTexturedPolygonRenderer ();
+        this->m_screen->scene()->registerObject(texturedPolygonOut, renderer);
+
+#else // ENABLE_BENCHMARK_POLYGON
+        kvs::StochasticPolygonRenderer* renderer = new kvs::StochasticPolygonRenderer();
+        m_polygon_pair[currentIndex-6] = this->m_screen->scene()->registerObject(importer, renderer);
+
+#endif // ENABLE_BENCHMARK_POLYGON
+
+    }else{
+        std::cerr << "ERROR : loading " << io->filename() << " failed." << std::endl;
+    }
+
+    delete io;
+}
+//OSAKI
+
+void ExtCommand::deletePolygonModel (int currentIndex) {
+    this->m_screen->scene()->removeObject(m_polygon_pair[currentIndex-6].first);
+}

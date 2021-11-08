@@ -128,7 +128,7 @@
            <string>...</string>
           </property>
           <property name="icon">
-           <iconset resource="../App/resources.qrc">
+           <iconset>
             <normaloff>:/Resources/images/unlocked.png</normaloff>
             <normalon>:/Resources/images/locked.png</normalon>:/Resources/images/unlocked.png</iconset>
           </property>
@@ -308,6 +308,9 @@
          <layout class="QGridLayout" name="gridLayout_4">
           <item row="0" column="2">
            <widget class="QSpinBox" name="num_transfer">
+            <property name="minimum">
+             <number>1</number>
+            </property>
             <property name="value">
              <number>5</number>
             </property>
@@ -748,7 +751,7 @@
            <string>...</string>
           </property>
           <property name="icon">
-           <iconset resource="../App/resources.qrc">
+           <iconset>
             <normaloff>:/Resources/images/unlocked.png</normaloff>
             <normalon>:/Resources/images/locked.png</normalon>:/Resources/images/unlocked.png</iconset>
           </property>
@@ -894,8 +897,6 @@
    <header>QGlue/histogram.h</header>
   </customwidget>
  </customwidgets>
- <resources>
-  <include location="../App/resources.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

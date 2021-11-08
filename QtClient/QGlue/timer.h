@@ -65,17 +65,16 @@ public:
     virtual ~Timer( void );
 
     void startSingleShot(){
-        //DEL BY)T.Osaki 2020.04.28
-//        if (!this) return;
-//        if(m_is_stopped){
-//            oneShot=true;
-//            m_is_stopped = false;
-//            extCommand->m_is_under_communication = true;
-//            QTimer::start(1);
-//        }
-//        else{
-//            qInfo("SingleShot canceled");
-//        }
+        if (!this) return;
+        if(m_is_stopped){
+            oneShot=true;
+            m_is_stopped = false;
+            extCommand->m_is_under_communication = true;
+            QTimer::start(1);
+        }
+        else{
+            qInfo("SingleShot canceled");
+        }
     }
     void start( int msec );
 

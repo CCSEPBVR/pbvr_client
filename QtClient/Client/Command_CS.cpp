@@ -366,12 +366,15 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
         result->m_min_merged_time_step = merger.getMergedInitialTimeStep();
         result->m_max_merged_time_step = merger.getMergedFinalTimeStep();
         // サーバにないステップは対象としない 2018.12.19 start
-        if (m_detailed_particles.size() > param->m_time_step){
-            m_detailed_particles[param->m_time_step] = object;
-        }
-        else {
-            m_detailed_particles.push_back(object);
-        }
+        //by TO0603 2021/11/05 全タイムステップのメモリ確保の廃止
+//        if (m_detailed_particles.size() > param->m_time_step){
+//            m_detailed_particles[param->m_time_step] = object;
+//        }
+//        else {
+//            m_detailed_particles.push_back(object);
+//        }
+        m_detailed_particles[m_detailed_particles.size()-1] = object;
+
         // Change TransferFunction
         if ( param->m_client_server_mode == 1 && ( !isSamplingParamsKeeped( *param ) || m_coord_panel_ui->getChangeCoordFlagForStoreParticle() ) )
         {
