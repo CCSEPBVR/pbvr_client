@@ -157,7 +157,7 @@ private:
     float pixelRatio=1;
     SwitchablePBRProxy m_renderer;
 
-    int m_reset_count = 0;
+//    int m_reset_count = 0;
 
     void storeCurrentXForm();
     void restoreXForm();
@@ -174,7 +174,7 @@ public:
     void animation_add();
     void animation_del();
     void animation_play();
-    void switch_gpu(bool f);
+//    void switch_gpu(bool f);
 
     void switch_shader(char st){
         this->shadinglevel[0]=st;

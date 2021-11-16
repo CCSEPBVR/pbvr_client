@@ -1,4 +1,4 @@
-﻿//KVS2.7.0
+//KVS2.7.0
 //ADD BY)T.Osaki 2020.06.08
 #include <QOpenGLContext>
 
@@ -256,11 +256,11 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
                         int stepno;
                         if ((stepno = getServerStep(param)) >= 0 ){
                             delete m_detailed_particles[param->m_time_step];
-                            if(m_coord_panel_ui->m_use_particle_side_coords){
-                            m_detailed_particles[param->m_time_step] = m_server->getPointObjectFromServer(*param, result, numvol, stepno);
-                            }else{
+//                            if(m_coord_panel_ui->m_use_particle_side_coords){
+//                            m_detailed_particles[param->m_time_step] = m_server->getPointObjectFromServer(*param, result, numvol, stepno);
+//                            }else{
                             m_detailed_particles[param->m_time_step] = m_server->getPointObjectFromServer(*param, result, numvol, stepno,PBVRmincoords,PBVRmaxcoords);
-                            }
+//                            }
                             // ADD START FEAST 2016.01.07
                             if (m_detailed_particles[param->m_time_step] == NULL)
                             {
@@ -281,18 +281,19 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
                         if (m_detailed_particles.size() > param->m_time_step){
                             if (m_detailed_particles[param->m_time_step])
                                 delete m_detailed_particles[param->m_time_step];
-                            if(m_coord_panel_ui->m_use_particle_side_coords){
-                            m_detailed_particles[param->m_time_step] = m_server->getPointObjectFromServer(*param, result, numvol, stepno);
-                            }else{
+//                            if(m_coord_panel_ui->m_use_particle_side_coords){
+//                            m_detailed_particles[param->m_time_step] = m_server->getPointObjectFromServer(*param, result, numvol, stepno);
+//                            }else{
                             m_detailed_particles[param->m_time_step] = m_server->getPointObjectFromServer(*param, result, numvol, stepno,PBVRmincoords,PBVRmaxcoords);
-                            }
+//                            }
                         }
                         else{
-                            if(m_coord_panel_ui->m_use_particle_side_coords){
-                            m_detailed_particles[param->m_time_step] = m_server->getPointObjectFromServer(*param, result, numvol, stepno);
-                            }else{
+//                            if(m_coord_panel_ui->m_use_particle_side_coords){
+//                            m_detailed_particles[param->m_time_step] = m_server->getPointObjectFromServer(*param, result, numvol, stepno);
+//                            }else{
                             m_detailed_particles[param->m_time_step] = m_server->getPointObjectFromServer(*param, result, numvol, stepno,PBVRmincoords,PBVRmaxcoords);
-                            }                        }
+//                            }
+                        }
                         if (m_server_particles.size() < param->m_time_step + 1){
                             m_server_particles.resize(param->m_time_step + 1, NULL);
                             // サーバー生成粒子の各stepの存在範囲を格納
@@ -346,7 +347,9 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
             {
                 // add by @hira at 2016/12/01
                 if (m_server_particles[param->m_time_step]->coords().pointer() != NULL) {
+                    if(m_coord_panel_ui->getResetViewFlag()){
                     m_server_particles[param->m_time_step]->updateMinMaxCoords();
+                    }
                     m_server_coord_min[param->m_time_step] = m_server_particles[param->m_time_step]->minObjectCoord();
                     m_server_coord_max[param->m_time_step] = m_server_particles[param->m_time_step]->maxObjectCoord();
                     m_server_coord_flag[param->m_time_step] = true;
@@ -583,6 +586,10 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
             {
                 // 正規化フラグをfalseに戻す
                 m_coord_panel_ui->resetResetViewFlag();
+                if(keeper == true){
+                    keeper = false;
+                    resetflag = false;
+                }
             }
         }
         m_particle_merge_ui->particleResetChangedFlag();
@@ -618,8 +625,13 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
     // change view
     if ( resetflag )
     {
+        keeper = true;
         qInfo(" *** Command::update::9 starts *** %d",QThread::currentThreadId() );
         ((RenderArea*)m_screen)->setCoordinateBoundaries(crd);
+    }
+    if(keeper == true){
+        m_detailed_particles[m_detailed_particles.size()-1]->setMinMaxObjectCoords(kvs::Vector3f(m_server_coord_min[1][0],m_server_coord_min[1][1],m_server_coord_min[1][2]),kvs::Vector3f(m_server_coord_max[1][0],m_server_coord_max[1][1],m_server_coord_max[1][2]));
+        m_detailed_particles[m_detailed_particles.size()-1]->setMinMaxExternalCoords(kvs::Vector3f(m_server_coord_min[1][0],m_server_coord_min[1][1],m_server_coord_min[1][2]),kvs::Vector3f(m_server_coord_max[1][0],m_server_coord_max[1][1],m_server_coord_max[1][2]));
     }
     qInfo(" *** Command::update ends *** %d\n",QThread::currentThreadId() );
 }

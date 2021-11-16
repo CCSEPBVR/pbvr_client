@@ -169,6 +169,7 @@ private:
     std::vector<kvs::Vector3f> m_server_coord_min;
     std::vector<kvs::Vector3f> m_server_coord_max;
     std::vector<bool> m_server_coord_flag;
+    bool keeper = false;
 
 public:
     size_t getUsingMemoryByKiloByte();

@@ -336,13 +336,13 @@ void RenderArea::setCoordinateBoundaries(float  crd[6])
     m_point_object->setMinMaxExternalCoords(min_t,max_t);
 
     this->m_scene->objectManager()->updateExternalCoords();
-    if(m_reset_count == 0){
-        m_reset_count++;
-    }else{
-#ifdef CS_MODE
-        this->m_scene->reset();
-#endif
-    }
+//    if(m_reset_count == 0){
+//        m_reset_count++;
+//    }else{
+//#ifdef CS_MODE
+//        this->m_scene->reset();
+//#endif
+//    }
     std::cout << " !!!!!!!!!!!!!!!!!!! Reset Viewer Scale !!!!!!!!!!!!!!!!!!!!!!!! " << std::endl;
 }
 
@@ -745,31 +745,31 @@ void RenderArea::animation_play()
 /**
  * @brief RenderArea::switch_gpu, helper for toolbar button
  */
-void RenderArea::switch_gpu(bool f)
-{
-    if (f){
-        m_renderer.use_gpu();
-    }
-    else{
-        m_renderer.use_cpu();
-    }
-    m_scene->replaceRenderer(m_obj_id_pair.second, m_renderer.pbr_pointer(),false);
-    // The lines below are a work around for m_initial_modelview problem
-    // in kvs::glsl::ParticleBasedRenderer.
-    makeCurrent();
-    // Save current X form
-    storeCurrentXForm();
-    // Reset object Manager's XForm
-    m_scene->objectManager()->resetXform();
-    // Manually call  paint function, to set m_initial_xform in Renderer
-//    m_scene->paintFunction();
-    m_compositor->update();
-    // Restore xform to original scene xform
-    restoreXForm();
-    // Paint the frame again, to erase previous frame
-//    m_scene->paintFunction();
-    m_compositor->update();
-    doneCurrent();
-    update();
-}
+//void RenderArea::switch_gpu(bool f)
+//{
+//    if (f){
+//        m_renderer.use_gpu();
+//    }
+//    else{
+//        m_renderer.use_cpu();
+//    }
+//    m_scene->replaceRenderer(m_obj_id_pair.second, m_renderer.pbr_pointer(),false);
+//    // The lines below are a work around for m_initial_modelview problem
+//    // in kvs::glsl::ParticleBasedRenderer.
+//    makeCurrent();
+//    // Save current X form
+//    storeCurrentXForm();
+//    // Reset object Manager's XForm
+//    m_scene->objectManager()->resetXform();
+//    // Manually call  paint function, to set m_initial_xform in Renderer
+////    m_scene->paintFunction();
+//    m_compositor->update();
+//    // Restore xform to original scene xform
+//    restoreXForm();
+//    // Paint the frame again, to erase previous frame
+////    m_scene->paintFunction();
+//    m_compositor->update();
+//    doneCurrent();
+//    update();
+//}
 

@@ -44,7 +44,7 @@ public:
 protected:
      bool m_coordinate_for_store_particle; // 座標式に変更があった場合(粒子保存機能用)
      bool m_coordinate;
-     bool m_reset_flag;
+     bool m_reset_flag = false;
 
 private:
      //Event handlers

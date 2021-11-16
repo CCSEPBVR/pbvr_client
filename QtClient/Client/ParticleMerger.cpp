@@ -154,7 +154,7 @@ void ParticleMerger::setParam( const ParticleMergeParameter& param, const size_t
                     std::cout << prefix << std::endl;
                     FILE* serverMinMaxCoords_file = fopen(filename_minMax.c_str(),"r");
                     if(serverMinMaxCoords_file == NULL)
-                    {                    
+                    {
                         const kvs::Vector3f& min_t = impobj->minObjectCoord();
                         const kvs::Vector3f& max_t = impobj->maxObjectCoord();
                         m_parameter.m_particles[n].m_x_min = min_t[0];
