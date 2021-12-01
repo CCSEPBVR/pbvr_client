@@ -311,9 +311,11 @@ void RenderArea::attachPointObject(const kvs::PointObject* point, int sp_level)
         m_obj_id_pair = m_scene->registerObject(m_point_object,m_renderer.pbr_pointer());
     }
     else {
+        m_renderer.updateModelView();
         this->m_scene->replaceObject(m_obj_id_pair.first,m_point_object,false);
     }
     m_orientation_axis->setObject( m_point_object);
+    m_scene->objectManager()->resetXform();
     // Let Qt know we are done using the context.
     doneCurrent();
     // Trigger a paint event
