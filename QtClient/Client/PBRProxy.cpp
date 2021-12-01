@@ -22,16 +22,16 @@ PBRProxy::PBRProxy(   PBR_MODE mode_selection, PBRProxy* other):
  */
 void PBRProxy::recreateImageBuffer()
 {
-    if(selected_mode==GPU){
-        //KVS2.7.0
-        //MOD BY)T.Osaki 2020.05.28
-        this->deleteParticleBuffer();
-        this->createParticleBuffer(    CPU_BASE::windowWidth(), CPU_BASE::windowHeight(),  m_subpixel_level );
-    }
+//    if(selected_mode==GPU){
+//        //KVS2.7.0
+//        //MOD BY)T.Osaki 2020.05.28
+//        this->deleteParticleBuffer();
+//        this->createParticleBuffer(    CPU_BASE::windowWidth(), CPU_BASE::windowHeight(),  m_subpixel_level );
+//    }
 }
 
 bool PBRProxy::isEnabledShading(){
-    return selected_mode==GPU?GPU_BASE::isEnabledShading():CPU_BASE::isEnabledShading();
+    return GPU_BASE::isEnabledShading();
 }
 /**
  * @brief setRepetitionLevel, set renderer repetition level.
@@ -40,8 +40,8 @@ bool PBRProxy::isEnabledShading(){
 void PBRProxy::setRepetitionLevel(size_t rep_level){
     if (selected_mode==GPU)
         GPU_BASE::setRepetitionLevel(rep_level);
-    else
-        CPU_BASE::setSubpixelLevel( (size_t) sqrt(rep_level));
+//    else
+//        CPU_BASE::setSubpixelLevel( (size_t) sqrt(rep_level));
 }
 /**
  * @brief setSubpixelLevel, set subpixel level
@@ -51,9 +51,9 @@ void PBRProxy::setSubpixelLevel(size_t sp_level){
     if (selected_mode==GPU){
         GPU_BASE::setRepetitionLevel(sp_level*sp_level);
     }
-    else{
-        CPU_BASE::setSubpixelLevel( sp_level);
-    }
+//    else{
+//        CPU_BASE::setSubpixelLevel( sp_level);
+//    }
 }
 
 /**
@@ -62,21 +62,21 @@ void PBRProxy::setSubpixelLevel(size_t sp_level){
  */
 template <typename ShadingType>
 void PBRProxy::setShader( const ShadingType shader ){
-    selected_mode==GPU?GPU_BASE::setShader(shader):CPU_BASE::setShader(shader);
+    GPU_BASE::setShader(shader);
 }
 
 /**
  * @brief disableShading, disable shading
  */
 void PBRProxy::disableShading(){
-    selected_mode==GPU?GPU_BASE::disableShading():CPU_BASE::disableShading();
+    GPU_BASE::disableShading();
 }
 
 /**
  * @brief enableShading, enable shading
  */
 void PBRProxy::enableShading(){
-    selected_mode==GPU?GPU_BASE::enableShading():CPU_BASE::enableShading();
+    GPU_BASE::enableShading();
 }
 
 /**
@@ -85,7 +85,7 @@ void PBRProxy::enableShading(){
  */
 size_t PBRProxy::repetitionLevel()
 {
-    return (selected_mode==GPU) ? GPU_BASE::repetitionLevel():CPU_BASE::subpixelLevel() *  CPU_BASE::subpixelLevel();
+    return GPU_BASE::repetitionLevel();
 
 }
 /**
@@ -94,7 +94,7 @@ size_t PBRProxy::repetitionLevel()
  */
 size_t PBRProxy::subpixelLevel()
 {
-    return selected_mode==GPU?(size_t) sqrt(GPU_BASE::repetitionLevel()):CPU_BASE::subpixelLevel();
+    return sqrt(GPU_BASE::repetitionLevel());
 }
 /**
  * @brief setShadingString , sets PBVR type shading string in format L|P|B[Ka,Kd][,Ks,S]
@@ -211,4 +211,11 @@ kvs::RendererBase* SwitchablePBRProxy::pbr_pointer(){
         return   (kvs::glsl::ParticleBasedRenderer*)pbr;
     else
         return (kvs::ParticleBasedRenderer*)pbr;
+}
+
+/**
+ * @brief updateModelView, Update m_initial_modelview.
+ */
+void SwitchablePBRProxy::updateModelView(){
+    pbr->updateModelViewMatrixTest();
 }

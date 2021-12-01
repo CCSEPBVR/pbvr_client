@@ -10,7 +10,7 @@ namespace visclient
 {
 
 typedef  kvs::glsl::ParticleBasedRenderer GPU_BASE;
-typedef  kvs::ParticleBasedRenderer CPU_BASE;
+//typedef  kvs::ParticleBasedRenderer CPU_BASE;
 enum PBR_MODE { CPU,GPU};
 
 /**
@@ -21,7 +21,8 @@ enum PBR_MODE { CPU,GPU};
  *        to underlying classes will be performed on the base class that corrsponds to the
  *        mode of operation.
  */
-class PBRProxy : public CPU_BASE, public GPU_BASE
+//class PBRProxy : public CPU_BASE, public GPU_BASE
+class PBRProxy : public GPU_BASE
 {
 public:
     PBR_MODE selected_mode = GPU;
@@ -70,5 +71,6 @@ public:
     size_t getRepetitionLevel();
     void setRepetitionLevel( const size_t rep_level);
     kvs::RendererBase* pbr_pointer();
+    void updateModelView();
 };
 #endif    // PBVR_PBR_PROXY_H_INCLUDE
