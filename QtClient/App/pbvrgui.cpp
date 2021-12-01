@@ -420,6 +420,7 @@ void PBVRGUI::onImportMenuAction()
         kvs::Xform xf = VizParameterFile::ConversionFloatToClass();
         kvs_renderarea->setPointObjectXform(xf);
         kvs_renderarea->redraw();
+        extCommand->CallBackApply(0);
     }
 }
 void PBVRGUI::onExportMenuAction()
