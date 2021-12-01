@@ -193,7 +193,9 @@ size_t SwitchablePBRProxy::getRepetitionLevel()
  * @param rep_level
  */
 void SwitchablePBRProxy::setRepetitionLevel( const size_t rep_level){
-    recreatePBR();
+    // Kawamura mod 2021/11/16
+    // below line comment out. It deletes and new renderer, and caused random texture id bug.
+    //recreatePBR();
     pbr->setRepetitionLevel(rep_level);
     assert (pbr->repetitionLevel() == pbr->subpixelLevel()* pbr->subpixelLevel());
 }
