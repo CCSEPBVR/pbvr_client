@@ -28,7 +28,7 @@ public:
 
 protected:
     //OSAKI
-    void registerPolygonModel();
+//    void registerPolygonModel();
     //OSAKI
 private:
     std::pair<int,int> m_polygon_pair[5];
