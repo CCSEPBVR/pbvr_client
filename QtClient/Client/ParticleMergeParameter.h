@@ -20,6 +20,9 @@ protected:
         bool m_keep_initial_step;
         bool m_keep_final_step;
         std::string m_file_path;
+        double m_polygon_opacity = 0.5;
+        kvs::RGBColor m_polygon_color;
+        bool is_polygon_display = true;
         float m_x_min, m_y_min, m_z_min;
         float m_x_max, m_y_max, m_z_max;
 
@@ -39,6 +42,7 @@ protected:
 public:
     bool m_do_export;
     std::string m_export_file_path;
+    /*Notice 0~5は粒子,6~10はポリゴンデータです。*/
     std::vector<ParticleData> m_particles; // 0:server 1-10:file
     int m_circuit_time;
 
