@@ -255,14 +255,14 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
                         // サーバにないステップは対象としない 2018.12.19 start
                         int stepno;
                         if ((stepno = getServerStep(param)) >= 0 ){
-                            delete m_detailed_particles[param->m_time_step];
+                            delete m_detailed_particles[m_detailed_particles.size()-1];
 //                            if(m_coord_panel_ui->m_use_particle_side_coords){
-//                            m_detailed_particles[param->m_time_step] = m_server->getPointObjectFromServer(*param, result, numvol, stepno);
+//                            m_detailed_particles[m_detailed_particles.size()-1] = m_server->getPointObjectFromServer(*param, result, numvol, stepno);
 //                            }else{
-                            m_detailed_particles[param->m_time_step] = m_server->getPointObjectFromServer(*param, result, numvol, stepno,PBVRmincoords,PBVRmaxcoords);
+                            m_detailed_particles[m_detailed_particles.size()-1] = m_server->getPointObjectFromServer(*param, result, numvol, stepno,PBVRmincoords,PBVRmaxcoords);
 //                            }
                             // ADD START FEAST 2016.01.07
-                            if (m_detailed_particles[param->m_time_step] == NULL)
+                            if (m_detailed_particles[m_detailed_particles.size()-1] == NULL)
                             {
                                 //                                m_timectrl_panel->toggleStop(true);
                                 m_timectrl_panel->toggleActive();
@@ -270,7 +270,7 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
                             // ADD END FEAST 2016.01.07
                         } // 2018.12.19 end
                         else if (param->m_client_server_mode == 0  ){
-                            if (m_detailed_particles[param->m_time_step]) delete m_detailed_particles[param->m_time_step];
+                            if (m_detailed_particles[m_detailed_particles.size()-1]) delete m_detailed_particles[m_detailed_particles.size()-1];
                         }
                 }
                 else if ( param->m_detailed_transfer_type == VisualizationParameter::Summalized )
@@ -279,19 +279,19 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
                     int stepno;
                     if ((stepno = getServerStep(param)) >= 0){
                         if (m_detailed_particles.size() > param->m_time_step){
-                            if (m_detailed_particles[param->m_time_step])
-                                delete m_detailed_particles[param->m_time_step];
+                            if (m_detailed_particles[m_detailed_particles.size()-1])
+                                delete m_detailed_particles[m_detailed_particles.size()-1];
 //                            if(m_coord_panel_ui->m_use_particle_side_coords){
-//                            m_detailed_particles[param->m_time_step] = m_server->getPointObjectFromServer(*param, result, numvol, stepno);
+//                            m_detailed_particles[m_detailed_particles.size()-1] = m_server->getPointObjectFromServer(*param, result, numvol, stepno);
 //                            }else{
-                            m_detailed_particles[param->m_time_step] = m_server->getPointObjectFromServer(*param, result, numvol, stepno,PBVRmincoords,PBVRmaxcoords);
+                            m_detailed_particles[m_detailed_particles.size()-1] = m_server->getPointObjectFromServer(*param, result, numvol, stepno,PBVRmincoords,PBVRmaxcoords);
 //                            }
                         }
                         else{
 //                            if(m_coord_panel_ui->m_use_particle_side_coords){
-//                            m_detailed_particles[param->m_time_step] = m_server->getPointObjectFromServer(*param, result, numvol, stepno);
+//                            m_detailed_particles[m_detailed_particles.size()-1] = m_server->getPointObjectFromServer(*param, result, numvol, stepno);
 //                            }else{
-                            m_detailed_particles[param->m_time_step] = m_server->getPointObjectFromServer(*param, result, numvol, stepno,PBVRmincoords,PBVRmaxcoords);
+                            m_detailed_particles[m_detailed_particles.size()-1] = m_server->getPointObjectFromServer(*param, result, numvol, stepno,PBVRmincoords,PBVRmaxcoords);
 //                            }
                         }
                         if (m_server_particles.size() < param->m_time_step + 1){
@@ -303,13 +303,13 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
                         }
                         if (m_server_particles[param->m_time_step])
                             delete m_server_particles[param->m_time_step];
-                        m_server_particles[param->m_time_step] = m_detailed_particles[param->m_time_step];
+                        m_server_particles[param->m_time_step] = m_detailed_particles[m_detailed_particles.size()-1];
 
                         m_coord_panel_ui->resetChangeFlagForStoreParticle();
 
 
                         // ADD START FEAST 2016.01.07
-                        if (m_detailed_particles[param->m_time_step] == NULL)
+                        if (m_detailed_particles[m_detailed_particles.size()-1] == NULL)
                         {
                             //                            m_timectrl_panel->toggleStop(true);
                             m_timectrl_panel->toggleActive();
@@ -317,7 +317,7 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
                         // ADD END FEAST 2016.01.07
                     }// 2018.12.19 end
                     else if (param->m_client_server_mode == 0){
-                        if (m_detailed_particles[param->m_time_step]) delete m_detailed_particles[param->m_time_step];
+                        if (m_detailed_particles[m_detailed_particles.size()-1]) delete m_detailed_particles[m_detailed_particles.size()-1];
                     }
                 }
                 else
@@ -366,12 +366,46 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
         kvs::PointObject* object;
         merger.setParam( param->m_particle_merge_param, param->m_min_server_time_step, param->m_max_server_time_step );
         object = merger.doMerge( server_object, param->m_time_step );
+
+        for(int i = 6;i < 11;i++)
+        {
+            if(merger.isPolygonEnable(i) == true)
+            {
+                if(m_is_polygon_displayed[i] == false){
+                extCommand->registerPolygonModel(merger.getPolygonFilePath(i),
+                                                 i,
+                                                 merger.getPolygon_opacity(i),
+                                                 merger.getPolygonColor(i));
+                m_before_opacity[i] = merger.getPolygon_opacity(i);
+                m_before_color[i] = merger.getPolygonColor(i);
+                m_is_polygon_displayed[i] = true;
+                }else if(m_before_color[i].r() != merger.getPolygonColor(i).r()||
+                         m_before_color[i].g() != merger.getPolygonColor(i).g()||
+                         m_before_color[i].b() != merger.getPolygonColor(i).b()||
+                         m_before_opacity[i] != merger.getPolygon_opacity(i))
+                {
+                    extCommand->deletePolygonModel(i);
+                    extCommand->registerPolygonModel(merger.getPolygonFilePath(i),
+                                                     i,
+                                                     merger.getPolygon_opacity(i),
+                                                     merger.getPolygonColor(i));
+                    m_before_opacity[i] = merger.getPolygon_opacity(i);
+                    m_before_color[i] = merger.getPolygonColor(i);
+                }
+            }else{
+                if(m_is_polygon_displayed[i] == true){
+                extCommand->deletePolygonModel(i);
+                m_is_polygon_displayed[i] = false;
+                }
+            }
+        }
+
         result->m_min_merged_time_step = merger.getMergedInitialTimeStep();
         result->m_max_merged_time_step = merger.getMergedFinalTimeStep();
         // サーバにないステップは対象としない 2018.12.19 start
         //by TO0603 2021/11/05 全タイムステップのメモリ確保の廃止
 //        if (m_detailed_particles.size() > param->m_time_step){
-//            m_detailed_particles[param->m_time_step] = object;
+//            m_detailed_particles[m_detailed_particles.size()-1] = object;
 //        }
 //        else {
 //            m_detailed_particles.push_back(object);
