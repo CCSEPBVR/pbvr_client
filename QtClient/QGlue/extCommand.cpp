@@ -738,7 +738,8 @@ void ExtCommand::registerPolygonModel (std::string str,int currentIndex,double o
         importer->setName ("POLYGON_MODEL");
 
 //        //bug調査
-//        importer->updateMinMaxCoords();
+        importer->updateMinMaxCoords();
+        importer->setXform(this->m_screen->scene()->objectManager()->xform());
 
 ////#ifdef ENABLE_CGMODEL_EXT_COORD_MODE
 //        //CGモデルを、粒子モデル同レベルのサイズ、位置で表示するための座標値を計算する
