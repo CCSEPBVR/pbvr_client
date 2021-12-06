@@ -172,24 +172,24 @@ void ParticlePanel::setParam( kvs::visclient::ParticleMergeParameter* param )
         if ( m_particle_value[i]->checkState() == Qt::Checked )
         {
             m_param->m_particles[i].m_enable = true;
-            if(i >= 6 && i <= 10 && m_polygon_changed[i-6] == false){
-                extCommand->registerPolygonModel(m_file_path_strings[i],i,m_polygon_opacity[i-6],m_polygon_color[i-6]);
-                m_polygon_changed[i-6] = true;
-            }
-            if(m_color_opacity_changed[i-6] == true){
-                std::cout << "m_color_opacity_changed" << i-6 << std::endl;
-                extCommand->deletePolygonModel(i);
-                extCommand->registerPolygonModel(m_file_path_strings[i],i,m_polygon_opacity[i-6],m_polygon_color[i-6]);
-                m_color_opacity_changed[i-6] = false;
-            }
+//            if(i >= 6 && i <= 10 && m_polygon_changed[i-6] == false){
+//                extCommand->registerPolygonModel(m_file_path_strings[i],i,m_polygon_opacity[i-6],m_polygon_color[i-6]);
+//                m_polygon_changed[i-6] = true;
+//            }
+//            if(m_color_opacity_changed[i-6] == true){
+//                std::cout << "m_color_opacity_changed" << i-6 << std::endl;
+//                extCommand->deletePolygonModel(i);
+//                extCommand->registerPolygonModel(m_file_path_strings[i],i,m_polygon_opacity[i-6],m_polygon_color[i-6]);
+//                m_color_opacity_changed[i-6] = false;
+//            }
         }
         else
         {
             m_param->m_particles[i].m_enable = false;
-            if(i >= 6 && i <= 10 && m_polygon_changed[i-6] == true){
-                extCommand->deletePolygonModel(i);
-                m_polygon_changed[i-6] = false;
-            }
+//            if(i >= 6 && i <= 10 && m_polygon_changed[i-6] == true){
+//                extCommand->deletePolygonModel(i);
+//                m_polygon_changed[i-6] = false;
+//            }
         }
         // 粒子ファイルのパスを設定。ただし未設定の場合、表示フラグはfalseにする
         // Set the path of particle file. However, if not set, the display flag is set to false
@@ -382,41 +382,6 @@ void ParticlePanel::onSetButtonClick()
             particleName=qfi.fileName();
         }
 
-        if(particleFileName.right(4) == ".stl" && m_polygon_changed[item_num-6]){
-            if(m_particle_value[item_num]->isEnabled() == false){
-                std::cout << ".stl" << std::endl;
-                m_polygon_changed[item_num-6] = false;
-                m_file_path_strings[item_num].clear();
-                m_file_path_strings[item_num].append(particleFileName.toStdString());
-                printf( "Set m_file_path : %s\n", m_file_path_strings[item_num].c_str() );
-
-                // 削除リストを初期化
-                //        ui->itemToDelete->clear();
-                m_total_item++;
-                m_particle_value[item_num]->setText(particleName);
-                //            m_keep_initial_value[item_num]->setText( particleName );
-                //            m_keep_final_value[item_num]->setText(particleName);
-                m_item_strings[item_num].erase( 0 );
-                m_item_strings[item_num].append( particleName.toStdString());
-
-                // 操作可能にする
-                m_particle_value[item_num]->setEnabled(true);
-                m_keep_initial_value[item_num]->setEnabled(true);
-                m_keep_final_value[item_num]->setEnabled(true);
-
-
-                // addリストに追加
-                ui->itemToAdd->clear();
-                for ( int i = 1; i < 11; i++ )
-                {
-                    ui->itemToAdd->addItem(m_particle_value[i]->text());
-                    //            m_list_add->add_item( i, m_checkbox_particle[i]->name.c_str() );
-                }
-                ui->itemToAdd->setCurrentIndex(item_num-1);
-                ui->delete_btn->setEnabled(true);
-            }
-        }else{
-
             m_file_path_strings[item_num].clear();
             m_file_path_strings[item_num].append(particleFileName.toStdString());
             printf( "Set m_file_path : %s\n", m_file_path_strings[item_num].c_str() );
@@ -445,7 +410,7 @@ void ParticlePanel::onSetButtonClick()
             }
             ui->itemToAdd->setCurrentIndex(item_num-1);
             ui->delete_btn->setEnabled(true);
-        }
+//        }
     }
     this->setParam(this->m_param);
 }
@@ -460,8 +425,7 @@ void ParticlePanel::onDivColorChanged()
 {
     qDebug("on_divColor_btn_clicked");
     if(ui->itemToAdd->currentIndex() >= 5 && ui->itemToAdd->currentIndex() <= 9  ){
-    m_polygon_color[ui->itemToAdd->currentIndex()-5]=this->m_polygon_color_edit->getColorSelection();
-    m_color_opacity_changed[ui->itemToAdd->currentIndex()-5] = true;
+        m_param->m_particles[ui->itemToAdd->currentIndex()+1].m_polygon_color=this->m_polygon_color_edit->getColorSelection();;
     }
 }
 
@@ -469,7 +433,6 @@ void ParticlePanel::changeOpacityValue()
 {
     qDebug("on_divColor_btn_clicked");
     if(ui->itemToAdd->currentIndex() >= 5 && ui->itemToAdd->currentIndex() <= 9  ){
-    m_polygon_opacity[ui->itemToAdd->currentIndex()-5]=ui->doubleSpinBox->value();
-    m_color_opacity_changed[ui->itemToAdd->currentIndex()-5] = true;
+        m_param->m_particles[ui->itemToAdd->currentIndex()+1].m_polygon_opacity=ui->doubleSpinBox->value();
     }
 }
