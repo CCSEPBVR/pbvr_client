@@ -191,7 +191,7 @@ bool ParticleMerger::calculateExternalCoords( float* crd )
 {
     bool cf = false;
     size_t num = m_parameter.m_particles.size();
-    for ( size_t n = 1; n < num; n++ )
+    for ( size_t n = 1; n < 6; n++ )
     {
         if ( !m_parameter.m_particles[n].m_enable ) continue;
         if ( cf )
@@ -236,7 +236,7 @@ size_t ParticleMerger::getMergedInitialTimeStep()
     size_t init_step = getMergedFinalTimeStep();
 
     size_t num = m_parameter.m_particles.size();
-    for ( size_t n = 0; n < num; n++ )
+    for ( size_t n = 0; n < 6; n++ )
     {
         if ( !m_parameter.m_particles[n].m_enable ) continue;
         init_step = std::min( init_step, m_initial_step[n] );
@@ -251,7 +251,7 @@ size_t ParticleMerger::getMergedFinalTimeStep()
 
     size_t num = m_parameter.m_particles.size();
 //      std::cout << "ParticleMerger::getMergedFinalTimeStep num " <<num<< std::endl;
-    for ( size_t n = 0; n < num; n++ )
+    for ( size_t n = 0; n < 6; n++ )
     {
         if ( !m_parameter.m_particles[n].m_enable ) continue;
         fin_step = std::max( fin_step, m_final_step[n] );
@@ -267,7 +267,7 @@ kvs::PointObject* ParticleMerger::doMerge(
     kvs::PointObject* obj = new kvs::PointObject();
     size_t num = m_parameter.m_particles.size();
 
-    for ( size_t n = 0; n < num; n++ )
+    for ( size_t n = 0; n < 6; n++ )
     {
         // 2018.12.25 ステップ数の不一致は関係ない
         if ( !m_parameter.m_particles[n].m_enable ) continue;
@@ -379,6 +379,26 @@ kvs::PointObject* ParticleMerger::doMerge(
     }
 
     return obj;
+}
+
+bool ParticleMerger::isPolygonEnable(int index)
+{
+    return m_parameter.m_particles[index].m_enable;
+}
+
+std::string ParticleMerger::getPolygonFilePath(int index)
+{
+    return m_parameter.m_particles[index].m_file_path;
+}
+
+kvs::RGBColor ParticleMerger::getPolygonColor(int index)
+{
+    return m_parameter.m_particles[index].m_polygon_color;
+}
+
+double ParticleMerger::getPolygon_opacity(int index)
+{
+    return m_parameter.m_particles[index].m_polygon_opacity;
 }
 
 } // namespace visclient
