@@ -236,7 +236,7 @@ void PBVRGUI::restoreDefaultLayout()
     filterinfoPanel.setVisible(true);
     timecontrolPanel.setVisible(true);
     ui->AnimationToolBar->setVisible(true);
-    ui->RenderModeToolBar->setVisible(true);
+//    ui->RenderModeToolBar->setVisible(false);
     ui->XformToolBar->setVisible(true);
 }
 /**
