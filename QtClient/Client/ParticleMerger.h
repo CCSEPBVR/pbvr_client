@@ -40,6 +40,10 @@ public:
         const size_t step );
     void setEnable( const int i );
 
+    bool isPolygonEnable(int);
+    std::string getPolygonFilePath(int);
+    double getPolygon_opacity(int);
+    kvs::RGBColor getPolygonColor(int);
 };
 
 } // namespace visclient
