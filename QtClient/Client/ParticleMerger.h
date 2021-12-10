@@ -25,6 +25,7 @@ protected:
     std::vector<std::string> m_file_prefix;
     float m_x_min, m_y_min, m_z_min;
     float m_x_max, m_y_max, m_z_max;
+    kvs::Real32 m_server_side_subpixel_level = 1;
 
 public:
 

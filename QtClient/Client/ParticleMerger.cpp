@@ -351,6 +351,9 @@ kvs::PointObject* ParticleMerger::doMerge(
 
             if ( nmemb != 0 )
             {
+                //エラー回避
+                obj->setSize( 1 );
+                impobj->setSize( 1 );
                 ( *obj ) += *impobj;
             }
             delete impobj;
@@ -377,7 +380,15 @@ kvs::PointObject* ParticleMerger::doMerge(
         fprintf(serverMinMaxCoords_file,"%f,%f,%f,%f,%f,%f",obj->minObjectCoord().x(),obj->minObjectCoord().y(),obj->minObjectCoord().z(),obj->maxObjectCoord().x(),obj->maxObjectCoord().y(),obj->maxObjectCoord().z());
         fclose(serverMinMaxCoords_file);
     }
-
+    //サーバーのポイントオブジェクトが存在する場合は、統合したポイントオブジェクトのsubpixellevelの値をサーバ側の値にセットする。
+    //この時にサーバのsubpixellevelの値を保持しておく。
+    //存在しない場合は保持した値をセットする。
+    if(server_particle != nullptr){
+        obj->setSize(server_particle->size());
+        m_server_side_subpixel_level = server_particle->size();
+    }else{
+        obj->setSize(m_server_side_subpixel_level);
+    }
     return obj;
 }
 
