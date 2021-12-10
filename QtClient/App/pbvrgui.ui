@@ -491,15 +491,12 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:1.0, fx:0.5
     <string>🎞 +</string>
    </property>
    <property name="toolTip">
-    <string>Add Animation Frame [ F ]</string>
+    <string>Add Animation Frame</string>
    </property>
    <property name="font">
     <font>
      <pointsize>16</pointsize>
     </font>
-   </property>
-   <property name="shortcut">
-    <string>F</string>
    </property>
   </action>
   <action name="actionRemoveFrame">
@@ -507,15 +504,12 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:1.0, fx:0.5
     <string>🎞  -</string>
    </property>
    <property name="toolTip">
-    <string>Remove Animation Frame [ Shift + F ] </string>
+    <string>Remove Animation Frame</string>
    </property>
    <property name="font">
     <font>
      <pointsize>16</pointsize>
     </font>
-   </property>
-   <property name="shortcut">
-    <string>Shift+F</string>
    </property>
   </action>
   <action name="actionPlayFrames">
@@ -523,15 +517,12 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:1.0, fx:0.5
     <string>🎞 ▷</string>
    </property>
    <property name="toolTip">
-    <string>Play Animation [ M ]</string>
+    <string>Play Animation</string>
    </property>
    <property name="font">
     <font>
      <pointsize>15</pointsize>
     </font>
-   </property>
-   <property name="shortcut">
-    <string>M</string>
    </property>
   </action>
   <action name="actionRrep">
