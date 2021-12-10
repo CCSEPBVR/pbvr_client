@@ -371,31 +371,31 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
         {
             if(merger.isPolygonEnable(i) == true)
             {
-                if(m_is_polygon_displayed[i] == false){
+                if(m_is_polygon_displayed[i - 6] == false){
                 extCommand->registerPolygonModel(merger.getPolygonFilePath(i),
                                                  i,
                                                  merger.getPolygon_opacity(i),
                                                  merger.getPolygonColor(i));
-                m_before_opacity[i] = merger.getPolygon_opacity(i);
-                m_before_color[i] = merger.getPolygonColor(i);
-                m_is_polygon_displayed[i] = true;
-                }else if(m_before_color[i].r() != merger.getPolygonColor(i).r()||
-                         m_before_color[i].g() != merger.getPolygonColor(i).g()||
-                         m_before_color[i].b() != merger.getPolygonColor(i).b()||
-                         m_before_opacity[i] != merger.getPolygon_opacity(i))
+                m_before_opacity[i - 6] = merger.getPolygon_opacity(i);
+                m_before_color[i - 6] = merger.getPolygonColor(i);
+                m_is_polygon_displayed[i - 6] = true;
+                }else if(m_before_color[i - 6].r() != merger.getPolygonColor(i).r()||
+                         m_before_color[i - 6].g() != merger.getPolygonColor(i).g()||
+                         m_before_color[i - 6].b() != merger.getPolygonColor(i).b()||
+                         m_before_opacity[i - 6] != merger.getPolygon_opacity(i))
                 {
                     extCommand->deletePolygonModel(i);
                     extCommand->registerPolygonModel(merger.getPolygonFilePath(i),
                                                      i,
                                                      merger.getPolygon_opacity(i),
                                                      merger.getPolygonColor(i));
-                    m_before_opacity[i] = merger.getPolygon_opacity(i);
-                    m_before_color[i] = merger.getPolygonColor(i);
+                    m_before_opacity[i - 6] = merger.getPolygon_opacity(i);
+                    m_before_color[i - 6] = merger.getPolygonColor(i);
                 }
             }else{
-                if(m_is_polygon_displayed[i] == true){
+                if(m_is_polygon_displayed[i - 6] == true){
                 extCommand->deletePolygonModel(i);
-                m_is_polygon_displayed[i] = false;
+                m_is_polygon_displayed[i - 6] = false;
                 }
             }
         }
