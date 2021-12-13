@@ -708,7 +708,6 @@ void ExtCommand::CallBackApply( const int i )
 
 //OSAKI
 void ExtCommand::registerPolygonModel (std::string str,int currentIndex,double opacity,kvs::RGBColor color) {
-    std::cout << __FILE_NAME__ << "," << __func__ << "," << __LINE__ << std::endl;
     const std::string filePath = str;
     const std::string extension = filePath.substr(filePath.length()-4, 4);
 
