@@ -42,7 +42,7 @@ protected:
 public:
     bool m_do_export;
     std::string m_export_file_path;
-    /*Notice 0~5は粒子,6~10はポリゴンデータです。*/
+    //Notice 0~5は粒子,6~10はポリゴンデータです。
     std::vector<ParticleData> m_particles; // 0:server 1-10:file
     int m_circuit_time;
 
