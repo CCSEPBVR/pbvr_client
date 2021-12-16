@@ -316,7 +316,7 @@ void PBVRGUI::load_parameter_file(kvs::visclient::Argument& argument)
      //    int ret = extCommand->getServerParticleInfomation(  ); // unused parameter
     if (ret < 0) {
         showStatusMessage("Failed to getServerParticleInfomation. Is the server still alive?",true);
-//        exit(1);
+        exit(1);
         //        exit(1);		// add by @hira at 2016/12/01 : 接続エラーの場合終了する
     }
 #endif
