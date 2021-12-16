@@ -14,7 +14,7 @@ namespace visclient
 class Argument : public kvs::CommandLine
 {
 public:
-    std::string m_header;
+    bool m_header;
     kvs::TransferFunction m_transfer_function;
     size_t m_subpixel_level_abstract;
     size_t m_subpixel_level_detailed;
@@ -262,14 +262,15 @@ public:
 
         // mofify by @hira at 2016/12/01
         // if ( this->hasOption( "vin" ))
+        //m_header trueはサーバーと通信 falseはスタンドアローンモード
         if ( this->hasOption( "vin" ) || this->hasOption( "fin" ))
         {
-            m_header = "";
+            m_header = true;
             client_mode = 1;
         }
         else
         {
-            m_header = "s";
+            m_header = false;
         }
 #else
         int client_mode = 1;
