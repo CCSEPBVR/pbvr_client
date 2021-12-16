@@ -287,7 +287,7 @@ void ExtCommand::initCommand()
 #else
     inSituInit();
 #endif
-    if ( argument.m_header != "" )
+    if(argument.m_header == false)
     {
         this->m_parameter.m_particle_directory = argument.m_header;
         this->m_parameter.m_client_server_mode = 0;
