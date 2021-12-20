@@ -74,7 +74,8 @@ void TimerEvent::update( kvs::TimeEvent* event )
                //全タイムステップの配列確保廃止に伴う変更
 //                *m_front_object = *( m_command->m_detailed_particles[m_command->m_parameter.m_time_step] );
                *m_front_object = *( m_command->m_detailed_particles[m_command->m_detailed_particles.size()-1] );
-                sp_level= m_command->m_parameter.m_detailed_subpixel_level;
+//                sp_level= m_command->m_parameter.m_detailed_subpixel_level;
+               sp_level = m_command->m_detailed_particles[m_command->m_detailed_particles.size()-1]->size();
             }
             else
             {

@@ -60,7 +60,8 @@ Command::Command( ParticleServer* server ) :
     m_is_key_frame_animation( false ),
     m_server( server ),
     m_last_sampling_params( NULL ),
-    m_particle_assign_flag( false )
+    m_particle_assign_flag( false ),
+    m_server_side_subpixel_level(1)
 {
     m_parameter.m_time_step_key_frame = -1;
     m_step_key_frame = 0;
@@ -222,7 +223,7 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
             {
                 object = m_server_particles[step];
             }
-            p = merger.doMerge( object, step );
+            p = merger.doMerge( object, step, false );
             delete p;
         }
         param->m_particle_merge_param.m_do_export = false;
@@ -365,7 +366,22 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
             server_object = m_server_particles[param->m_time_step];
         kvs::PointObject* object;
         merger.setParam( param->m_particle_merge_param, param->m_min_server_time_step, param->m_max_server_time_step );
-        object = merger.doMerge( server_object, param->m_time_step );
+
+        if(param->m_client_server_mode != 0){
+
+            object = merger.doMerge( server_object, param->m_time_step,true );
+            if(server_object != nullptr){
+                if(server_object->size() != m_server_side_subpixel_level){
+                    m_server_side_subpixel_level = server_object->size();
+                    object->setSize(m_server_side_subpixel_level);
+                }
+            }else{
+                object->setSize(m_server_side_subpixel_level);
+            }
+
+        }else{
+            object = merger.doMerge( server_object, param->m_time_step,false );
+        }
 
         for(int i = 6;i < 11;i++)
         {
@@ -656,6 +672,11 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
         }
     }
 
+//    if(param->m_client_server_mode == 0){
+//        param->m_detailed_subpixel_level = m_detailed_particles[m_detailed_particles.size()-1]->size();
+//        m_parameter.m_detailed_subpixel_level = m_detailed_particles[m_detailed_particles.size()-1]->size();
+//    }
+
     // change view
     if ( resetflag )
     {
@@ -664,9 +685,10 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
         ((RenderArea*)m_screen)->setCoordinateBoundaries(crd);
     }
     if(keeper == true){
+        if(param->m_client_server_mode != 0){
         m_detailed_particles[m_detailed_particles.size()-1]->setMinMaxObjectCoords(kvs::Vector3f(m_server_coord_min[1][0],m_server_coord_min[1][1],m_server_coord_min[1][2]),kvs::Vector3f(m_server_coord_max[1][0],m_server_coord_max[1][1],m_server_coord_max[1][2]));
         m_detailed_particles[m_detailed_particles.size()-1]->setMinMaxExternalCoords(kvs::Vector3f(m_server_coord_min[1][0],m_server_coord_min[1][1],m_server_coord_min[1][2]),kvs::Vector3f(m_server_coord_max[1][0],m_server_coord_max[1][1],m_server_coord_max[1][2]));
-
+        }
         if(local_particle_exits == true){
             m_detailed_particles[m_detailed_particles.size()-1]->setMinMaxObjectCoords(kvs::Vector3f(local_crd[0],local_crd[1],local_crd[2]),kvs::Vector3f(local_crd[3],local_crd[4],local_crd[5]));
             m_detailed_particles[m_detailed_particles.size()-1]->setMinMaxExternalCoords(kvs::Vector3f(local_crd[0],local_crd[1],local_crd[2]),kvs::Vector3f(local_crd[3],local_crd[4],local_crd[5]));

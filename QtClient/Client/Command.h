@@ -120,6 +120,7 @@ public:
     bool m_is_polygon_displayed[5] = {false,false,false,false,false};
     double m_before_opacity[5];
     kvs::RGBColor m_before_color[5];
+    kvs::Real32 m_server_side_subpixel_level;
     VisualizationParameter m_parameter;
     ReceivedMessage m_result;
 //    ExtendedParticleVolumeRenderer* m_renderer;

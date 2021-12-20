@@ -17,7 +17,8 @@ ParticleMerger::ParticleMerger():
     m_initial_step( m_parameter.m_particles.size() ),
     m_final_step( m_parameter.m_particles.size() ),
     m_division( m_parameter.m_particles.size() ),
-    m_file_prefix( m_parameter.m_particles.size() )
+    m_file_prefix( m_parameter.m_particles.size() ),
+    m_local_object_subpixel_level(1)
 {
 }
 
@@ -33,6 +34,7 @@ void ParticleMerger::setParam( const ParticleMergeParameter& param, const size_t
 
     for ( size_t n = 0; n < num; n++ )
     {
+        if(!m_parameter.m_particles[n].m_enable) continue;
         const std::string m_file_path = m_parameter.m_particles[n].m_file_path;
         const std::string lastm_file_path = m_last_parameter.m_particles[n].m_file_path;
         if ( m_file_path == "server" )
@@ -147,6 +149,7 @@ void ParticleMerger::setParam( const ParticleMergeParameter& param, const size_t
 
                     const kvs::File file( filename );
                     kvs::PointObject* impobj = new kvs::PointImporter( filename );
+                    m_local_object_subpixel_level = impobj->size();
                     //サーバ側のmix max coordsを書き記したテキストファイルを読み込む。
                     //ない場合は従来の方法でminmaxの値を決める。
                     std::string filename_minMax = prefix + ".minMax";
@@ -262,7 +265,8 @@ size_t ParticleMerger::getMergedFinalTimeStep()
 
 kvs::PointObject* ParticleMerger::doMerge(
     const kvs::PointObject* server_particle,
-    const size_t step )
+    const size_t step,
+    bool is_client_server_mode)
 {
     kvs::PointObject* obj = new kvs::PointObject();
     size_t num = m_parameter.m_particles.size();
@@ -383,11 +387,29 @@ kvs::PointObject* ParticleMerger::doMerge(
     //サーバーのポイントオブジェクトが存在する場合は、統合したポイントオブジェクトのsubpixellevelの値をサーバ側の値にセットする。
     //この時にサーバのsubpixellevelの値を保持しておく。
     //存在しない場合は保持した値をセットする。
-    if(server_particle != nullptr){
-        obj->setSize(server_particle->size());
-        m_server_side_subpixel_level = server_particle->size();
-    }else{
-        obj->setSize(m_server_side_subpixel_level);
+    if(is_client_server_mode == true){
+        if(server_particle != nullptr){
+            obj->setSize(server_particle->size());
+            m_server_side_subpixel_level = server_particle->size();
+        }else{
+                obj->setSize(m_server_side_subpixel_level);
+        }
+//        obj->setSize(server_particle->size());
+    }
+
+    if(is_client_server_mode == false){
+        if(server_particle != nullptr){
+            obj->setSize(server_particle->size());
+            m_server_side_subpixel_level = server_particle->size();
+        }else{
+            if(m_server_side_subpixel_level != m_local_object_subpixel_level)
+            {
+                obj->setSize(m_local_object_subpixel_level);
+            }else{
+                obj->setSize(m_server_side_subpixel_level);
+            }
+
+        }
     }
     return obj;
 }

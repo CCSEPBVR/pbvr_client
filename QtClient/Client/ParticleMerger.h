@@ -25,7 +25,8 @@ protected:
     std::vector<std::string> m_file_prefix;
     float m_x_min, m_y_min, m_z_min;
     float m_x_max, m_y_max, m_z_max;
-    kvs::Real32 m_server_side_subpixel_level = 1;
+    kvs::Real32 m_local_object_subpixel_level;//粒子統合時に最後に入力されたローカルファイルのサブピクセルレベルが入る。
+    kvs::Real32 m_server_side_subpixel_level;
 
 public:
 
@@ -38,7 +39,8 @@ public:
     size_t getMergedFinalTimeStep();
     kvs::PointObject* doMerge(
         const kvs::PointObject* server_particle,
-        const size_t step );
+        const size_t step,
+        bool is_client_server_mode);
     void setEnable( const int i );
 
     bool isPolygonEnable(int);
