@@ -232,7 +232,7 @@ void TimerEvent::update( kvs::TimeEvent* event )
             float f = delta * ( float )t;
             m_command->m_parameter.m_time_step_key_frame = ( int )( ( float )( m_time_steps->at( i ) ) + f );
 
-            if ( m_command->m_parameter.m_client_server_mode == 1 )
+            if ( m_command->m_parameter.m_client_server_mode == 1 || m_command->m_parameter.m_client_server_mode == 0)
             {
                 if ( m_command->m_parameter.m_time_step != m_command->m_parameter.m_time_step_key_frame )
                 {
