@@ -744,9 +744,10 @@ void Command::postUpdate()
     }else{
         m_parameter.m_detailed_subpixel_level = m_local_subpixel_level;
     }
-
-    m_screen->setRenderSubPixelLevel(m_parameter.m_detailed_subpixel_level);
-//    m_screen->recreateRenderImageBuffer(m_parameter.m_detailed_subpixel_level);
+    if(m_parameter.m_client_server_mode != 0){
+        m_screen->setRenderSubPixelLevel(m_parameter.m_detailed_subpixel_level);
+    }
+    //    m_screen->recreateRenderImageBuffer(m_parameter.m_detailed_subpixel_level);
 
     PBVR_TIMER_STA( 150 );
 
