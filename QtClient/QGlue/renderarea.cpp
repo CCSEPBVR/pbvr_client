@@ -449,7 +449,7 @@ void RenderArea::keyPressEvent(QKeyEvent *kbEvent){
         qInfo(" [debug] 'S' pressed. (write Xform to file)");
         KeyFrameAnimationWrite();
         break;
-    case kvs::Key::F:
+    case kvs::Key::L:
         qInfo(" [debug] 'F' pressed. (read Xform from file)");
         KeyFrameAnimationRead();
         break;
