@@ -312,10 +312,10 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:1.0, fx:0.5
   </action>
   <action name="actionZoomIn">
    <property name="text">
-    <string>🔍  +</string>
+    <string>Zoom +</string>
    </property>
    <property name="iconText">
-    <string>🔍  +</string>
+    <string>Zoom +</string>
    </property>
    <property name="toolTip">
     <string>Zoom In [ z ]</string>
@@ -331,10 +331,10 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:1.0, fx:0.5
   </action>
   <action name="actionZoomOut">
    <property name="text">
-    <string>🔍  -</string>
+    <string>Zoom -</string>
    </property>
    <property name="iconText">
-    <string>🔍  -</string>
+    <string>Zoom -</string>
    </property>
    <property name="toolTip">
     <string>Zoom Out [ Shift + z ]</string>
@@ -488,7 +488,7 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:1.0, fx:0.5
   </action>
   <action name="actionAddFrame">
    <property name="text">
-    <string>🎞 +</string>
+    <string>Add Frame</string>
    </property>
    <property name="toolTip">
     <string>Add Animation Frame [ F ]</string>
@@ -504,7 +504,7 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:1.0, fx:0.5
   </action>
   <action name="actionRemoveFrame">
    <property name="text">
-    <string>🎞  -</string>
+    <string>Remove Frame</string>
    </property>
    <property name="toolTip">
     <string>Remove Animation Frame [ Shift + F ] </string>
@@ -520,7 +520,7 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:1.0, fx:0.5
   </action>
   <action name="actionPlayFrames">
    <property name="text">
-    <string>🎞 ▷</string>
+    <string>Play Frames</string>
    </property>
    <property name="toolTip">
     <string>Play Animation [ M ]</string>
