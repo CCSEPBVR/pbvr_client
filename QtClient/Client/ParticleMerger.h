@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <kvs/PointObject>
+#include <kvs/PolygonObject>
 #include "ParticleMergeParameter.h"
 
 namespace kvs
@@ -47,6 +48,10 @@ public:
     std::string getPolygonFilePath(int);
     double getPolygon_opacity(int);
     kvs::RGBColor getPolygonColor(int);
+    size_t getLocalObjectInitialStep(int);
+    size_t getLocalObjectFinalStep(int);
+    bool getLocalObjectIsEnableKeepInitial(int);
+    bool getLocalObjectIsEnableKeepFinal(int);
 };
 
 } // namespace visclient

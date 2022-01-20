@@ -61,16 +61,16 @@ ParticlePanel::ParticlePanel(QWidget *parent) :
     connect_T(ui->doubleSpinBox,  QDoubleSpinBox,  valueChanged,double, &ParticlePanel::changeOpacityValue);
 
     onItemToAddIndexChange(ui->itemToAdd->currentIndex());
-    ui->keepInitial6->setVisible(false);
-    ui->keepInitial7->setVisible(false);
-    ui->keepInitial8->setVisible(false);
-    ui->keepInitial9->setVisible(false);
-    ui->keepInitial10->setVisible(false);
-    ui->keepFinal6->setVisible(false);
-    ui->keepFinal7->setVisible(false);
-    ui->keepFinal8->setVisible(false);
-    ui->keepFinal9->setVisible(false);
-    ui->keepFinal10->setVisible(false);
+//    ui->keepInitial6->setVisible(false);
+//    ui->keepInitial7->setVisible(false);
+//    ui->keepInitial8->setVisible(false);
+//    ui->keepInitial9->setVisible(false);
+//    ui->keepInitial10->setVisible(false);
+//    ui->keepFinal6->setVisible(false);
+//    ui->keepFinal7->setVisible(false);
+//    ui->keepFinal8->setVisible(false);
+//    ui->keepFinal9->setVisible(false);
+//    ui->keepFinal10->setVisible(false);
 
 }
 /*===============================================================================*/

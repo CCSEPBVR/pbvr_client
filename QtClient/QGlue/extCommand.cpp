@@ -707,6 +707,270 @@ void ExtCommand::CallBackApply( const int i )
 //OSAKI
 
 //OSAKI
+void ExtCommand::calculateTotalPolygonObjectXform(std::string str, int currentIndex){
+    const std::string filePath = str;
+    const std::string extension = filePath.substr(filePath.length()-4, 4);
+
+    kvs::FileFormatBase* io = nullptr;
+
+    // select importer
+    if(extension == ".stl"){
+        io = new kvs::Stl;
+    }else{
+        std::cerr << "Unknown file format:" << filePath << std::endl;
+        return;
+    }
+
+    io->read(filePath);
+
+    kvs::PolygonImporter* importer = nullptr;
+
+    if(io->isSuccess()){
+        std::cout << "loading " << io->filename() << " succeed." << std::endl;
+        importer = new kvs::PolygonImporter();
+        importer->exec(io);
+        std::string ObjName = "POLYGON_MODEL" + std::to_string(currentIndex - 6);
+        importer->setName(ObjName);
+
+        importer->updateMinMaxCoords();
+        importer->setXform(this->m_screen->scene()->objectManager()->xform());
+
+        kvs::StochasticPolygonRenderer* renderer = new kvs::StochasticPolygonRenderer();
+
+            this->m_screen->scene()->registerObject(importer, renderer);
+            m_total_polygon_object_xform = this->m_screen->scene()->object()->xform();
+            m_total_polygon_object_min_coords = this->m_screen->scene()->object()->minExternalCoord();
+            m_total_polygon_object_max_coords = this->m_screen->scene()->object()->maxExternalCoord();
+
+            std::cout << __FILE_NAME__ << "," << __func__  << "," << __LINE__ << std::endl;
+            std::cout << "[objectManager]" << std::endl;
+            std::cout << "[ObjectCoord]" << std::endl;
+            std::cout << this->m_screen->scene()->objectManager()->minObjectCoord().x() << std::endl;
+            std::cout << this->m_screen->scene()->objectManager()->minObjectCoord().y() << std::endl;
+            std::cout << this->m_screen->scene()->objectManager()->minObjectCoord().z() << std::endl;
+            std::cout << this->m_screen->scene()->objectManager()->maxObjectCoord().x() << std::endl;
+            std::cout << this->m_screen->scene()->objectManager()->maxObjectCoord().y() << std::endl;
+            std::cout << this->m_screen->scene()->objectManager()->maxObjectCoord().z() << std::endl;
+            std::cout << "[External]" << std::endl;
+            std::cout << this->m_screen->scene()->objectManager()->minExternalCoord().x() << std::endl;
+            std::cout << this->m_screen->scene()->objectManager()->minExternalCoord().y() << std::endl;
+            std::cout << this->m_screen->scene()->objectManager()->minExternalCoord().z() << std::endl;
+            std::cout << this->m_screen->scene()->objectManager()->maxExternalCoord().x() << std::endl;
+            std::cout << this->m_screen->scene()->objectManager()->maxExternalCoord().y() << std::endl;
+            std::cout << this->m_screen->scene()->objectManager()->maxExternalCoord().z() << std::endl;
+            std::cout << "[xform]" << std::endl;
+            std::cout << this->m_screen->scene()->objectManager()->xform().translation() << std::endl;
+            std::cout << this->m_screen->scene()->objectManager()->xform().scaling() << std::endl;
+            std::cout << this->m_screen->scene()->objectManager()->xform().rotation() << std::endl;
+            std::cout << "[object]" << std::endl;
+            std::cout << "[ObjectCoord]" << std::endl;
+            std::cout << this->m_screen->scene()->object(ObjName)->minObjectCoord().x() << std::endl;
+            std::cout << this->m_screen->scene()->object(ObjName)->minObjectCoord().y() << std::endl;
+            std::cout << this->m_screen->scene()->object(ObjName)->minObjectCoord().z() << std::endl;
+            std::cout << this->m_screen->scene()->object(ObjName)->maxObjectCoord().x() << std::endl;
+            std::cout << this->m_screen->scene()->object(ObjName)->maxObjectCoord().y() << std::endl;
+            std::cout << this->m_screen->scene()->object(ObjName)->maxObjectCoord().z() << std::endl;
+            std::cout << "[External]" << std::endl;
+            std::cout << this->m_screen->scene()->object(ObjName)->minExternalCoord().x() << std::endl;
+            std::cout << this->m_screen->scene()->object(ObjName)->minExternalCoord().y() << std::endl;
+            std::cout << this->m_screen->scene()->object(ObjName)->minExternalCoord().z() << std::endl;
+            std::cout << this->m_screen->scene()->object(ObjName)->maxExternalCoord().x() << std::endl;
+            std::cout << this->m_screen->scene()->object(ObjName)->maxExternalCoord().y() << std::endl;
+            std::cout << this->m_screen->scene()->object(ObjName)->maxExternalCoord().z() << std::endl;
+            std::cout << "[xform]" << std::endl;
+            std::cout << this->m_screen->scene()->object(ObjName)->xform().translation() << std::endl;
+            std::cout << this->m_screen->scene()->object(ObjName)->xform().scaling() << std::endl;
+            std::cout << this->m_screen->scene()->object(ObjName)->xform().rotation() << std::endl;
+
+    }else{
+        std::cerr << "ERROR : loading " << io->filename() << " failed." << std::endl;
+    }
+
+    delete io;
+}
+
+void ExtCommand::debug2(int currentIndex){
+    kvs::PolygonObject* m_polygon_object_spx = new kvs::PolygonObject();    //spxは実体
+    kvs::PolygonObject* m_polygon_imp_object_spx = new kvs::PolygonImporter("/Users/kawamuratakuma/OsakiWorkSpace/PBVR_DEV/CS_PBVR_SAMPLES/spx_stl3/spx_00003.stl");
+
+    //1レンダラーにつき1オブジェクトにしてみて
+    m_polygon_object_spx->setXform(m_screen->scene()->objectManager()->xform());//これをしないとマウス回転中に登録が発生した場合位置がずれる。
+    m_polygon_object_spx->setMinMaxObjectCoords(m_polygon_imp_object_spx->minObjectCoord(),m_polygon_imp_object_spx->maxObjectCoord());//これをしないと真ん中にこない
+    m_polygon_object_spx->setMinMaxExternalCoords(m_polygon_imp_object_spx->minExternalCoord(),m_polygon_imp_object_spx->maxExternalCoord());//これをしないと横長になる
+
+    m_polygon_object_spx->setName("Polygon_spx");
+    m_polygon_imp_object_spx->setName("Polygon_spx_imp");
+
+    kvs::StochasticPolygonRenderer* renderer = new kvs::StochasticPolygonRenderer();
+    if(m_screen->scene()->hasObject("Polygon_spx") == false && m_screen->scene()->hasObject("Polygon_spx_imp") == false)
+    {
+    m_screen->scene()->registerObject(m_polygon_object_spx,renderer);
+    m_screen->scene()->replaceObject("Polygon_spx",m_polygon_imp_object_spx,false);
+    }
+
+    else if(m_screen->scene()->hasObject("Polygon_spx") == true)
+    {
+    m_screen->scene()->replaceObject("Polygon_spx",m_polygon_imp_object_spx,false);
+    }
+
+    else if(m_screen->scene()->hasObject("Polygon_spx_imp"))
+    {
+    m_screen->scene()->replaceObject("Polygon_spx_imp",m_polygon_object_spx,false); //入力ポリゴンデータが複数ある時に使用する。
+//    m_screen->scene()->removeObject("Polygon_spx_imp",false,false); //入力されるポリゴンデータが一つしかない時に使用する。
+    }
+    std::cout << m_screen->scene()->hasObjects() << std::endl;
+
+    m_screen->update();
+}
+
+void ExtCommand::debug3(int currentIndex)
+{
+    kvs::PolygonObject* m_polygon_object_tube = new kvs::PolygonObject();   //tubeは空
+    kvs::PolygonObject* m_polygon_imp_object_tube = new kvs::PolygonImporter("/Users/kawamuratakuma/OsakiWorkSpace/PBVR_DEV/CS_PBVR_SAMPLES/bin/bin_00001.stl");
+
+    m_polygon_object_tube->setXform(m_screen->scene()->objectManager()->xform());
+    m_polygon_object_tube->setMinMaxObjectCoords(m_polygon_imp_object_tube->minObjectCoord(),m_polygon_imp_object_tube->maxObjectCoord());
+    m_polygon_object_tube->setMinMaxExternalCoords(m_polygon_imp_object_tube->minExternalCoord(),m_polygon_imp_object_tube->maxExternalCoord());
+
+    m_polygon_object_tube->setName("Polygon_tube");
+    m_polygon_imp_object_tube->setName("Polygon_tube_imp");
+
+    kvs::StochasticPolygonRenderer* renderer = new kvs::StochasticPolygonRenderer();
+    if(m_screen->scene()->hasObject("Polygon_tube") == false && m_screen->scene()->hasObject("Polygon_tube_imp") == false)
+    {
+        m_screen->scene()->registerObject(m_polygon_object_tube,renderer);
+//        m_screen->scene()->replaceObject("Polygon_tube",m_polygon_imp_object_tube,false);
+    }
+
+    else if(m_screen->scene()->hasObject("Polygon_tube") == true)
+    {
+        m_screen->scene()->replaceObject("Polygon_tube",m_polygon_imp_object_tube,false);
+    }
+
+    else if(m_screen->scene()->hasObject("Polygon_tube_imp") == true)
+    {
+        m_screen->scene()->replaceObject("Polygon_tube_imp",m_polygon_object_tube,false); //入力ポリゴンデータが複数ある時に使用する。
+//        m_screen->scene()->removeObject("Polygon_tube_imp",false,false); //入力されるポリゴンデータが一つしかない時に使用する。
+    }
+    std::cout << m_screen->scene()->hasObjects() << std::endl;
+
+    m_screen->update(); //これがないと画面が更新されない
+}
+
+void ExtCommand::registerPolygonModel_v2(std::string str, int currentIndex, double opacity, kvs::RGBColor color){
+    const std::string filePath = str;
+    const std::string extension = filePath.substr(filePath.length()-4, 4);
+
+    kvs::FileFormatBase* io = nullptr;
+
+    // select importer
+    if(extension == ".stl"){
+        io = new kvs::Stl;
+    }else{
+        std::cerr << "Unknown file format:" << filePath << std::endl;
+        return;
+    }
+
+    kvs::PolygonObject* m_polygon_object_empty = new kvs::PolygonObject(); //空オブジェクト
+    kvs::PolygonObject* m_polygon_imp_object = new kvs::PolygonImporter(filePath);
+
+    std::string ObjNameEmpty = "POLYGON_OBJ_EMPTY" + std::to_string(currentIndex - 5);
+    std::string ObjNameImp = "POLYGON_OBJ_IMP" + std::to_string(currentIndex - 5);
+
+    m_polygon_object_empty->setXform(m_screen->scene()->objectManager()->xform());
+    m_polygon_object_empty->setMinMaxObjectCoords(m_polygon_imp_object->minObjectCoord(),m_polygon_imp_object->maxObjectCoord());
+    m_polygon_object_empty->setMinMaxExternalCoords(m_polygon_imp_object->minExternalCoord(),m_polygon_imp_object->maxExternalCoord());
+
+    m_polygon_object_empty->setName(ObjNameEmpty);
+    m_polygon_imp_object->setName(ObjNameImp);
+    m_polygon_imp_object->setOpacity(opacity*255);
+    m_polygon_imp_object->setColor(color);
+
+    kvs::StochasticPolygonRenderer* renderer = new kvs::StochasticPolygonRenderer();
+    if(m_screen->scene()->hasObject(ObjNameEmpty) == false && m_screen->scene()->hasObject(ObjNameImp) == false)
+    {
+        m_screen->scene()->registerObject(m_polygon_object_empty,renderer);
+        m_screen->scene()->replaceObject(ObjNameEmpty,m_polygon_imp_object,false);
+    }
+
+    if(m_screen->scene()->hasObject(ObjNameImp) == true)
+    {
+        m_screen->scene()->replaceObject(ObjNameImp,m_polygon_imp_object,false);
+    }
+
+    if(m_screen->scene()->hasObject(ObjNameEmpty) == true)
+    {
+        m_screen->scene()->replaceObject(ObjNameEmpty,m_polygon_imp_object,false);
+    }
+
+//    else if(m_screen->scene()->hasObject(ObjNameEmpty) == true)
+//    {
+//        m_screen->scene()->replaceObject(ObjNameEmpty,m_polygon_imp_object,false);
+//    }
+
+//    else if(m_screen->scene()->hasObject(ObjNameImp) == true)
+//    {
+//        m_screen->scene()->replaceObject(ObjNameImp,m_polygon_object_empty,false); //入力ポリゴンデータが複数ある時に使用する。
+////        m_screen->scene()->removeObject("Polygon_tube_imp",false,false); //入力されるポリゴンデータが一つしかない時に使用する。
+//    }
+
+}
+
+void ExtCommand::registerPolygonModel_v3(std::string str, int currentIndex, double opacity, kvs::RGBColor color){
+    const std::string filePath = str;
+    const std::string extension = filePath.substr(filePath.length()-4, 4);
+
+    kvs::FileFormatBase* io = nullptr;
+
+    // select importer
+    if(extension == ".stl"){
+        io = new kvs::Stl;
+    }else{
+        std::cerr << "Unknown file format:" << filePath << std::endl;
+        return;
+    }
+
+    kvs::PolygonObject* m_polygon_object_empty = new kvs::PolygonObject(); //空オブジェクト
+    kvs::PolygonObject* m_polygon_imp_object = new kvs::PolygonImporter(filePath);
+
+    std::string ObjNameEmpty = "POLYGON_OBJ_EMPTY" + std::to_string(currentIndex - 5);
+    std::string ObjNameImp = "POLYGON_OBJ_IMP" + std::to_string(currentIndex - 5);
+
+    m_polygon_object_empty->setXform(m_screen->scene()->objectManager()->xform());
+    m_polygon_object_empty->setMinMaxObjectCoords(m_polygon_imp_object->minObjectCoord(),m_polygon_imp_object->maxObjectCoord());
+    m_polygon_object_empty->setMinMaxExternalCoords(m_polygon_imp_object->minExternalCoord(),m_polygon_imp_object->maxExternalCoord());
+
+    m_polygon_object_empty->setName(ObjNameEmpty);
+    m_polygon_imp_object->setName(ObjNameImp);
+    m_polygon_imp_object->setOpacity(opacity*255);
+    m_polygon_imp_object->setColor(color);
+
+    kvs::StochasticPolygonRenderer* renderer = new kvs::StochasticPolygonRenderer();
+    if(m_screen->scene()->hasObject(ObjNameEmpty) == false && m_screen->scene()->hasObject(ObjNameImp) == false)
+    {
+        m_screen->scene()->registerObject(m_polygon_object_empty,renderer);
+        m_screen->scene()->replaceObject(ObjNameEmpty,m_polygon_object_empty,false);
+    }
+
+    if(m_screen->scene()->hasObject(ObjNameEmpty) == true)
+    {
+        m_screen->scene()->replaceObject(ObjNameEmpty,m_polygon_object_empty,false);
+    }
+
+    if(m_screen->scene()->hasObject(ObjNameImp) == true)
+    {
+        m_screen->scene()->replaceObject(ObjNameImp,m_polygon_object_empty,false);
+    }
+
+//    else if(m_screen->scene()->hasObject(ObjNameImp) == true)
+//    {
+//        m_screen->scene()->replaceObject(ObjNameImp,m_polygon_object_empty,false); //入力ポリゴンデータが複数ある時に使用する。
+////        m_screen->scene()->removeObject("Polygon_tube_imp",false,false); //入力されるポリゴンデータが一つしかない時に使用する。
+//    }
+
+}
+
+
 void ExtCommand::registerPolygonModel (std::string str,int currentIndex,double opacity,kvs::RGBColor color) {
     const std::string filePath = str;
     const std::string extension = filePath.substr(filePath.length()-4, 4);
@@ -734,7 +998,8 @@ void ExtCommand::registerPolygonModel (std::string str,int currentIndex,double o
 //        importer->setOpacity(opacity);//*255(kvs::UInt8)
         importer->setColor(color);
 //        importer->setColor()
-        importer->setName ("POLYGON_MODEL");
+        std::string ObjName = "POLYGON_MODEL" + std::to_string(currentIndex - 6);
+        importer->setName(ObjName);
 
 //        //bug調査
         importer->updateMinMaxCoords();
@@ -793,7 +1058,102 @@ void ExtCommand::registerPolygonModel (std::string str,int currentIndex,double o
 
 #else // ENABLE_BENCHMARK_POLYGON
         kvs::StochasticPolygonRenderer* renderer = new kvs::StochasticPolygonRenderer();
-        m_polygon_pair[currentIndex-6] = this->m_screen->scene()->registerObject(importer, renderer);
+        if(this->m_screen->scene()->hasObject(ObjName) == true)
+        {
+            this->m_screen->scene()->replaceObject(ObjName,importer,false);
+        }else{
+            this->m_screen->scene()->registerObject(importer, renderer);
+        }
+//        this->m_screen->scene()->objectManager()->setXform(kvs::Xform(m_total_polygon_object_xform.translation(),m_total_polygon_object_xform.scaling(),this->m_screen->scene()->objectManager()->xform().rotation()));
+//        this->m_screen->scene()->object()->setXform(kvs::Xform(m_total_polygon_object_xform.translation(),m_total_polygon_object_xform.scaling(),this->m_screen->scene()->object()->xform().rotation()));
+                this->m_screen->scene()->object()->setXform(kvs::Xform(this->m_screen->scene()->object()->xform().translation(),this->m_screen->scene()->object()->xform().scaling(),this->m_screen->scene()->object()->xform().rotation()));
+//        this->m_screen->scene()->object()->setXform(kvs::Xform(m_total_polygon_object_xform.translation(),m_total_polygon_object_xform.scaling(),m_total_polygon_object_xform.rotation()));
+        //Obj_1 Obj_nそれぞれのxformを計算してみる。(存在したらの話ね)
+//        for(int i = 0; i < 5;i ++)
+//        {
+//            std::string TestName = "POLYGON_MODEL" + std::to_string(i);
+//            if(this->m_screen->scene()->hasObject(TestName))
+//            {
+//                this->m_screen->scene()->object(TestName)->setXform(this->m_screen->scene()->object(TestName)->xform()*this->m_screen->scene()->objectManager()->xform());
+//            }
+//        }
+//                this->m_screen->scene()->object()->setXform(this->m_screen->scene()->object()->xform());
+//                this->m_screen->scene()->object()->setMinMaxObjectCoords(this->m_screen->scene()->object()->minObjectCoord(),this->m_screen->scene()->object()->maxObjectCoord());
+//                this->m_screen->scene()->object()->setMinMaxExternalCoords(this->m_screen->scene()->object()->minExternalCoord(),this->m_screen->scene()->object()->maxExternalCoord());
+//        this->m_screen->scene()->object()->setMinMaxObjectCoords(m_total_polygon_object_min_coords,m_total_polygon_object_max_coords);
+//        this->m_screen->scene()->object()->setMinMaxExternalCoords(m_total_polygon_object_min_coords,m_total_polygon_object_max_coords);
+
+        float crd_name[6];
+        float crd_name2[6];
+        float crd_name3[6];
+//        crd[0] = 0.025677;
+//        crd[1] = 0;
+//        crd[2] = -8.67;
+//        crd[3] = 10;
+//        crd[4] = 8.80969;
+//        crd[5] = 4.50402;
+
+        //tubeが正しい位置にある時のcoords
+        crd_name[0] = 0.025677;
+        crd_name[1] = 0;
+        crd_name[2] = -8.67;
+        crd_name[3] = 10;
+        crd_name[4] = 8.80969;
+        crd_name[5] = 4.50402;
+
+        crd_name2[0] = 4.06067;
+        crd_name2[1] = 0;
+        crd_name2[2] = -8.67;
+        crd_name2[3] = 10;
+        crd_name2[4] = 6.94658;
+        crd_name2[5] = 0.725;
+
+        crd_name3[0] = 0.025677;
+        crd_name3[1] = 5.84257;
+        crd_name3[2] = 2.86;
+        crd_name3[3] = 2.98463;
+        crd_name3[4] = 8.80969;
+        crd_name3[5] = 4.50402;
+
+//        m_screen->scene()->objectManager()->setMinMaxObjectCoords(kvs::Vec3(crd_name[0],crd_name[1],crd_name[2]),kvs::Vec3(crd_name[3],crd_name[4],crd_name[5]));
+//        m_screen->scene()->objectManager()->setMinMaxExternalCoords(kvs::Vec3(-3,-3,-3),kvs::Vec3(3,3,3));
+
+//        m_screen->scene()->objectManager()->object()->setMinMaxObjectCoords(kvs::Vec3(crd_name[0],crd_name[1],crd_name[2]),kvs::Vec3(crd_name[3],crd_name[4],crd_name[5]));
+//        m_screen->scene()->objectManager()->object()->setMinMaxExternalCoords(kvs::Vec3(crd_name[0],crd_name[1],crd_name[2]),kvs::Vec3(crd_name[3],crd_name[4],crd_name[5]));
+
+//        m_screen->scene()->objectManager()->object()->setMinMaxObjectCoords(kvs::Vec3(crd_name2[0],crd_name2[1],crd_name2[2]),kvs::Vec3(crd_name2[3],crd_name2[4],crd_name2[5]));
+//        m_screen->scene()->objectManager()->object()->setMinMaxExternalCoords(kvs::Vec3(crd_name2[0],crd_name2[1],crd_name2[2]),kvs::Vec3(crd_name2[3],crd_name2[4],crd_name2[5]));
+
+//        m_screen->scene()->objectManager()->setMinMaxObjectCoords(kvs::Vec3(crd_name3[0],crd_name3[1],crd_name3[2]),kvs::Vec3(crd_name3[3],crd_name3[4],crd_name3[5]));
+//        m_screen->scene()->objectManager()->setMinMaxExternalCoords(kvs::Vec3(-3,-3,-3),kvs::Vec3(3,3,3));
+//        m_screen->scene()->objectManager()->object()->setMinMaxObjectCoords(kvs::Vec3(crd_name3[0],crd_name3[1],crd_name3[2]),kvs::Vec3(crd_name3[3],crd_name3[4],crd_name3[5]));
+//        m_screen->scene()->objectManager()->object()->setMinMaxExternalCoords(kvs::Vec3(crd_name3[0],crd_name3[1],crd_name3[2]),kvs::Vec3(crd_name3[3],crd_name3[4],crd_name3[5]));
+//        m_screen->scene()->objectManager()->updateExternalCoords();
+//        m_screen->scene()->objectManager()->updateMinMaxCoords();
+//        m_screen->scene()->objectManager()->object()->updateMinMaxCoords();
+
+
+
+        std::cout << "[ObjectManager]" << std::endl;
+        std::cout << "[min object coord]" << std::endl;
+        std::cout << m_screen->scene()->objectManager()->minObjectCoord() << std::endl;
+        std::cout << "[max object coord]" << std::endl;
+        std::cout << m_screen->scene()->objectManager()->maxObjectCoord() << std::endl;
+        std::cout << "[min object external coord]" << std::endl;
+        std::cout << m_screen->scene()->objectManager()->minExternalCoord() << std::endl;
+        std::cout << "[max object external coord]" << std::endl;
+        std::cout << m_screen->scene()->objectManager()->maxExternalCoord() << std::endl;
+        std::cout << "-----------------------------------" << std::endl;
+        std::cout << "[Object]" << std::endl;
+        std::cout << "[min object coord]" << std::endl;
+        std::cout << m_screen->scene()->object()->minObjectCoord() << std::endl;
+        std::cout << "[max object coord]" << std::endl;
+        std::cout << m_screen->scene()->object()->maxObjectCoord() << std::endl;
+        std::cout << "[min object external coord]" << std::endl;
+        std::cout << m_screen->scene()->object()->minExternalCoord() << std::endl;
+        std::cout << "[max object external coord]" << std::endl;
+        std::cout << m_screen->scene()->object()->maxExternalCoord() << std::endl;
+        this->m_screen->update();
 
 #endif // ENABLE_BENCHMARK_POLYGON
 
@@ -806,5 +1166,51 @@ void ExtCommand::registerPolygonModel (std::string str,int currentIndex,double o
 //OSAKI
 
 void ExtCommand::deletePolygonModel (int currentIndex) {
-    this->m_screen->scene()->removeObject(m_polygon_pair[currentIndex-6].first,false,false);
+    std::cout << __FILE_NAME__ << "," << __func__  << "," << __LINE__ << std::endl;
+    std::string ObjName = "POLYGON_MODEL" + std::to_string(currentIndex - 6);
+    std::cout << ObjName << std::endl;
+    if(this->m_screen->scene()->hasObject(ObjName) == true)
+    {
+        std::cout << "delete:" << ObjName << std::endl;
+        this->m_screen->scene()->removeObject(ObjName,false,false);
+    }
 }
+
+//void ExtCommand::replacePolygonModel(std::string str,int currentIndex,double opacity,kvs::RGBColor color){
+//    const std::string filePath = str;
+//    const std::string extension = filePath.substr(filePath.length()-4, 4);
+
+//    kvs::FileFormatBase* io = nullptr;
+
+//    // select importer
+//    if(extension == ".stl"){
+//        io = new kvs::Stl;
+//    }else{
+//        std::cerr << "Unknown file format:" << filePath << std::endl;
+//        return;
+//    }
+
+//    io->read(filePath);
+
+////    kvs::jaea::TexturedPolygonImporter* importer = nullptr;
+//    kvs::PolygonImporter* importer = nullptr;
+//    if(io->isSuccess()){
+//        std::cout << "loading " << io->filename() << " succeed." << std::endl;
+////        importer = new kvs::jaea::TexturedPolygonImporter();
+//        importer = new kvs::PolygonImporter();
+//        importer->exec(io);
+//        importer->setOpacity(opacity*255);//*255(kvs::UInt8)
+////        importer->setOpacity(opacity);//*255(kvs::UInt8)
+//        importer->setColor(color);
+////        importer->setColor()
+//        importer->setName ("POLYGON_MODEL");
+
+////        //bug調査
+//        importer->updateMinMaxCoords();
+//        importer->setXform(this->m_screen->scene()->objectManager()->xform());
+
+//    this->m_screen->scene()->replaceObject(m_polygon_pair[currentIndex-6].first,importer,false);
+//    }else{
+//        std::cerr << "ERROR : loading " << io->filename() << " failed." << std::endl;
+//    }
+//}

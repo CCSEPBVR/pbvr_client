@@ -117,6 +117,8 @@ public:
     bool m_is_key_frame_animation;
     bool m_is_import_transfer_function_parameter;
     bool m_particle_assign_flag;
+    bool m_is_polygon_checkbox_current[5] = {false,false,false,false,false};
+    bool m_is_polygon_checkbox_before[5] = {false,false,false,false,false};
     bool m_is_polygon_displayed[5] = {false,false,false,false,false};
     double m_before_opacity[5];
     kvs::RGBColor m_before_color[5];

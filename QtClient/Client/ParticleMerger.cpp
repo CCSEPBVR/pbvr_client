@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <kvs/Directory>
 #include <kvs/File>
+#include <kvs/PolygonImporter>
 #include <kvs/PointImporter>
 #include <kvs/PointExporter>
 //#include <kvs/KVSMLObjectPoint>
@@ -54,6 +55,7 @@ void ParticleMerger::setParam( const ParticleMergeParameter& param, const size_t
             kvs::FileList::iterator fi;
             std::string prefix;
             size_t num_kvsml = 0;
+            size_t num_stl = 0;
             size_t step;
             size_t div = 0;
             size_t init_step = 0, fin_step = 0;
@@ -62,21 +64,28 @@ void ParticleMerger::setParam( const ParticleMergeParameter& param, const size_t
             size_t step_length    = 5;
             size_t div_length     = 7;
             size_t div_num_length = 7;
-            size_t suffix_length = std::string("kvsml").length();
+            size_t kvsml_suffix_length = std::string("kvsml").length();
+            size_t stl_suffix_length = std::string("stl").length();
             std::string f_prefix = file_prefix.fileName();
 
-            size_t file_length = f_prefix.length() + 1
+            size_t kvsml_file_length = f_prefix.length() + 1
                                + step_length + 1
                                + div_length + 1
                                + div_num_length + 1
-                               + suffix_length;
+                               + kvsml_suffix_length;
+
+            size_t stl_file_length = f_prefix.length() + 1
+                               + step_length + 1
+                               + stl_suffix_length;
 
             for ( fi = pre_files.begin(); fi != pre_files.end(); fi++ )
             {
                 std::string bn = fi->baseName();
                 std::string f_name = fi->fileName();
                 size_t sep1 = bn.find(f_prefix, 0);
-                if (sep1 == 0 && file_length == f_name.length())
+                if (sep1 == 0 && kvsml_file_length == f_name.length())
+                    files.push_back(*fi);
+                if (sep1 == 0 && stl_file_length == f_name.length())
                     files.push_back(*fi);
             }
 
@@ -106,6 +115,29 @@ void ParticleMerger::setParam( const ParticleMergeParameter& param, const size_t
                     fin_step  = ( num_kvsml ) ? std::max( fin_step, step ) : step;
 
                     num_kvsml++;
+                }
+
+                if ( ext == "stl" )
+                {
+                    std::string bn = fi->baseName();
+                    std::string f_prefix = file_prefix.fileName();
+                    size_t sep0 = f_prefix.length();
+                    size_t sep1 = bn.find( "_", sep0 );
+                    if ( sep1 == std::string::npos )
+                        continue;
+                    prefix = bn.substr( 0, sep1 );
+                    sstep = bn.substr( sep1 + 1, step_length );
+//                    std::cout << bn << " " << prefix << " " << sdiv << std::endl;
+
+                    ss.clear();
+                    ss << sstep << ' ' << sdiv;
+                    ss >> step >> div;
+
+                    init_step = ( num_stl ) ? std::min( init_step, step ) : step;
+                    fin_step  = ( num_stl ) ? std::max( fin_step, step ) : step;
+
+                    num_stl++;
+
                 }
             }
 
@@ -186,6 +218,30 @@ void ParticleMerger::setParam( const ParticleMergeParameter& param, const size_t
                     delete impobj;
                 }
             }
+
+            if ( num_stl != 0 )
+            {
+
+                // ファイルがない
+                // 最初のstepのファイルをopenして情報を得る
+                std::string prefix = m_file_prefix[n];
+                std::stringstream suffix;
+                suffix << '_' << std::setw( 5 ) << std::setfill( '0' ) << m_initial_step[n];
+                std::string filename = prefix + suffix.str() + ".stl";
+                const kvs::File file( filename );
+                kvs::PolygonObject* impobj = new kvs::PolygonImporter( filename );
+
+                    const kvs::Vector3f& min_t = impobj->minObjectCoord();
+                    const kvs::Vector3f& max_t = impobj->maxObjectCoord();
+                    m_parameter.m_particles[n].m_x_min = min_t[0];
+                    m_parameter.m_particles[n].m_y_min = min_t[1];
+                    m_parameter.m_particles[n].m_z_min = min_t[2];
+                    m_parameter.m_particles[n].m_x_max = max_t[0];
+                    m_parameter.m_particles[n].m_y_max = max_t[1];
+                    m_parameter.m_particles[n].m_z_max = max_t[2];
+
+                delete impobj;
+            }
         }
     }
 }
@@ -194,7 +250,7 @@ bool ParticleMerger::calculateExternalCoords( float* crd )
 {
     bool cf = false;
     size_t num = m_parameter.m_particles.size();
-    for ( size_t n = 1; n < 6; n++ )
+    for ( size_t n = 1; n < num; n++ )
     {
         if ( !m_parameter.m_particles[n].m_enable ) continue;
         if ( cf )
@@ -226,6 +282,9 @@ bool ParticleMerger::calculateExternalCoords( float* crd )
         crd[4] = m_y_max;
         crd[5] = m_z_max;
     }
+    std::cout << __FILE_NAME__ << "," << __func__  << "," << __LINE__ << std::endl;
+    for(int i = 0;i < 6;i++)
+        std::cout << crd[i] << std::endl;
     return cf;
 }
 
@@ -239,7 +298,7 @@ size_t ParticleMerger::getMergedInitialTimeStep()
     size_t init_step = getMergedFinalTimeStep();
 
     size_t num = m_parameter.m_particles.size();
-    for ( size_t n = 0; n < 6; n++ )
+    for ( size_t n = 0; n < num; n++ )
     {
         if ( !m_parameter.m_particles[n].m_enable ) continue;
         init_step = std::min( init_step, m_initial_step[n] );
@@ -254,7 +313,7 @@ size_t ParticleMerger::getMergedFinalTimeStep()
 
     size_t num = m_parameter.m_particles.size();
 //      std::cout << "ParticleMerger::getMergedFinalTimeStep num " <<num<< std::endl;
-    for ( size_t n = 0; n < 6; n++ )
+    for ( size_t n = 0; n < num; n++ )
     {
         if ( !m_parameter.m_particles[n].m_enable ) continue;
         fin_step = std::max( fin_step, m_final_step[n] );
@@ -271,7 +330,7 @@ kvs::PointObject* ParticleMerger::doMerge(
     kvs::PointObject* obj = new kvs::PointObject();
     size_t num = m_parameter.m_particles.size();
 
-    for ( size_t n = 0; n < 6; n++ )
+    for ( size_t n = 0; n < num; n++ )
     {
         // 2018.12.25 ステップ数の不一致は関係ない
         if ( !m_parameter.m_particles[n].m_enable ) continue;
@@ -432,6 +491,26 @@ kvs::RGBColor ParticleMerger::getPolygonColor(int index)
 double ParticleMerger::getPolygon_opacity(int index)
 {
     return m_parameter.m_particles[index].m_polygon_opacity;
+}
+
+size_t ParticleMerger::getLocalObjectInitialStep(int index)
+{
+    return m_initial_step[index];
+}
+
+size_t ParticleMerger::getLocalObjectFinalStep(int index)
+{
+    return m_final_step[index];
+}
+
+bool ParticleMerger::getLocalObjectIsEnableKeepInitial(int index)
+{
+    return m_parameter.m_particles[index].m_keep_initial_step;
+}
+
+bool ParticleMerger::getLocalObjectIsEnableKeepFinal(int index)
+{
+    return m_parameter.m_particles[index].m_keep_final_step;
 }
 
 } // namespace visclient

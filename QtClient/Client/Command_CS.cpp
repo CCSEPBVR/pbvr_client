@@ -5,6 +5,7 @@
 //#include "PBRProxy.h"
 
 #include <QThread>
+#include <QFile>
 #include <algorithm>
 #include <string.h>
 
@@ -383,38 +384,110 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
             object = merger.doMerge( server_object, param->m_time_step,false );
         }
 
-        for(int i = 6;i < 11;i++)
+        m_is_polygon_checkbox_current[0] = merger.isPolygonEnable(6);
+        m_is_polygon_checkbox_current[1] = merger.isPolygonEnable(7);
+        m_is_polygon_checkbox_current[2] = merger.isPolygonEnable(8);
+        m_is_polygon_checkbox_current[3] = merger.isPolygonEnable(9);
+        m_is_polygon_checkbox_current[4] = merger.isPolygonEnable(10);
+        if(     m_is_polygon_checkbox_current[0] != m_is_polygon_checkbox_before[0]||
+                m_is_polygon_checkbox_current[1] != m_is_polygon_checkbox_before[1]||
+                m_is_polygon_checkbox_current[2] != m_is_polygon_checkbox_before[2]||
+                m_is_polygon_checkbox_current[3] != m_is_polygon_checkbox_before[3]||
+                m_is_polygon_checkbox_current[4] != m_is_polygon_checkbox_before[4])
+        {
+            for(int i = 6; i < 11; i++)
+            {
+                if(m_is_polygon_checkbox_current[i - 6] == true)
+                {
+                    std::stringstream polygon_file_tmp;
+                    polygon_file_tmp << merger.getPolygonFilePath(i) << '_' << std::setw(5) << std::setfill( '0' ) << merger.getLocalObjectInitialStep(i) << ".stl";
+                    std::string polygon_file = polygon_file_tmp.str();
+                    extCommand->calculateTotalPolygonObjectXform(polygon_file,i);
+
+                }
+                m_is_polygon_checkbox_before[i - 6] = m_is_polygon_checkbox_current[i - 6];
+            }
+            for(int i = 6; i < 11; i++)
+            {
+                extCommand->deletePolygonModel(i);
+            }
+        }
+
+        for(int i = 6; i < 11;i++)
         {
             if(merger.isPolygonEnable(i) == true)
             {
-                if(m_is_polygon_displayed[i - 6] == false){
-                extCommand->registerPolygonModel(merger.getPolygonFilePath(i),
-                                                 i,
-                                                 merger.getPolygon_opacity(i),
-                                                 merger.getPolygonColor(i));
-                m_before_opacity[i - 6] = merger.getPolygon_opacity(i);
-                m_before_color[i - 6] = merger.getPolygonColor(i);
-                m_is_polygon_displayed[i - 6] = true;
-                }else if(m_before_color[i - 6].r() != merger.getPolygonColor(i).r()||
-                         m_before_color[i - 6].g() != merger.getPolygonColor(i).g()||
-                         m_before_color[i - 6].b() != merger.getPolygonColor(i).b()||
-                         m_before_opacity[i - 6] != merger.getPolygon_opacity(i))
+                size_t filestep = param->m_time_step;
+                if(merger.getLocalObjectIsEnableKeepFinal(i) == false && merger.getLocalObjectIsEnableKeepInitial(i) == false){
+                    std::cout << __FILE_NAME__ << "," << __func__  << "," << __LINE__ << std::endl;
+                    if(merger.getLocalObjectFinalStep(i) < filestep){
+                    }else if(merger.getLocalObjectInitialStep(i) <= filestep){
+                    }
+                }
+
+                if(merger.getLocalObjectIsEnableKeepFinal(i) == true && merger.getLocalObjectIsEnableKeepInitial(i) == false){
+                    std::cout << __FILE_NAME__ << "," << __func__  << "," << __LINE__ << std::endl;
+                    if(merger.getLocalObjectFinalStep(i) < filestep){
+                        filestep = merger.getLocalObjectFinalStep(i);
+                    }else if(merger.getLocalObjectInitialStep(i) <= filestep){
+                    }
+                }
+
+                if(merger.getLocalObjectIsEnableKeepFinal(i) == false && merger.getLocalObjectIsEnableKeepInitial(i) == true){
+                    std::cout << __FILE_NAME__ << "," << __func__  << "," << __LINE__ << std::endl;
+                    if(merger.getLocalObjectInitialStep(i) > filestep){
+                        filestep = merger.getLocalObjectInitialStep(i);
+                    }else if(merger.getLocalObjectFinalStep(i) >= filestep){
+                    }
+                }
+
+                if(merger.getLocalObjectIsEnableKeepFinal(i) == true && merger.getLocalObjectIsEnableKeepInitial(i) == true){
+                    std::cout << __FILE_NAME__ << "," << __func__  << "," << __LINE__ << std::endl;
+                    if(merger.getLocalObjectFinalStep(i) < filestep){
+                        filestep = merger.getLocalObjectFinalStep(i);
+                    }else if(merger.getLocalObjectInitialStep(i) <= filestep){
+                    }else if(merger.getLocalObjectInitialStep(i) > filestep){
+                        filestep = merger.getLocalObjectInitialStep(i);
+                    }else{
+                    }
+                }
+
+                std::stringstream polygon_file_tmp;
+                polygon_file_tmp << merger.getPolygonFilePath(i) << '_' << std::setw(5) << std::setfill( '0' ) << filestep << ".stl";
+                std::string polygon_file = polygon_file_tmp.str();
+                QFile file(QString::fromStdString(polygon_file));
+                std::cout << __FILE_NAME__ << "," << __func__  << "," << __LINE__ << std::endl;
+                std::cout << polygon_file << std::endl;
+
+                std::stringstream polygon_file_empty_tmp;
+                polygon_file_empty_tmp << merger.getPolygonFilePath(i) << '_' << std::setw(5) << std::setfill( '0' ) << merger.getLocalObjectInitialStep(i) << ".stl";
+                std::string polygon_file_empty = polygon_file_empty_tmp.str();
+
+                std::cout << file.exists() << std::endl;
+                if(file.exists() == true)
                 {
-                    extCommand->deletePolygonModel(i);
-                    extCommand->registerPolygonModel(merger.getPolygonFilePath(i),
+                    std::cout << __FILE_NAME__ << "," << __func__  << "," << __LINE__ << std::endl;
+                    extCommand->registerPolygonModel_v2(polygon_file,
                                                      i,
                                                      merger.getPolygon_opacity(i),
                                                      merger.getPolygonColor(i));
-                    m_before_opacity[i - 6] = merger.getPolygon_opacity(i);
-                    m_before_color[i - 6] = merger.getPolygonColor(i);
                 }
+                else
+                {
+                    std::cout << __FILE_NAME__ << "," << __func__  << "," << __LINE__ << std::endl;
+                    extCommand->registerPolygonModel_v3(polygon_file_empty,
+                                                        i,
+                                                        merger.getPolygon_opacity(i),
+                                                        merger.getPolygonColor(i));
+                }
+
+
             }else{
-                if(m_is_polygon_displayed[i - 6] == true){
-                extCommand->deletePolygonModel(i);
-                m_is_polygon_displayed[i - 6] = false;
-                }
+//                extCommand->deletePolygonModel(i);
             }
         }
+
+        extCommand->m_screen->update();
 
         result->m_min_merged_time_step = merger.getMergedInitialTimeStep();
         result->m_max_merged_time_step = merger.getMergedFinalTimeStep();
@@ -537,6 +610,7 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
             // スタンドアローンモードで、統合粒子が指定されているならば
             if ( local_particle_exits )
             {
+                std::cout << __FILE_NAME__ << "," << __func__  << "," << __LINE__ << std::endl;
                 // クライアントの粒子情報で設定
                 crd[0] = local_crd[0];
                 crd[1] = local_crd[1];
@@ -680,6 +754,14 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
     // change view
     if ( resetflag )
     {
+        std::cout << __FILE_NAME__ << "," << __func__  << "," << __LINE__ << std::endl;
+        std::cout << crd[0] << std::endl;
+        std::cout << crd[1] << std::endl;
+        std::cout << crd[2] << std::endl;
+        std::cout << crd[3] << std::endl;
+        std::cout << crd[4] << std::endl;
+        std::cout << crd[5] << std::endl;
+
         keeper = true;
         qInfo(" *** Command::update::9 starts *** %d",QThread::currentThreadId() );
         ((RenderArea*)m_screen)->setCoordinateBoundaries(crd);
@@ -695,6 +777,13 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
         }
 
     }
+    std::cout << __FILE_NAME__ << "," << __func__  << "," << __LINE__ << std::endl;
+    std::cout << crd[0] << std::endl;
+    std::cout << crd[1] << std::endl;
+    std::cout << crd[2] << std::endl;
+    std::cout << crd[3] << std::endl;
+    std::cout << crd[4] << std::endl;
+    std::cout << crd[5] << std::endl;
     qInfo(" *** Command::update ends *** %d\n",QThread::currentThreadId() );
 }
 
