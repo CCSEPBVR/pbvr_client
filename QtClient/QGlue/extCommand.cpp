@@ -1169,10 +1169,22 @@ void ExtCommand::deletePolygonModel (int currentIndex) {
     std::cout << __FILE_NAME__ << "," << __func__  << "," << __LINE__ << std::endl;
     std::string ObjName = "POLYGON_MODEL" + std::to_string(currentIndex - 6);
     std::cout << ObjName << std::endl;
+    std::string ObjNameEmpty = "POLYGON_OBJ_EMPTY" + std::to_string(currentIndex - 5);
+    std::string ObjNameImp = "POLYGON_OBJ_IMP" + std::to_string(currentIndex - 5);
     if(this->m_screen->scene()->hasObject(ObjName) == true)
     {
         std::cout << "delete:" << ObjName << std::endl;
         this->m_screen->scene()->removeObject(ObjName,false,false);
+    }
+    if(this->m_screen->scene()->hasObject(ObjNameEmpty) == true)
+    {
+        std::cout << "delete:" << ObjNameEmpty << std::endl;
+        this->m_screen->scene()->removeObject(ObjNameEmpty,false,false);
+    }
+    if(this->m_screen->scene()->hasObject(ObjNameImp) == true)
+    {
+        std::cout << "delete:" << ObjNameImp << std::endl;
+        this->m_screen->scene()->removeObject(ObjNameImp,false,false);
     }
 }
 

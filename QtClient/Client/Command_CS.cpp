@@ -483,7 +483,7 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
 
 
             }else{
-//                extCommand->deletePolygonModel(i);
+                extCommand->deletePolygonModel(i);
             }
         }
 
