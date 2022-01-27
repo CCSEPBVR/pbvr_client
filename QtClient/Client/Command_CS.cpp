@@ -733,13 +733,6 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
     // change view
     if ( resetflag )
     {
-        std::cout << crd[0] << std::endl;
-        std::cout << crd[1] << std::endl;
-        std::cout << crd[2] << std::endl;
-        std::cout << crd[3] << std::endl;
-        std::cout << crd[4] << std::endl;
-        std::cout << crd[5] << std::endl;
-
         keeper = true;
         qInfo(" *** Command::update::9 starts *** %d",QThread::currentThreadId() );
         ((RenderArea*)m_screen)->setCoordinateBoundaries(crd);
@@ -755,12 +748,6 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
         }
 
     }
-    std::cout << crd[0] << std::endl;
-    std::cout << crd[1] << std::endl;
-    std::cout << crd[2] << std::endl;
-    std::cout << crd[3] << std::endl;
-    std::cout << crd[4] << std::endl;
-    std::cout << crd[5] << std::endl;
     qInfo(" *** Command::update ends *** %d\n",QThread::currentThreadId() );
 }
 

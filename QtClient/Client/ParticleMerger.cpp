@@ -282,8 +282,6 @@ bool ParticleMerger::calculateExternalCoords( float* crd )
         crd[4] = m_y_max;
         crd[5] = m_z_max;
     }
-    for(int i = 0;i < 6;i++)
-        std::cout << crd[i] << std::endl;
     return cf;
 }
 
