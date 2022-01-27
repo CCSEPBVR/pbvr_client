@@ -397,19 +397,8 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
         {
             for(int i = 6; i < 11; i++)
             {
-                if(m_is_polygon_checkbox_current[i - 6] == true)
-                {
-                    std::stringstream polygon_file_tmp;
-                    polygon_file_tmp << merger.getPolygonFilePath(i) << '_' << std::setw(5) << std::setfill( '0' ) << merger.getLocalObjectInitialStep(i) << ".stl";
-                    std::string polygon_file = polygon_file_tmp.str();
-                    extCommand->calculateTotalPolygonObjectXform(polygon_file,i);
-
-                }
-                m_is_polygon_checkbox_before[i - 6] = m_is_polygon_checkbox_current[i - 6];
-            }
-            for(int i = 6; i < 11; i++)
-            {
                 extCommand->deletePolygonModel(i);
+                m_is_polygon_checkbox_before[i - 6] = m_is_polygon_checkbox_current[i - 6];
             }
         }
 
@@ -419,14 +408,12 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
             {
                 size_t filestep = param->m_time_step;
                 if(merger.getLocalObjectIsEnableKeepFinal(i) == false && merger.getLocalObjectIsEnableKeepInitial(i) == false){
-                    std::cout << __FILE_NAME__ << "," << __func__  << "," << __LINE__ << std::endl;
                     if(merger.getLocalObjectFinalStep(i) < filestep){
                     }else if(merger.getLocalObjectInitialStep(i) <= filestep){
                     }
                 }
 
                 if(merger.getLocalObjectIsEnableKeepFinal(i) == true && merger.getLocalObjectIsEnableKeepInitial(i) == false){
-                    std::cout << __FILE_NAME__ << "," << __func__  << "," << __LINE__ << std::endl;
                     if(merger.getLocalObjectFinalStep(i) < filestep){
                         filestep = merger.getLocalObjectFinalStep(i);
                     }else if(merger.getLocalObjectInitialStep(i) <= filestep){
@@ -434,7 +421,6 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
                 }
 
                 if(merger.getLocalObjectIsEnableKeepFinal(i) == false && merger.getLocalObjectIsEnableKeepInitial(i) == true){
-                    std::cout << __FILE_NAME__ << "," << __func__  << "," << __LINE__ << std::endl;
                     if(merger.getLocalObjectInitialStep(i) > filestep){
                         filestep = merger.getLocalObjectInitialStep(i);
                     }else if(merger.getLocalObjectFinalStep(i) >= filestep){
@@ -442,7 +428,6 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
                 }
 
                 if(merger.getLocalObjectIsEnableKeepFinal(i) == true && merger.getLocalObjectIsEnableKeepInitial(i) == true){
-                    std::cout << __FILE_NAME__ << "," << __func__  << "," << __LINE__ << std::endl;
                     if(merger.getLocalObjectFinalStep(i) < filestep){
                         filestep = merger.getLocalObjectFinalStep(i);
                     }else if(merger.getLocalObjectInitialStep(i) <= filestep){
@@ -456,26 +441,21 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
                 polygon_file_tmp << merger.getPolygonFilePath(i) << '_' << std::setw(5) << std::setfill( '0' ) << filestep << ".stl";
                 std::string polygon_file = polygon_file_tmp.str();
                 QFile file(QString::fromStdString(polygon_file));
-                std::cout << __FILE_NAME__ << "," << __func__  << "," << __LINE__ << std::endl;
-                std::cout << polygon_file << std::endl;
 
                 std::stringstream polygon_file_empty_tmp;
                 polygon_file_empty_tmp << merger.getPolygonFilePath(i) << '_' << std::setw(5) << std::setfill( '0' ) << merger.getLocalObjectInitialStep(i) << ".stl";
                 std::string polygon_file_empty = polygon_file_empty_tmp.str();
 
-                std::cout << file.exists() << std::endl;
                 if(file.exists() == true)
                 {
-                    std::cout << __FILE_NAME__ << "," << __func__  << "," << __LINE__ << std::endl;
-                    extCommand->registerPolygonModel_v2(polygon_file,
+                    extCommand->registerPolygonModel(polygon_file,
                                                      i,
                                                      merger.getPolygon_opacity(i),
                                                      merger.getPolygonColor(i));
                 }
                 else
                 {
-                    std::cout << __FILE_NAME__ << "," << __func__  << "," << __LINE__ << std::endl;
-                    extCommand->registerPolygonModel_v3(polygon_file_empty,
+                    extCommand->registerEmptyPolygonModel(polygon_file_empty,
                                                         i,
                                                         merger.getPolygon_opacity(i),
                                                         merger.getPolygonColor(i));
@@ -610,7 +590,6 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
             // スタンドアローンモードで、統合粒子が指定されているならば
             if ( local_particle_exits )
             {
-                std::cout << __FILE_NAME__ << "," << __func__  << "," << __LINE__ << std::endl;
                 // クライアントの粒子情報で設定
                 crd[0] = local_crd[0];
                 crd[1] = local_crd[1];
@@ -754,7 +733,6 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
     // change view
     if ( resetflag )
     {
-        std::cout << __FILE_NAME__ << "," << __func__  << "," << __LINE__ << std::endl;
         std::cout << crd[0] << std::endl;
         std::cout << crd[1] << std::endl;
         std::cout << crd[2] << std::endl;
@@ -777,7 +755,6 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
         }
 
     }
-    std::cout << __FILE_NAME__ << "," << __func__  << "," << __LINE__ << std::endl;
     std::cout << crd[0] << std::endl;
     std::cout << crd[1] << std::endl;
     std::cout << crd[2] << std::endl;
