@@ -1,5 +1,7 @@
-﻿#ifndef LEGENDPANEL_H
+#ifndef LEGENDPANEL_H
 #define LEGENDPANEL_H
+
+#include <kvs/OpenGL>
 
 #include <QDockWidget>
 

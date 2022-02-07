@@ -1,3 +1,9 @@
+
+#ifdef __cplusplus
+#define GL_GLEXT_PROTOTYPES
+#include <kvs/OpenGL>
+#endif
+
 #include <QOpenGLContext>
 
 #ifdef __cplusplus
@@ -12,7 +18,6 @@
 #include <functional>
 #include <fstream>
 //#include <direct.h>
-
 
 #include "kvs/CommandLine"
 #include "kvs/TransferFunction"

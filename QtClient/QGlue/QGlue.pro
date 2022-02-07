@@ -12,8 +12,19 @@ CONFIG += warn_off
 QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.15
 
 HEADERS += \
+    ControllerBase.h \
+    InputDevice.h \
+    PBVRStochasticRenderingCompositor.h \
+    TouchController.h \
+    call.h \
     colorpalette.h \
     colormappalette.h \
+    headmounteddisplay.h \
+    objnameutil.h \
+    oculus.h \
+    oculustexturebuffer.h \
+    ovr.h \
+    pbvrwidgethandler.h \
     renderarea.h \
 #    Screen.h \
     orientationaxis.h \
@@ -31,11 +42,24 @@ HEADERS += \
     colorundoredocommand.h \
     opacityundoredocommand.h \
     deferredtexture.h \
-    screen.h
+    screen.h \
+    Scene.h \
+    version.h \
+    widgethandler.h
 
 SOURCES +=     \
+    ControllerBase.cpp \
+    InputDevice.cpp \
+    PBVRStochasticRenderingCompositor.cpp \
+    TouchController.cpp \
+    call.cpp \
     colorpalette.cpp \
     colormappalette.cpp \
+    headmounteddisplay.cpp \
+    objnameutil.cpp \
+    oculustexturebuffer.cpp \
+    ovr.cpp \
+    pbvrwidgethandler.cpp \
     renderarea.cpp \
 #    Screen.cpp \
     orientationaxis.cpp \
@@ -52,6 +76,8 @@ SOURCES +=     \
     colorundoredocommand.cpp \
     opacityundoredocommand.cpp \
     deferredtexture.cpp \
-    screen.cpp
+    screen.cpp \
+    Scene.cpp \
+    widgethandler.cpp
 
 

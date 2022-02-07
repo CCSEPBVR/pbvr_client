@@ -1,14 +1,19 @@
 #ifndef KVSQS2creen_H
 #define KVSQS2creen_H
-//#include <GL/glew.h>
+#include <GL/glew.h>
+#include <kvs/OpenGL>
 #include <QGLFormat>
 #include <QThread>
 #include <QOpenGLWidget>
-#include <qopenglfunctions.h>
+#include <QOpenGLFunctions>
 #include <kvs/ScreenBase>
 #include <kvs/Scene>
 
-#include <kvs/StochasticRenderingCompositor>
+#include <OVR_CAPI.h>
+#include "headmounteddisplay.h"
+#include "pbvrwidgethandler.h"
+#include "TouchController.h"
+#include "PBVRStochasticRenderingCompositor.h"
 
 /**
  * @brief The Screen class, this class is designed as a combined and simplified version
@@ -25,19 +30,52 @@ class Screen :public kvs::ScreenBase,public QOpenGLWidget, public QOpenGLFunctio
 {
 
 public:
+    static const kvs::Vec3 KVS_CAMERA_INITIAL_POSITION;
 
     typedef kvs::ScreenBase BaseClass;
     typedef kvs::Scene::ControlTarget ControlTarget;
     bool m_hold_paintGL=false;
     double m_fps = 0.0;
 
+//    // from OculusKVS (kvs::oculus::kaea::Screen)
+//    enum MirrorBufferType
+//    {
+//        LeftEyeImage = 0,
+//        RightEyeImage,
+//        BothEyeImage,
+//        DistortedBothEyeImage
+//    };
+
+    enum ManipulatorUseFlag
+    {
+        UseNoManipulator = 0,
+        UseLeftManipulator,
+        UseRightManipulator,
+    };
+
+
 private:
     bool m_enable_default_paint_event;
+
+    // from OculusKVS (kvs::oculus::kaea::Screen)
+    kvs::oculus::jaea::HeadMountedDisplay m_hmd; ///< Oculus HMD
+    //MirrorBufferType m_mirror_buffer_type; ///< mirror buffer type
+
+    kvs::oculus::jaea::TouchController *m_touch_controller;
+    kvs::oculus::jaea::WidgetHandler *m_widget_handler;
+    //ManipulatorUseFlag m_enableManipulator;
+
+    //ObjectSelectionManager m_objectSelectionManager;
+
 
 protected:
     kvs::Scene* m_scene;
     bool m_gl_initialized;
-    kvs::StochasticRenderingCompositor *m_compositor;
+    PBVRStochasticRenderingCompositor *m_compositor;
+
+protected:
+    virtual void defaultPaintEvent();
+
 
 public:
     Screen( QWidget* parent_surface = NULL);
@@ -69,6 +107,23 @@ public:
         this->update();
         //assert(false);
     }
+
+    // from OculusKVS (kvs::oculus::jaea::Screen)
+    //bool isEnabledManipulator();
+    //void setEnabledManipulator(ManipulatorUseFlag flag);
+
+    void setWidgetHandler (kvs::oculus::jaea::WidgetHandler *handler);
+
+    const kvs::oculus::jaea::HeadMountedDisplay& headMountedDisplay() const { return m_hmd; }
+//    void setMirrorBufferType( const MirrorBufferType type ) { m_mirror_buffer_type = type; }
+//    void setMirrorBufferTypeToLeftEyeImage() { this->setMirrorBufferType( LeftEyeImage ); }
+//    void setMirrorBufferTypeToRightEyeImage() { this->setMirrorBufferType( RightEyeImage ); }
+//    void setMirrorBufferTypeToBothEyeImage() { this->setMirrorBufferType( BothEyeImage ); }
+//    void setMirrorBufferTypeToDistortedBothEyeImage() { this->setMirrorBufferType( DistortedBothEyeImage ); }
+    void setMirrorBufferTypeToLeftEyeImage() { m_hmd.setMirrorBufferTypeToLeftEyeImage(); }
+    void setMirrorBufferTypeToRightEyeImage() { m_hmd.setMirrorBufferTypeToRightEyeImage(); }
+    void setMirrorBufferTypeToBothEyeImage() { m_hmd.setMirrorBufferTypeToBothEyeImage(); }
+    void setMirrorBufferTypeToDistortedBothEyeImage() { m_hmd.setMirrorBufferTypeToDistortedBothEyeImage(); }
 
 };
 

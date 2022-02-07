@@ -104,6 +104,14 @@ public:
     bool m_hasfin;
 #endif
 
+    // APPEND START By)K.yodo 2020.12.16
+    std::string m_cgmodel_filename;
+    // APPEND END By)K.yodo 2020.12.16
+
+    // APPEND START By)K.yodo 2021.1.22
+    bool m_lefty_mode;
+    // APPEND END By)K.yodo 2021.1.22
+
     //OSAKI
     std::string m_polygon_model_filename;
     //OSAKI
@@ -126,6 +134,12 @@ public:
         m_rendering_id( 0 ),
         m_shading_type_flag( false ),
         m_no_repsampling( 0 ),
+        // APPEND START By)K.yodo 2020.12.16
+        m_cgmodel_filename(""),
+        // APPEND END By)K.yodo 2020.12.16
+        // APPEND START By)K.yodo 2021.1.22
+        m_lefty_mode (false),
+        // APPEND END By)K.yodo 2021.1.22
         //OSAKI
         m_polygon_model_filename("")
         //OSAKI

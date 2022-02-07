@@ -1,13 +1,15 @@
 #ifndef SLIDERCONTROL_H
 #define SLIDERCONTROL_H
-#include <timecontrolpanel.h>
+
+#include "timecontrolpanel.h"
+#include "slidersynchronizer.h"
 #include <QWidget>
 #include <QSlider>
 namespace Ui {
 class SliderControl;
 }
 
-class SliderControl : public QWidget
+class SliderControl : public QWidget, public SliderSynchronizationClient
 {
     Q_OBJECT
 
@@ -18,15 +20,20 @@ public:
     TimecontrolPanel* tcp;
     void SetResolution(int res);
     void SetLimit(int min, int max);
-    void setRange(int min, int max);
-    void setValue(int value);
+    void setRange(int min, int max, bool blockSignalsFlag = false);
+    void setValue(int value, bool blockSignalsFlag = false);
     int getValue();
     void snapSliderToTick(QSlider* slider);
     void snapAllSlidersToTick();
     void blockAllSliderSignals(bool flag);
     void limitSliderToMax(QSlider* slider, int max);
     void limitSliderToMin(QSlider* slider, int min);
+    void updateSliders (int min, int max, int curTime, int minTime, int maxTime);
+
 public:
+    static const int stepSize=100;
+    static const int tickInterval=1;
+
     int min, max, curTime;
 private slots:
 

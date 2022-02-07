@@ -89,6 +89,8 @@ private:
     };
     static PointObjectProxy m_point_object;
 
+    // dummy object to generate initial modeling&projection matrices & viewport vector for ParticleBasedRenderer.
+    kvs::PointObject* m_dummy_object;
 
 public:
 
@@ -135,7 +137,9 @@ public:
     QGlue::StepLabel*       m_stepLabel=NULL;
     QGlue::FPSLabel*        m_fpsLabel=NULL;
     QGlue::LegendBar*       g_legend=NULL;
+#ifdef SHOW_ORIENTATION_AXIS
     QGlue::OrientationAxis* m_orientation_axis=NULL;
+#endif // SHOW_ORIENTATION_AXIS
     QGlue::Timer*           qt_timer;
 
     QList<QGlue::Label*>     m_labels;

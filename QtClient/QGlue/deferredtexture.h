@@ -1,6 +1,7 @@
 #ifndef DEFERREDTEXTURE_H
 #define DEFERREDTEXTURE_H
 
+#include <kvs/OpenGL>
 #include "qglue_base.h"
 
 #include <kvs/Texture>

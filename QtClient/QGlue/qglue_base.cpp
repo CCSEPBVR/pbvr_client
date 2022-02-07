@@ -63,8 +63,14 @@ void QGLUEBase::end_draw( void )
  */
 /*===========================================================================*/
 void QGLUEBase::initializeOpenGLFunctions(){
+
+    std::cout << "start QGLUEBase::initializeOpenGLFunctions()" << std::endl;
+
     QOpenGLFunctions::initializeOpenGLFunctions();
     m_gl_initialized=true;
+
+
+    std::cout << "finish QGLUEBase::initializeOpenGLFunctions()" << std::endl;
 }
 /*===========================================================================*/
 /**
@@ -103,6 +109,10 @@ bool QGLUEBase::contextReady()
         qCritical("QGLUEBase GL Thread  is not main");
         return false;
     }
+
+    //qDebug("QGLUEBase context ready");
+    std::cerr << "QGLUEBase context ready" << std::endl;
+
     return true;
 }
 /*===========================================================================*/

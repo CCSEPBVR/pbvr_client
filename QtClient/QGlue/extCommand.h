@@ -28,9 +28,12 @@ public:
 //    int  getServerParticleInfomation();
 
 protected:
-    //OSAKI
-//    void registerPolygonModel();
-    //OSAKI
+    void registerCGModel();
+
+#ifdef ENABLE_BENCHMARK_POLYGON
+    void registerBenchmarkModel();
+#endif // ENABLE_BENCHMARK_POLYGON
+
 };
 extern ExtCommand* extCommand;
 

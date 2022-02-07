@@ -1,5 +1,6 @@
 //KVS2.7.0
 //ADD BY)T.Osaki 2020.06.08
+#include <GL/glew.h>
 #include <QOpenGLContext>
 
 #include "systemstatuspanel.h"
@@ -202,6 +203,9 @@ void SystemstatusPanel::onDisableSamplingToggled(int arg1)
  */
 void SystemstatusPanel::onSetParamClicked()
 {
+    // 20210106 yodo append
+    std::cout << "SystemstatusPanel::onSetParamClicked() calls extCommand->CAllBackApply()" << std::endl;
+
     extCommand->CallBackApply(0);
 }
 

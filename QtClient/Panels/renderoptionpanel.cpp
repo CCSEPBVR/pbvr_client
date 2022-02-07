@@ -95,6 +95,11 @@ void RenderoptionPanel::onDataSizeLimitChanged(int val)
  */
 void RenderoptionPanel::onApplyButtonClicked()
 {
+
+    // 20210106 yodo append
+    std::cout << "RenderoptionPanel::onApplyButtonClicked() calls extCommand->CAllBackApply()" << std::endl;
+
+
     extCommand->CallBackApply(0);
 }
 

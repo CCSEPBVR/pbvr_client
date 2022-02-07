@@ -16,6 +16,7 @@
 #ifndef QGLUE_OPACITY_MAP_PALETTE_H_INCLUDE
 #define QGLUE_OPACITY_MAP_PALETTE_H_INCLUDE
 
+#include <kvs/OpenGL>
 
 #include <QGlue/colormappalette.h>
 

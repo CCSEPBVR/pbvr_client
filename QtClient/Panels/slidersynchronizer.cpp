@@ -1,0 +1,2 @@
+#include "slidersynchronizer.h"
+

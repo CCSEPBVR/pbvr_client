@@ -1,3 +1,5 @@
+#include <kvs/OpenGL>
+
 #include "deferredtexture.h"
 
 #include <QThread>

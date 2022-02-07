@@ -12,10 +12,12 @@ CONFIG += warn_off
 QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.15
 
 HEADERS += transferfunceditor.h \
-    slidercontrol.h
+    slidercontrol.h \
+    slidersynchronizer.h
 HEADERS += transferfunceditor_$${PBVR_MODE}.h
 SOURCES += transferfunceditor_$${PBVR_MODE}.cpp \
-    slidercontrol.cpp
+    slidercontrol.cpp \
+    slidersynchronizer.cpp
 
 HEADERS += \
     coloreditdialog.h \

@@ -17,6 +17,9 @@
 #include <kvs/Background>
 #include <kvs/ObjectManager>
 
+// 20210902 yodo
+#include "Scene.h"
+
 #ifdef PBVR_DEBUG
 int     timestep = 0;
 #endif
@@ -42,12 +45,14 @@ RenderArea::RenderArea( QWidget* parent_surface):
     m_stepLabel->setPosition(150*pixelRatio,50);
     m_labels.append(m_stepLabel);
 
+#ifdef SHOW_ORIENTATION_AXIS
     int size=90*pixelRatio;
     m_orientation_axis=new QGlue::OrientationAxis( this);
     m_orientation_axis->setPosition( ScreenBase::width() -(size + 10),10);
     m_orientation_axis->setBoxType( QGlue::OrientationAxis::SolidBox );
     m_orientation_axis->setSize(size);
     m_orientation_axis->show();
+#endif // SHOW_ORIENTATION_AXIS
 
     // Setup Legend bar
     g_legend= new QGlue::LegendBar( this, *extCommand );
@@ -163,7 +168,9 @@ void RenderArea::updateCommandInfo(ExtCommand* extCommand)
 {
     //KVS2.7.0
     //MOD BY)T.Osaki 2020.07.20
-    extCommand->m_parameter.m_camera = this->m_scene->camera();
+    //extCommand->m_parameter.m_camera = this->m_scene->camera();
+    // mod by K.Yodo 2021.1.29.
+    extCommand->m_parameter.m_camera = this->scene()->camera();
     // Setup Controll Object
     kvs::PointObject* object1 = extCommand->m_detailed_particles[0];
     const kvs::Vector3f& min = object1->minObjectCoord();
@@ -193,12 +200,16 @@ void RenderArea::updateCommandInfo(ExtCommand* extCommand)
 void RenderArea::onInitializeGL( void )
 {
     qInfo("KVSRenderArea::initializeGL( void )");
+
+#ifdef SHOW_ORIENTATION_AXIS
     m_orientation_axis->initializeOpenGLFunctions();
+#endif // SHOW_ORIENTATION_AXIS
+
     g_legend->initializeOpenGLFunctions();
     this->setAutoFillBackground(false);
 
     m_scene->light()->on();
-    m_scene->mouse()->attachCamera(m_scene->camera());
+    //m_scene->mouse()->attachCamera(m_scene->camera());
 }
 /**
  * @brief RenderArea::onResizeGL, GL Surface resized handler overrides PBVR Screen onResizeGL.
@@ -216,8 +227,10 @@ void RenderArea::onResizeGL(int w, int h)
     m_stepLabel->setPosition(150*scale,50);
     if (m_fpsLabel)
         m_fpsLabel->setPosition(50*scale,50);
+#ifdef SHOW_ORIENTATION_AXIS
     int size=90*scale;
     m_orientation_axis->setPosition( w_scaled -(size + 10),10);
+#endif // SHOW_ORIENTATION_AXIS
     g_legend->setPosition( 10, h_scaled -10 );
 
 }
@@ -227,12 +240,14 @@ void RenderArea::onResizeGL(int w, int h)
  */
 void RenderArea::onPaintGL(void)
 {
+#ifdef SHOW_ORIENTATION_AXIS
     if (m_orientation_axis){
         glPushMatrix();
         m_orientation_axis->paintEvent();
         glPopMatrix();
     }
     this->drawLabelList(m_labels,QColor(0,0,0,255));
+#endif // SHOW_ORIENTATION_AXIS
 
     if(g_legend){
         glPushMatrix();
@@ -314,8 +329,9 @@ void RenderArea::attachPointObject(const kvs::PointObject* point, int sp_level)
         m_renderer.updateModelView();
         this->m_scene->replaceObject(m_obj_id_pair.first,m_point_object,false);
     }
+#ifdef SHOW_ORIENTATION_AXIS
     m_orientation_axis->setObject( m_point_object);
-    m_scene->objectManager()->resetXform();
+#endif // SHOW_ORIENTATION_AXIS
     // Let Qt know we are done using the context.
     doneCurrent();
     // Trigger a paint event
@@ -497,8 +513,14 @@ void RenderArea::keyPressEvent(QKeyEvent *kbEvent){
     }
     if(kbEvent->key()==Qt::Key_Home){
         qInfo(" [debug] 'HOME' pressed. (Reset the viewer)");
+#if 0
         //MOD BY)T.Osaki 2020.06.29
         m_scene->reset();
+#else
+        // 20210902 yodo
+        kvs::oculus::jaea::Scene* my_scene = static_cast<kvs::oculus::jaea::Scene*>(m_scene);
+        my_scene->resetObjects();
+#endif
         //kvs::ScreenBase::reset();
         this->update();
     }
@@ -652,7 +674,9 @@ void RenderArea::mouseMoveEvent(QMouseEvent *event)
     //KVS2.7.0
     //MOD BY)T.Osaki 2020.06.04
     //if( kvs::ScreenBase::controlTarget() == kvs::ScreenBase::TargetObject )
-    if( m_scene->controlTarget() == m_scene->TargetObject );
+    // 2021.1.29. K.Yodo modified
+    //if( m_scene->controlTarget() == m_scene->TargetObject );
+    if( m_scene->controlTarget() == m_scene->TargetObject )
     {
         //if( !kvs::ScreenBase::objectManager()->isEnableAllMove() )
         if( !m_scene->isEnabledObjectOperation())
@@ -666,8 +690,14 @@ void RenderArea::mouseMoveEvent(QMouseEvent *event)
         }
     }
 
-    const int x = event->x()*pixelRatio;
-    const int y = event->y()*pixelRatio;
+    //const int x = event->x()*pixelRatio;
+    //const int y = event->y()*pixelRatio;
+    int x = event->x()*pixelRatio;
+    int y = event->y()*pixelRatio;
+    if(m_scene->mouse()->operationMode() == kvs::Mouse::Scaling){
+        x *= 10;
+        y *= 10;
+    }
     //KVS2.7.0
     //MOD BY)T.Osaki 2020.06.04
     m_scene->mouseMoveFunction(x,y);
@@ -702,8 +732,11 @@ void RenderArea::setSize( const int width, const int height )
     kvs::ScreenBase::setSize( w_scaled, h_scaled);
     //KVS2.7.0
     //MOD BY)T.Osaki 2020.06.04
-    if ( m_scene->camera() ) m_scene->camera()->setWindowSize( w_scaled, h_scaled);
-    if ( m_scene->mouse() ) m_scene->camera()->setWindowSize( w_scaled, h_scaled );
+//    if ( m_scene->camera() ) m_scene->camera()->setWindowSize( w_scaled, h_scaled);
+//    if ( m_scene->mouse() ) m_scene->camera()->setWindowSize( w_scaled, h_scaled );
+    // mod by K.Yodo 2021.01.29.
+        if ( scene()->camera() ) scene()->camera()->setWindowSize( w_scaled, h_scaled);
+        if ( scene()->mouse() ) scene()->camera()->setWindowSize( w_scaled, h_scaled );
     //if ( kvs::ScreenBase::camera() ) kvs::ScreenBase::camera()->setWindowSize( w_scaled, h_scaled);
     //if ( kvs::ScreenBase::mouse()  ) kvs::ScreenBase::mouse()->setWindowSize( w_scaled, h_scaled);
     QOpenGLWidget::resize( w_scaled, h_scaled);

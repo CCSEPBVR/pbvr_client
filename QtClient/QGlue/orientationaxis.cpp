@@ -1,5 +1,7 @@
 //KVS2.7.0
 //ADD BY)T.Osaki 2020.06.08
+
+#include <kvs/OpenGL>
 #include <QOpenGLContext>
 
 #include <QGlue/renderarea.h>

@@ -1,5 +1,6 @@
 //KVS2.7.0
 //ADD BY)T.Osaki 2020.06.08
+#include <GL/glew.h>
 #include <QOpenGLContext>
 
 #include "timecontrolpanel.h"

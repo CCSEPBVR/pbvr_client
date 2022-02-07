@@ -6,7 +6,7 @@ CONFIG += console
 #PRECOMPILED_HEADER=stable.h
 
 CONFIG += warn_off
-QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.15
+QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.14
 
 include(../SETTINGS.pri)
 message (Building PBVR:$${TARGET} - RenderMode:$${RENDER_MODE} Mode:$${PBVR_MODE}  - Platform: $${PLATFORM}  - ReleaseType: $${RELTYPE})
@@ -22,18 +22,26 @@ LIBS += -L../FunctionParser -lpbvrFunc
 LIBS += -L../Common -lCommon
 #LIBS += -L$${KVS_DIR} -lKVS
 LIBS += -L$$(KVS_DIR)/lib -lkvsCore
-
-!isEmpty(KVS_GLEW_DIR){
-    win32{
-        LIBS += -L$$(KVS_GLEW_DIR)/lib -lglew32
-    }
-    else {
-        LIBS += -L$$(KVS_GLEW_DIR)/lib
-    }
-    unix:macx:LIBS +=  -lglew
-    unix:!macx:LIBS += -lGLEW -lGLU
+win32{
+LIBS += -L$$(GLEW_DIR)/lib -lglew32
+LIBS += -L$$(OCULUS_LIB_DIR) -lLibOVR
+LIBS += -L$$(IMGUI_DIR) -llibimgui -llibimgui_impl_opengl3
+#-llibimgui_impl_win32
+LIBS += -L$$(CGFORMAT_EXT4KVS_SHADER_DIR) -lLibCGFormatExt4KVS
+LIBS += -L$$(FBX_SDK_LIB_DIR) -llibfbxsdk-mt -llibxml2-mt -lzlib-mt -ladvapi32
+LIBS += -L$$(ASSIMP_LIB_DIR) -lassimp-vc141-mt
 }
-
+else {
+LIBS += -L$$(GLEW_DIR)/lib
+}
+unix:macx:LIBS +=  -lglew
+unix:!macx:LIBS += -lGLEW -lGLU
+#QT += opengl
+#QT += core gui opengl widgets
+#QMAKE_CXXFLAGS += -DQT_NO_OPENGL_ES_2
+#QMAKE_CXXFLAGS += -DQT_OPENGL_ES
+#QMAKE_CXXFLAGS += -DQT_NO_OPENGL_ES
+#LIBS += -lOpenGL32
 win32{
 LIBS += glu32.lib
 LIBS += opengl32.lib

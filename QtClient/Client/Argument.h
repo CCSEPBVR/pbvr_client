@@ -58,6 +58,15 @@ public:
     bool m_hasfin;
 #endif
 
+    // APPEND START By)K.Yodo 2020.12.16
+    std::string m_cgmodel;
+    bool m_cgmodel_flag;
+    // APPEND END By)K.Yodo 2020.12.16
+
+    // APPEND START By)K.Yodo 2021.1.22
+    bool m_lefty_flag;
+    // APPEND END By)K.Yodo 2021.1.22
+
     //OSAKI
     std::string m_polygon_model;
     bool m_polygon_model_flag;
@@ -109,6 +118,14 @@ public:
         addOption( "fin", "filter parameter filename", 1, false );
 #endif
 
+        // APPEND START By) K.Yodo 2020.12.16
+        addOption( "cgmodel", "background CG model file", 1, false);
+        // APPEND END By) K.Yodo 2020.12.16
+
+        // APPEND START By) K.Yodo 2021.1.22
+        addOption( "lefty", "lefty mode (x=click, right stick=move)", 0, false);
+        // APPEND END By) K.Yodo 2021.1.22
+
         //OSAKI
         addOption("polygon_model", "background Polygon model file", 1, false);
         //OSAKI
@@ -144,6 +161,15 @@ public:
         m_filter_parameter_filename  = "";
         m_hasfin = false;
 #endif
+
+        // APPEND START By)K.Yodo 2020.12.16
+        m_cgmodel = "";
+        m_cgmodel_flag = false;
+        // APPEND END By)K.Yodo 2020.12.16
+
+        // APPEND START By)K.Yodo 2021.1.22
+        m_lefty_flag = false;
+        // APPEND END By)K.Yodo 2021.1.22
 
         //OSAKI
         m_polygon_model = "";
@@ -276,6 +302,25 @@ public:
         int client_mode = 1;
         m_header = "";
 #endif
+
+        // APPEND START By) K.Yodo 2020.12.16
+        if (hasOption("cgmodel")) {
+            m_cgmodel = this->optionValue<std::string>( "cgmodel" );
+            m_cgmodel_flag = true;
+
+            //std::cout << "Augument::Augument() : -cgmodel is set to " << m_cgmodel << std::endl;
+
+        }
+        // APPEND END By) K.Yodo 2020.12.16
+
+        // APPEND START By) K.Yodo 2021.1.22
+        if (hasOption("lefty")) {
+            m_lefty_flag = true;
+
+            //std::cout << "Augument::Augument() : -lefty flga is set." << std::endl;
+
+        }
+        // APPEND END By) K.Yodo 2021.1.22
 
         //OSAKI
         if(hasOption("polygon_model")){

@@ -1,6 +1,8 @@
 #ifndef QGLUEBASE_H
 #define QGLUEBASE_H
 
+#include <kvs/OpenGL>
+
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
 #include <QPainter>

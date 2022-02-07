@@ -1,9 +1,14 @@
 #include "slidercontrol.h"
 #include "ui_slidercontrol.h"
 
+
+static int recursiveCount;
+
+// MOD BY) K.Yodo 2020.12.24
+// these 2 constarnts moved to SliderControl's member constants.
 // stepSize is the number of "intermediate" tics between two "integers"
-const int stepSize=100;
-const int tickInterval=1;
+//const int stepSize=100;
+//const int tickInterval=1;
 SliderControl::SliderControl(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::SliderControl)
@@ -30,11 +35,17 @@ SliderControl::SliderControl(QWidget *parent) :
     ui->timeSlider->setTracking(false);
     this->adjustSize();
     this->layout()->setSizeConstraint(QLayout::SetDefaultConstraint);
+
+    //append By) K.Yodo 2020.12.24
+    SliderSynchronizer::instance().addClient(this);
 }
 
 SliderControl::~SliderControl()
 {
     delete ui;
+
+    //append By) K.Yodo 2020.12.24
+    SliderSynchronizer::instance().removeClient(this);
 }
 
 /**
@@ -53,9 +64,13 @@ void SliderControl::blockAllSliderSignals(bool flag)
  * @param min
  * @param max
  */
-void SliderControl::setRange(int min, int max)
+void SliderControl::setRange(int min, int max, bool blockSignalsFlag)
 {
     qInfo("SliderControl::setRange %d %d", min,  max);
+    if (blockSignalsFlag) {
+        ui->minSlider->blockSignals(true);
+        ui->maxSlider->blockSignals(true);
+    }
     ui->minVal->setText(QString::number(min));
     ui->maxVal->setText(QString::number(max));
     ui->maxSlider->setRange(min*stepSize,max*stepSize);
@@ -66,21 +81,54 @@ void SliderControl::setRange(int min, int max)
 //    ui->maxSlider->setValue(max*stepSize);
 //    ui->minSlider->setValue(min*stepSize);
     //MOD BY)T.Osaki 2020.03.06
+//    this->min=min;
+//    this->max=max;
 
-#ifdef IS_MODE
-    this->min=min;
-    this->max=max;
-#else
-    this->min = ui->minSlider->value()/100;
-    this->max = ui->maxSlider->value()/100;
-#endif
+    //MOD By) K.Yodo 2020.12.24
+    // replace "100" to stepSize
+    this->min = ui->minSlider->value()/stepSize;
+    this->max = ui->maxSlider->value()/stepSize;
+//    this->min = ui->minSlider->value()/100;
+//    this->max = ui->maxSlider->value()/100;
+    if (blockSignalsFlag) {
+        ui->minSlider->blockSignals(false);
+        ui->maxSlider->blockSignals(false);
+    }
+
+    //append By) K.Yodo 2020.12.24
+    if (!blockSignalsFlag) {
+        recursiveCount++;
+        SliderSynchronizer::instance().synchronize(this, min, max, curTime, ui->minSlider->value()/stepSize, ui->maxSlider->value()/stepSize);
+        recursiveCount--;
+    }
 }
 
-void SliderControl::setValue(int value)
+void SliderControl::updateSliders (int min, int max, int curTime, int minTime, int maxTime) {
+
+    std::cout << "SliderControl::updateSliders() : recursiveCount=" << recursiveCount << std::endl;
+
+    this->setRange(min, max, true);
+    this->setValue(curTime, true);
+}
+
+void SliderControl::setValue(int value, bool blockSignalsFlag)
 {
     qInfo("SliderControl::setValue %d  ", value);
     curTime=value;
+    if (blockSignalsFlag) {
+        ui->timeSlider->blockSignals(true);
+    }
     ui->timeSlider->setValue(value*stepSize);
+    if (blockSignalsFlag) {
+        ui->timeSlider->blockSignals(false);
+    }
+
+    //append By) K.Yodo 2020.12.24
+    if (!blockSignalsFlag) {
+        recursiveCount++;
+        SliderSynchronizer::instance().synchronize(this, min, max, curTime, ui->minSlider->value()/stepSize, ui->maxSlider->value()/stepSize);
+        recursiveCount--;
+    }
 }
 
 int SliderControl::getValue( ){
@@ -151,6 +199,11 @@ void SliderControl::on_timeSlider_valueChanged(int value)
     curTime=ui->timeSlider->value()/stepSize;
     ui->timeVal->setText(QString::number(curTime));
     tcp->onTimeSliderMoved(curTime);
+
+    //append By) K.Yodo 2020.12.24
+    recursiveCount++;
+    SliderSynchronizer::instance().synchronize(this, min, max, curTime, ui->minSlider->value()/stepSize, ui->maxSlider->value()/stepSize);
+    recursiveCount--;
 }
 
 /**
@@ -182,6 +235,11 @@ void SliderControl::on_maxSlider_valueChanged(int value)
     max=ui->maxSlider->value()/stepSize;
     //ADD BY)T.Osaki 2020.03.06
     on_timeSlider_valueChanged(max);
+
+    //append By) K.Yodo 2020.12.24
+    recursiveCount++;
+    SliderSynchronizer::instance().synchronize(this, this->min, this->max, curTime, ui->minSlider->value()/stepSize, ui->maxSlider->value()/stepSize);
+    recursiveCount--;
 }
 
 /**
@@ -213,6 +271,11 @@ void SliderControl::on_minSlider_valueChanged(int value)
     min=ui->minSlider->value()/stepSize;
     //ADD BY)T.Osaki 2020.03.06
     on_timeSlider_valueChanged(min);
+
+    //append By) K.Yodo 2020.12.24
+    recursiveCount++;
+    SliderSynchronizer::instance().synchronize(this, min, max, curTime, ui->minSlider->value()/stepSize, ui->maxSlider->value()/stepSize);
+    recursiveCount--;
 }
 
 /**

@@ -1,5 +1,6 @@
 //KVS2.7.0
 //ADD BY)T.Osaki 2020.06.08
+#include <GL/glew.h>
 #include <QOpenGLContext>
 
 #include "transformpanel.h"
@@ -178,6 +179,10 @@ void TransformPanel::onUniformScaleChanged(double val)
  */
 void TransformPanel::onApplyButtonClicked()
 {
+    // 20210106 yodo append
+    std::cout << "TransformPanel::onApplyButtonClicked() calls extCommand->CAllBackApply()" << std::endl;
+
+
     extCommand->CallBackApply(0);
     extCommand->m_screen->update();
 }

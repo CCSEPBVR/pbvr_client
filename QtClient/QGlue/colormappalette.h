@@ -1,6 +1,8 @@
 #ifndef COLORMAPPALETTE_H
 #define COLORMAPPALETTE_H
 
+#include <kvs/OpenGL>
+
 #include "qglue_base.h"
 #include "colorpalette.h"
 

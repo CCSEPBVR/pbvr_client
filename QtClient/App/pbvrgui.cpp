@@ -1,4 +1,4 @@
-﻿#include "pbvrgui.h"
+#include "pbvrgui.h"
 #include "ui_pbvrgui.h"
 
 #include <QDesktopServices>
@@ -172,7 +172,8 @@ void PBVRGUI::start()
     setBackgroundColor(VizParameterFile::getBackgroundColor());
 
 
-
+// 20210106 yodo append
+    std::cout << "PBVRGUI::start() calls extCommand->CAllBackApply()" << std::endl;
 
     extCommand->CallBackApply(0);
     showNormal();
