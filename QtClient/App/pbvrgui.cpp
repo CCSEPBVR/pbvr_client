@@ -115,10 +115,10 @@ PBVRGUI::PBVRGUI(ExtCommand* command) :
             this,&PBVRGUI::on_actionYpos_triggered);
     connect(ui->actionYneg,&QAction::triggered,
             this,&PBVRGUI::on_actionYneg_triggered);
-//    connect(ui->actionCPU,&QAction::triggered,
-//            this,&PBVRGUI::on_actionCPU_triggered);
-//    connect(ui->actionGPU,&QAction::triggered,
-//            this,&PBVRGUI::on_actionGPU_triggered);
+    connect(ui->actionCPU,&QAction::triggered,
+            this,&PBVRGUI::on_actionCPU_triggered);
+    connect(ui->actionGPU,&QAction::triggered,
+            this,&PBVRGUI::on_actionGPU_triggered);
 
     connect(ui->actionAddFrame,&QAction::triggered,
             this,&PBVRGUI::on_actionAddFrame_triggered);
@@ -236,7 +236,7 @@ void PBVRGUI::restoreDefaultLayout()
     filterinfoPanel.setVisible(true);
     timecontrolPanel.setVisible(true);
     ui->AnimationToolBar->setVisible(true);
-//    ui->RenderModeToolBar->setVisible(false);
+    ui->RenderModeToolBar->setVisible(true);
     ui->XformToolBar->setVisible(true);
 }
 /**
@@ -608,21 +608,21 @@ void PBVRGUI::on_actionYneg_triggered()
     kvs_renderarea->update();
 }
 
-//void PBVRGUI::on_actionCPU_triggered()
-//{
-//    ui->actionGPU->setChecked(false);
-//    ui->actionGPU->setDisabled(false);
-//    ui->actionCPU->setDisabled(true);
-//    kvs_renderarea->switch_gpu(false);
-//}
+void PBVRGUI::on_actionCPU_triggered()
+{
+    ui->actionGPU->setChecked(false);
+    ui->actionGPU->setDisabled(false);
+    ui->actionCPU->setDisabled(true);
+    kvs_renderarea->switch_gpu(false);
+}
 
-//void PBVRGUI::on_actionGPU_triggered()
-//{
-//    ui->actionCPU->setChecked(false);
-//    ui->actionCPU->setDisabled(false);
-//    ui->actionGPU->setDisabled(true);
-//    kvs_renderarea->switch_gpu(true);
-//}
+void PBVRGUI::on_actionGPU_triggered()
+{
+    ui->actionCPU->setChecked(false);
+    ui->actionCPU->setDisabled(false);
+    ui->actionGPU->setDisabled(true);
+    kvs_renderarea->switch_gpu(true);
+}
 
 void PBVRGUI::on_actionAddFrame_triggered()
 {

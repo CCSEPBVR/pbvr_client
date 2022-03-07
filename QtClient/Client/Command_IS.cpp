@@ -4,6 +4,7 @@
 //#include "ExtendedParticleVolumeRenderer.h"
 
 #include <QThread>
+#include <QFile>
 #include <algorithm>
 #include <string.h>
 #include "ParticleTransferClient.h"
@@ -67,7 +68,8 @@ Command::Command( ParticleServer* server ) :
     m_is_key_frame_animation( false ),
     m_server( server ),
     m_last_sampling_params( NULL ),
-    m_particle_assign_flag( false )
+    m_particle_assign_flag( false ),
+    m_server_side_subpixel_level(1)
 {
     m_parameter.m_time_step_key_frame = -1;
     m_step_key_frame = 0;
@@ -245,7 +247,7 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
             {
                 object = m_server_particles[step];
             }
-            p = merger.doMerge( object, step );
+            p = merger.doMerge( object, step, false );
             delete p;
         }
         param->m_particle_merge_param.m_do_export = false;
@@ -338,7 +340,92 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
         kvs::PointObject* server_object = m_server_particles[param->m_time_step];
         kvs::PointObject* object;
         merger.setParam( param->m_particle_merge_param, param->m_min_server_time_step, param->m_max_server_time_step );
-        object = merger.doMerge( server_object, param->m_time_step );
+        object = merger.doMerge( server_object, param->m_time_step ,true);
+
+        m_is_polygon_checkbox_current[0] = merger.isPolygonEnable(6);
+        m_is_polygon_checkbox_current[1] = merger.isPolygonEnable(7);
+        m_is_polygon_checkbox_current[2] = merger.isPolygonEnable(8);
+        m_is_polygon_checkbox_current[3] = merger.isPolygonEnable(9);
+        m_is_polygon_checkbox_current[4] = merger.isPolygonEnable(10);
+        if(     m_is_polygon_checkbox_current[0] != m_is_polygon_checkbox_before[0]||
+                m_is_polygon_checkbox_current[1] != m_is_polygon_checkbox_before[1]||
+                m_is_polygon_checkbox_current[2] != m_is_polygon_checkbox_before[2]||
+                m_is_polygon_checkbox_current[3] != m_is_polygon_checkbox_before[3]||
+                m_is_polygon_checkbox_current[4] != m_is_polygon_checkbox_before[4])
+        {
+            for(int i = 6; i < 11; i++)
+            {
+                extCommand->deletePolygonModel(i);
+                m_is_polygon_checkbox_before[i - 6] = m_is_polygon_checkbox_current[i - 6];
+            }
+        }
+
+        for(int i = 6; i < 11;i++)
+        {
+            if(merger.isPolygonEnable(i) == true)
+            {
+                size_t filestep = param->m_time_step;
+                if(merger.getLocalObjectIsEnableKeepFinal(i) == false && merger.getLocalObjectIsEnableKeepInitial(i) == false){
+                    if(merger.getLocalObjectFinalStep(i) < filestep){
+                    }else if(merger.getLocalObjectInitialStep(i) <= filestep){
+                    }
+                }
+
+                if(merger.getLocalObjectIsEnableKeepFinal(i) == true && merger.getLocalObjectIsEnableKeepInitial(i) == false){
+                    if(merger.getLocalObjectFinalStep(i) < filestep){
+                        filestep = merger.getLocalObjectFinalStep(i);
+                    }else if(merger.getLocalObjectInitialStep(i) <= filestep){
+                    }
+                }
+
+                if(merger.getLocalObjectIsEnableKeepFinal(i) == false && merger.getLocalObjectIsEnableKeepInitial(i) == true){
+                    if(merger.getLocalObjectInitialStep(i) > filestep){
+                        filestep = merger.getLocalObjectInitialStep(i);
+                    }else if(merger.getLocalObjectFinalStep(i) >= filestep){
+                    }
+                }
+
+                if(merger.getLocalObjectIsEnableKeepFinal(i) == true && merger.getLocalObjectIsEnableKeepInitial(i) == true){
+                    if(merger.getLocalObjectFinalStep(i) < filestep){
+                        filestep = merger.getLocalObjectFinalStep(i);
+                    }else if(merger.getLocalObjectInitialStep(i) <= filestep){
+                    }else if(merger.getLocalObjectInitialStep(i) > filestep){
+                        filestep = merger.getLocalObjectInitialStep(i);
+                    }else{
+                    }
+                }
+
+                std::stringstream polygon_file_tmp;
+                polygon_file_tmp << merger.getPolygonFilePath(i) << '_' << std::setw(5) << std::setfill( '0' ) << filestep << ".stl";
+                std::string polygon_file = polygon_file_tmp.str();
+                QFile file(QString::fromStdString(polygon_file));
+
+                std::stringstream polygon_file_empty_tmp;
+                polygon_file_empty_tmp << merger.getPolygonFilePath(i) << '_' << std::setw(5) << std::setfill( '0' ) << merger.getLocalObjectInitialStep(i) << ".stl";
+                std::string polygon_file_empty = polygon_file_empty_tmp.str();
+
+                if(file.exists() == true)
+                {
+                    extCommand->registerPolygonModel(polygon_file,
+                                                     i,
+                                                     merger.getPolygon_opacity(i),
+                                                     merger.getPolygonColor(i));
+                }
+                else
+                {
+                    extCommand->registerEmptyPolygonModel(polygon_file_empty,
+                                                        i,
+                                                        merger.getPolygon_opacity(i),
+                                                        merger.getPolygonColor(i));
+                }
+
+
+            }else{
+                extCommand->deletePolygonModel(i);
+            }
+        }
+
+        extCommand->m_screen->update();
 
         result->m_min_merged_time_step = merger.getMergedInitialTimeStep();
         result->m_max_merged_time_step = merger.getMergedFinalTimeStep();
@@ -419,7 +506,7 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
     }
 #endif
     // For change view (Reset scale)
-    if ( m_particle_merge_ui->checkChangeFlag() )
+    if ( m_particle_merge_ui->checkChangeFlag() || m_coord_panel_ui->getResetViewFlag() )
     {
         // 粒子統合の表示,非表示フラグが変化した
         if ( param->m_client_server_mode != 1 )
@@ -461,6 +548,15 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
                 crd[4] = PBVRmaxcoords[1];
                 crd[5] = PBVRmaxcoords[2];
                 resetflag = true;
+            }
+            if ( m_coord_panel_ui->getResetViewFlag() )
+            {
+                // 正規化フラグをfalseに戻す
+                m_coord_panel_ui->resetResetViewFlag();
+                if(keeper == true){
+                    keeper = false;
+                    resetflag = false;
+                }
             }
         }
         m_particle_merge_ui->particleResetChangedFlag();
@@ -504,8 +600,20 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
     // change view
     if ( resetflag )
     {
+        keeper = true;
         qInfo(" *** Command::update::9 starts *** %d",QThread::currentThreadId() );
         ((RenderArea*)m_screen)->setCoordinateBoundaries(crd);
+    }
+    if(keeper == true){
+        if(param->m_client_server_mode != 0){
+        m_detailed_particles[m_detailed_particles.size()-1]->setMinMaxObjectCoords(kvs::Vector3f(m_server_coord_min[1][0],m_server_coord_min[1][1],m_server_coord_min[1][2]),kvs::Vector3f(m_server_coord_max[1][0],m_server_coord_max[1][1],m_server_coord_max[1][2]));
+        m_detailed_particles[m_detailed_particles.size()-1]->setMinMaxExternalCoords(kvs::Vector3f(m_server_coord_min[1][0],m_server_coord_min[1][1],m_server_coord_min[1][2]),kvs::Vector3f(m_server_coord_max[1][0],m_server_coord_max[1][1],m_server_coord_max[1][2]));
+        }
+        if(local_particle_exits == true){
+            m_detailed_particles[m_detailed_particles.size()-1]->setMinMaxObjectCoords(kvs::Vector3f(local_crd[0],local_crd[1],local_crd[2]),kvs::Vector3f(local_crd[3],local_crd[4],local_crd[5]));
+            m_detailed_particles[m_detailed_particles.size()-1]->setMinMaxExternalCoords(kvs::Vector3f(local_crd[0],local_crd[1],local_crd[2]),kvs::Vector3f(local_crd[3],local_crd[4],local_crd[5]));
+        }
+
     }
 
     FilterinfoPanel::updateFilterInfo();
@@ -550,7 +658,16 @@ void Command::postUpdate()
             }
         }
     }
-    m_parameter.m_detailed_subpixel_level = m_local_subpixel_level;
+    //    ADD BY)T.Osaki 2020.03.16
+    if(m_server_subpixel_level != m_local_subpixel_level){
+        m_parameter.m_detailed_subpixel_level = m_server_subpixel_level;
+    }else{
+        m_parameter.m_detailed_subpixel_level = m_local_subpixel_level;
+    }
+    if(m_parameter.m_client_server_mode != 0){
+        m_screen->setRenderSubPixelLevel(m_parameter.m_detailed_subpixel_level);
+    }
+    //    m_screen->recreateRenderImageBuffer(m_parameter.m_detailed_subpixel_level);
 #ifdef CPUMODE
     m_screen->setRenderSubPixelLevel(m_parameter.m_detailed_subpixel_level );
     m_screen->recreateRenderImageBuffer( );

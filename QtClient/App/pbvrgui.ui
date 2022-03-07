@@ -192,6 +192,19 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:1.0, fx:0.5
    <addaction name="actionPlayFrames"/>
    <addaction name="separator"/>
   </widget>
+  <widget class="QToolBar" name="RenderModeToolBar">
+   <property name="windowTitle">
+    <string>Render Mode Toolbar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionGPU"/>
+   <addaction name="actionCPU"/>
+  </widget>
   <action name="actionConnect_To_Server">
    <property name="enabled">
     <bool>false</bool>
@@ -312,10 +325,10 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:1.0, fx:0.5
   </action>
   <action name="actionZoomIn">
    <property name="text">
-    <string>Zoom +</string>
+    <string>🔍  +</string>
    </property>
    <property name="iconText">
-    <string>Zoom +</string>
+    <string>🔍  +</string>
    </property>
    <property name="toolTip">
     <string>Zoom In [ z ]</string>
@@ -331,10 +344,10 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:1.0, fx:0.5
   </action>
   <action name="actionZoomOut">
    <property name="text">
-    <string>Zoom -</string>
+    <string>🔍  -</string>
    </property>
    <property name="iconText">
-    <string>Zoom -</string>
+    <string>🔍  -</string>
    </property>
    <property name="toolTip">
     <string>Zoom Out [ Shift + z ]</string>
@@ -488,7 +501,7 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:1.0, fx:0.5
   </action>
   <action name="actionAddFrame">
    <property name="text">
-    <string>Add Frame</string>
+    <string>🎞 +</string>
    </property>
    <property name="toolTip">
     <string>Add Animation Frame [ F ]</string>
@@ -504,7 +517,7 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:1.0, fx:0.5
   </action>
   <action name="actionRemoveFrame">
    <property name="text">
-    <string>Remove Frame</string>
+    <string>🎞  -</string>
    </property>
    <property name="toolTip">
     <string>Remove Animation Frame [ Shift + F ] </string>
@@ -520,7 +533,7 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:1.0, fx:0.5
   </action>
   <action name="actionPlayFrames">
    <property name="text">
-    <string>Play Frames</string>
+    <string>🎞 ▷</string>
    </property>
    <property name="toolTip">
     <string>Play Animation [ M ]</string>

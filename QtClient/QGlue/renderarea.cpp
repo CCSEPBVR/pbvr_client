@@ -97,7 +97,7 @@ void RenderArea::setRenderRepetitionLevel(int level)
     level=level>1?level:1;
 //    if(level != m_renderer.getRepetitionLevel()){
         m_renderer.setRepetitionLevel( level );
-        m_compositor->setRepetitionLevel( level );
+//        m_compositor->setRepetitionLevel( level );
         // Replacement of renderer is required to get correct output with
         // kvs::glsl::ParticleBasedRenderer when changing repetition level after the
         // the renderers first render function call. (kvs 2.9.0)
@@ -112,13 +112,13 @@ void RenderArea::setRenderRepetitionLevel(int level)
         // Reset object Manager's XForm
         m_scene->objectManager()->resetXform();
         // Manually call  paint function, to set m_initial_xform in Renderer
-//        m_scene->paintFunction();
+        m_scene->paintFunction();
 //        m_compositor->update();
         // Restore xform to original scene xform
         restoreXForm();
         // Paint the frame again, to erase previous frame
-//        m_scene->paintFunction();
-        m_compositor->update();
+        m_scene->paintFunction();
+//        m_compositor->update();
         doneCurrent();
 //    }
 }
@@ -311,7 +311,7 @@ void RenderArea::attachPointObject(const kvs::PointObject* point, int sp_level)
         m_obj_id_pair = m_scene->registerObject(m_point_object,m_renderer.pbr_pointer());
     }
     else {
-        m_renderer.updateModelView();
+//        m_renderer.updateModelView();
         this->m_scene->replaceObject(m_obj_id_pair.first,m_point_object,false);
     }
     m_orientation_axis->setObject( m_point_object);
@@ -774,4 +774,30 @@ void RenderArea::animation_play()
 //    doneCurrent();
 //    update();
 //}
+
+void RenderArea::switch_gpu(bool f)
+{
+    if (f){
+        m_renderer.use_gpu();
+    }
+    else{
+        m_renderer.use_cpu();
+    }
+    m_scene->replaceRenderer(m_obj_id_pair.second, m_renderer.pbr_pointer(),false);
+    // The lines below are a work around for m_initial_modelview problem
+    // in kvs::glsl::ParticleBasedRenderer.
+    makeCurrent();
+    // Save current X form
+    storeCurrentXForm();
+    // Reset object Manager's XForm
+    m_scene->objectManager()->resetXform();
+    // Manually call  paint function, to set m_initial_xform in Renderer
+    m_scene->paintFunction();
+    // Restore xform to original scene xform
+    restoreXForm();
+    // Paint the frame again, to erase previous frame
+    m_scene->paintFunction();
+    doneCurrent();
+    update();
+}
 
