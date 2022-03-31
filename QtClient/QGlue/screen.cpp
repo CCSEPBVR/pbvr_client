@@ -73,8 +73,12 @@ void Screen::paintGL()
     p.loadIdentity();
     {
         timer.start();
+#ifdef CPU_MODE
         m_scene->paintFunction();
-//        m_compositor->update();
+#endif
+#ifdef GPU_MODE
+        m_compositor->update();
+#endif
         m_fps = 1.0 / ((double)timer.elapsed()/1000.0);
     }
     glPopAttrib();
@@ -138,15 +142,16 @@ void Screen::initializeGL()
 #endif
     initializeOpenGLFunctions();
     onInitializeGL();
-
-//    m_compositor = new kvs::StochasticRenderingCompositor( m_scene );
-////    m_compositor->setRepetitionLevel( 16 );
-//    std::cout << __LINE__ <<  m_compositor->repetitionLevel() << std::endl;
-//    //m_compositor->enableLODControl();
-//    m_compositor->disableLODControl();
-//    BaseClass::eventHandler()->attach( m_compositor );
-//    m_compositor->initializeEvent();
-//    this->m_enable_default_paint_event = false;
+#ifdef GPU_MODE
+    m_compositor = new kvs::StochasticRenderingCompositor( m_scene );
+//    m_compositor->setRepetitionLevel( 16 );
+    std::cout << __LINE__ <<  m_compositor->repetitionLevel() << std::endl;
+    //m_compositor->enableLODControl();
+    m_compositor->disableLODControl();
+    BaseClass::eventHandler()->attach( m_compositor );
+    m_compositor->initializeEvent();
+    this->m_enable_default_paint_event = false;
+#endif
 
     m_gl_initialized=true;
 }

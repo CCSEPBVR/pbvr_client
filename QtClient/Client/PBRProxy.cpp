@@ -1,4 +1,4 @@
-#include "PBRProxy.h"
+﻿#include "PBRProxy.h"
 #include <assert.h>
 using namespace  kvs::visclient;
 
@@ -22,38 +22,52 @@ PBRProxy::PBRProxy(   PBR_MODE mode_selection, PBRProxy* other):
  */
 void PBRProxy::recreateImageBuffer()
 {
-    if(selected_mode==GPU){
-        //KVS2.7.0
-        //MOD BY)T.Osaki 2020.05.28
-        this->deleteParticleBuffer();
-        this->createParticleBuffer(    CPU_BASE::windowWidth(), CPU_BASE::windowHeight(),  m_subpixel_level );
-    }
+#ifdef CPU_MODE
+#endif
+#ifdef GPU_MODE
+    //必要かどうか不明
+//    this->deleteParticleBuffer();
+//    this->createParticleBuffer(    CPU_BASE::windowWidth(), CPU_BASE::windowHeight(),  m_subpixel_level );
+#endif
+//    if(selected_mode==GPU){
+//        //KVS2.7.0
+//        //MOD BY)T.Osaki 2020.05.28
+//        this->deleteParticleBuffer();
+//        this->createParticleBuffer(    CPU_BASE::windowWidth(), CPU_BASE::windowHeight(),  m_subpixel_level );
+//    }
 }
 
 bool PBRProxy::isEnabledShading(){
-    return selected_mode==GPU?GPU_BASE::isEnabledShading():CPU_BASE::isEnabledShading();
+#ifdef CPU_MODE
+    return CPU_BASE::isEnabledShading();
+#endif
+#ifdef GPU_MODE
+    return GPU_BASE::isEnabledShading();
+#endif
 }
 /**
  * @brief setRepetitionLevel, set renderer repetition level.
  * @param rep_level
  */
 void PBRProxy::setRepetitionLevel(size_t rep_level){
-    if (selected_mode==GPU)
-        GPU_BASE::setRepetitionLevel(rep_level);
-    else
-        CPU_BASE::setSubpixelLevel( (size_t) sqrt(rep_level));
+#ifdef CPU_MODE
+    CPU_BASE::setSubpixelLevel( (size_t) sqrt(rep_level));
+#endif
+#ifdef GPU_MODE
+    GPU_BASE::setRepetitionLevel(rep_level);
+#endif
 }
 /**
  * @brief setSubpixelLevel, set subpixel level
  * @param sp_level
  */
 void PBRProxy::setSubpixelLevel(size_t sp_level){
-    if (selected_mode==GPU){
-        GPU_BASE::setRepetitionLevel(sp_level*sp_level);
-    }
-    else{
-        CPU_BASE::setSubpixelLevel( sp_level);
-    }
+#ifdef CPU_MODE
+    CPU_BASE::setSubpixelLevel( sp_level);
+#endif
+#ifdef GPU_MODE
+    GPU_BASE::setRepetitionLevel(sp_level*sp_level);
+#endif
 }
 
 /**
@@ -62,21 +76,36 @@ void PBRProxy::setSubpixelLevel(size_t sp_level){
  */
 template <typename ShadingType>
 void PBRProxy::setShader( const ShadingType shader ){
-    selected_mode==GPU?GPU_BASE::setShader(shader):CPU_BASE::setShader(shader);
+#ifdef CPU_MODE
+    CPU_BASE::setShader(shader);
+#endif
+#ifdef GPU_MODE
+    GPU_BASE::setShader(shader);
+#endif
 }
 
 /**
  * @brief disableShading, disable shading
  */
 void PBRProxy::disableShading(){
-    selected_mode==GPU?GPU_BASE::disableShading():CPU_BASE::disableShading();
+#ifdef CPU_MODE
+    CPU_BASE::disableShading();
+#endif
+#ifdef GPU_MODE
+    GPU_BASE::disableShading();
+#endif
 }
 
 /**
  * @brief enableShading, enable shading
  */
 void PBRProxy::enableShading(){
-    selected_mode==GPU?GPU_BASE::enableShading():CPU_BASE::enableShading();
+#ifdef CPU_MODE
+    CPU_BASE::enableShading();
+#endif
+#ifdef GPU_MODE
+    GPU_BASE::enableShading();
+#endif
 }
 
 /**
@@ -85,8 +114,12 @@ void PBRProxy::enableShading(){
  */
 size_t PBRProxy::repetitionLevel()
 {
-    return (selected_mode==GPU) ? GPU_BASE::repetitionLevel():CPU_BASE::subpixelLevel() *  CPU_BASE::subpixelLevel();
-
+#ifdef CPU_MODE
+    return CPU_BASE::subpixelLevel() *  CPU_BASE::subpixelLevel();
+#endif
+#ifdef GPU_MODE
+    return GPU_BASE::repetitionLevel();
+#endif
 }
 /**
  * @brief subpixelLevel, return the sub pixel level
@@ -94,7 +127,12 @@ size_t PBRProxy::repetitionLevel()
  */
 size_t PBRProxy::subpixelLevel()
 {
-    return selected_mode==GPU?(size_t) sqrt(GPU_BASE::repetitionLevel()):CPU_BASE::subpixelLevel();
+#ifdef CPU_MODE
+    return CPU_BASE::subpixelLevel();
+#endif
+#ifdef GPU_MODE
+    return sqrt(GPU_BASE::repetitionLevel());
+#endif
 }
 /**
  * @brief setShadingString , sets PBVR type shading string in format L|P|B[Ka,Kd][,Ks,S]
@@ -123,8 +161,16 @@ void PBRProxy::setShadingString(  const char* pbvr_shader_string)
 
 
 SwitchablePBRProxy::SwitchablePBRProxy(bool use_gpu){
-    this->_use_gpu=use_gpu;
-    kvs::visclient::PBR_MODE m = _use_gpu?kvs::visclient::GPU:kvs::visclient::CPU;
+#ifdef CPU_MODE
+    this->_use_gpu=false;
+    kvs::visclient::PBR_MODE m = kvs::visclient::CPU;
+#endif
+#ifdef GPU_MODE
+    this->_use_gpu=true;
+    kvs::visclient::PBR_MODE m = kvs::visclient::GPU;
+#endif
+//    this->_use_gpu=use_gpu;
+//    kvs::visclient::PBR_MODE m = _use_gpu?kvs::visclient::GPU:kvs::visclient::CPU;
     pbr=new kvs::visclient::PBRProxy(m );
 }
 
@@ -172,7 +218,13 @@ void SwitchablePBRProxy::setShadingString(  const char* pbvr_shading_string)
  * @brief recreatePBR, recreates the PBR instance
  */
 void SwitchablePBRProxy::recreatePBR(){
-    kvs::visclient::PBR_MODE m = _use_gpu?kvs::visclient::GPU:kvs::visclient::CPU;
+#ifdef CPU_MODE
+    kvs::visclient::PBR_MODE m = kvs::visclient::CPU;
+#endif
+#ifdef GPU_MODE
+    kvs::visclient::PBR_MODE m = kvs::visclient::GPU;
+#endif
+//    kvs::visclient::PBR_MODE m = _use_gpu?kvs::visclient::GPU:kvs::visclient::CPU;
     auto new_pbr=new kvs::visclient::PBRProxy(m,pbr );
     if (pbr){
         delete pbr;
@@ -193,7 +245,7 @@ size_t SwitchablePBRProxy::getRepetitionLevel()
  * @param rep_level
  */
 void SwitchablePBRProxy::setRepetitionLevel( const size_t rep_level){
-    recreatePBR();
+//    recreatePBR();
     pbr->setRepetitionLevel(rep_level);
     assert (pbr->repetitionLevel() == pbr->subpixelLevel()* pbr->subpixelLevel());
 }
@@ -204,9 +256,23 @@ void SwitchablePBRProxy::setRepetitionLevel( const size_t rep_level){
  */
 kvs::RendererBase* SwitchablePBRProxy::pbr_pointer(){
     assert (pbr->repetitionLevel() == pbr->subpixelLevel()* pbr->subpixelLevel());
-
-    if (_use_gpu)
-        return   (kvs::glsl::ParticleBasedRenderer*)pbr;
-    else
-        return (kvs::ParticleBasedRenderer*)pbr;
+#ifdef CPU_MODE
+    return (kvs::ParticleBasedRenderer*)pbr;
+#endif
+#ifdef GPU_MODE
+    return   (kvs::glsl::ParticleBasedRenderer*)pbr;
+#endif
+//    if (_use_gpu)
+//        return   (kvs::glsl::ParticleBasedRenderer*)pbr;
+//    else
+//        return (kvs::ParticleBasedRenderer*)pbr;
 }
+
+/**
+ * @brief updateModelView, Update m_initial_modelview.
+ */
+#ifdef GPU_MODE
+void SwitchablePBRProxy::updateModelView(){
+    pbr->updateModelViewMatrixTest();
+}
+#endif

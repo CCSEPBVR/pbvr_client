@@ -108,8 +108,8 @@ private slots:
     void on_actionYneg_triggered();
     void on_actionXpos_triggered();
     void on_actionXneg_triggered();
-    void on_actionCPU_triggered();
-    void on_actionGPU_triggered();
+//    void on_actionCPU_triggered();
+//    void on_actionGPU_triggered();
     void on_actionRrep_triggered();
 
 

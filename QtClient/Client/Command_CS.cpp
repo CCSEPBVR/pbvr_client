@@ -383,7 +383,7 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
         }else{
             object = merger.doMerge( server_object, param->m_time_step,false );
         }
-
+#ifdef GPU_MODE
         m_is_polygon_checkbox_current[0] = merger.isPolygonEnable(6);
         m_is_polygon_checkbox_current[1] = merger.isPolygonEnable(7);
         m_is_polygon_checkbox_current[2] = merger.isPolygonEnable(8);
@@ -466,6 +466,7 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
                 extCommand->deletePolygonModel(i);
             }
         }
+#endif
 
         extCommand->m_screen->update();
 

@@ -71,7 +71,12 @@ ParticlePanel::ParticlePanel(QWidget *parent) :
 //    ui->keepFinal8->setVisible(false);
 //    ui->keepFinal9->setVisible(false);
 //    ui->keepFinal10->setVisible(false);
-
+#ifdef CPU_MODE
+    for(int i = 1; i < 6;i++)
+    {
+        ui->itemToAdd->removeItem(ui->itemToAdd->findText("(Polygon " + QString::number(i) + ")"));
+    }
+#endif
 }
 /*===============================================================================*/
 /**
@@ -272,11 +277,11 @@ void ParticlePanel::onDeleteButtonClick()
     QString buf;
     if(item_num >= 1 && ui->itemToAdd->currentIndex() <= 5  )
     {
-        buf = QString("(Particle%1)").arg(item_num);
+        buf = QString("(Particle %1)").arg(item_num);
     }
     if(item_num >= 6 && ui->itemToAdd->currentIndex() <= 10  )
     {
-        buf = QString("(Polygon%1)").arg(item_num-5);
+        buf = QString("(Polygon %1)").arg(item_num-5);
     }
 
     m_particle_value[item_num]->setText(buf);
@@ -297,7 +302,12 @@ void ParticlePanel::onDeleteButtonClick()
     m_total_item--;
     // 削除リストを初期化
     ui->itemToAdd->clear();
-    for ( int i = 1; i < 11; i++ )
+#ifdef CPU_MODE
+            for ( int i = 1; i < 6; i++ )
+#endif
+#ifdef GPU_MODE
+            for ( int i = 1; i < 11; i++ )
+#endif
     {
         ui->itemToAdd->addItem(m_particle_value[i]->text());
         //            m_list_add->add_item( i, m_checkbox_particle[i]->name.c_str() );
@@ -403,7 +413,12 @@ void ParticlePanel::onSetButtonClick()
 
             // addリストに追加
             ui->itemToAdd->clear();
+#ifdef CPU_MODE
+            for ( int i = 1; i < 6; i++ )
+#endif
+#ifdef GPU_MODE
             for ( int i = 1; i < 11; i++ )
+#endif
             {
                 ui->itemToAdd->addItem(m_particle_value[i]->text());
                 //            m_list_add->add_item( i, m_checkbox_particle[i]->name.c_str() );

@@ -20,9 +20,11 @@ public:
     void parseArguments();
     void CallBackApply( const int i );
     //OSAKI
+#ifdef GPU_MODE
     void registerPolygonModel(std::string,int currentIndex,double opacity,kvs::RGBColor color);
     void registerEmptyPolygonModel(std::string,int currentIndex,double opacity,kvs::RGBColor color);
     void deletePolygonModel(int currentIndex);
+#endif
 //    void replacePolygonModel(std::string,int currentIndex,double opacity,kvs::RGBColor color);
     //OSAKI
 //    int  getServerParticleInfomation();

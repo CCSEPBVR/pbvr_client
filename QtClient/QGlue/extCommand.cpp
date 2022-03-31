@@ -707,6 +707,7 @@ void ExtCommand::CallBackApply( const int i )
 //OSAKI
 
 //OSAKI
+#ifdef GPU_MODE
 void ExtCommand::registerPolygonModel(std::string str, int currentIndex, double opacity, kvs::RGBColor color){
     const std::string filePath = str;
     const std::string extension = filePath.substr(filePath.length()-4, 4);
@@ -754,7 +755,9 @@ void ExtCommand::registerPolygonModel(std::string str, int currentIndex, double 
     }
 
 }
+#endif
 
+#ifdef GPU_MODE
 void ExtCommand::registerEmptyPolygonModel(std::string str, int currentIndex, double opacity, kvs::RGBColor color){
     const std::string filePath = str;
     const std::string extension = filePath.substr(filePath.length()-4, 4);
@@ -802,8 +805,10 @@ void ExtCommand::registerEmptyPolygonModel(std::string str, int currentIndex, do
     }
 
 }
+#endif
 //OSAKI
 
+#ifdef GPU_MODE
 void ExtCommand::deletePolygonModel (int currentIndex) {
     std::string ObjName = "POLYGON_MODEL" + std::to_string(currentIndex - 6);
     std::string ObjNameEmpty = "POLYGON_OBJ_EMPTY" + std::to_string(currentIndex - 5);
@@ -821,3 +826,4 @@ void ExtCommand::deletePolygonModel (int currentIndex) {
         this->m_screen->scene()->removeObject(ObjNameImp,false,false);
     }
 }
+#endif

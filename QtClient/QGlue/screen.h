@@ -37,8 +37,9 @@ private:
 protected:
     kvs::Scene* m_scene;
     bool m_gl_initialized;
+#ifdef GPU_MODE
     kvs::StochasticRenderingCompositor *m_compositor;
-
+#endif
 public:
     Screen( QWidget* parent_surface = NULL);
     ~Screen();
