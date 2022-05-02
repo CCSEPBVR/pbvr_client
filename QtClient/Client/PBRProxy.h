@@ -9,9 +9,17 @@ namespace kvs
 namespace visclient
 {
 
+#ifdef CPU_MODE
+typedef  kvs::ParticleBasedRenderer CPU_BASE;
+enum PBR_MODE { CPU};
+#endif
+#ifdef GPU_MODE
 typedef  kvs::glsl::ParticleBasedRenderer GPU_BASE;
+enum PBR_MODE { GPU};
+#endif
+//typedef  kvs::glsl::ParticleBasedRenderer GPU_BASE;
 //typedef  kvs::ParticleBasedRenderer CPU_BASE;
-enum PBR_MODE { CPU,GPU};
+//enum PBR_MODE { CPU,GPU};
 
 /**
  * @brief The PBRProxy class, this acts a a proxy (in lack of a better term) class for the
@@ -21,11 +29,21 @@ enum PBR_MODE { CPU,GPU};
  *        to underlying classes will be performed on the base class that corrsponds to the
  *        mode of operation.
  */
-//class PBRProxy : public CPU_BASE, public GPU_BASE
+#ifdef CPU_MODE
+class PBRProxy : public CPU_BASE
+#endif
+#ifdef GPU_MODE
 class PBRProxy : public GPU_BASE
+#endif
+//class PBRProxy : public CPU_BASE, public GPU_BASE
 {
 public:
+#ifdef CPU_MODE
+    PBR_MODE selected_mode = CPU;
+#endif
+#ifdef GPU_MODE
     PBR_MODE selected_mode = GPU;
+#endif
     kvs::Shader::Lambert L;
     kvs::Shader::BlinnPhong B;
     kvs::Shader::Phong P;
@@ -58,10 +76,19 @@ class SwitchablePBRProxy{
 private:
     kvs::visclient::PBRProxy* pbr; // ParticleBasedRenderer (proxy)
     bool shading_enabled;
+#ifdef CPU_MODE
+    bool _use_gpu=false;
+#endif
+#ifdef GPU_MODE
     bool _use_gpu=true;
+#endif
 public:
-
+#ifdef CPU_MODE
+    SwitchablePBRProxy(bool use_gpu=false);
+#endif
+#ifdef GPU_MODE
     SwitchablePBRProxy(bool use_gpu=true);
+#endif
     void use_gpu();
     void use_cpu();
     void enableShading();
@@ -71,6 +98,8 @@ public:
     size_t getRepetitionLevel();
     void setRepetitionLevel( const size_t rep_level);
     kvs::RendererBase* pbr_pointer();
+#ifdef GPU_MODE
     void updateModelView();
+#endif
 };
 #endif    // PBVR_PBR_PROXY_H_INCLUDE
