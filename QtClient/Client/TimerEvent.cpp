@@ -84,18 +84,18 @@ void TimerEvent::update( kvs::TimeEvent* event )
             if ( m_command->m_parameter.m_shading_type_flag )
                 m_screen->enableRendererShading();
 
-            kvs::Xform before_Xform;
-            if(     m_front_object->numberOfVertices() != 0 &&
-                    m_front_object->numberOfColors() != 0 &&
-                    m_front_object->numberOfNormals() != 0){
-                before_Xform = kvs::Xform(m_screen->scene()->objectManager()->xform());
-            }
+//            kvs::Xform before_Xform;
+//            if(     m_front_object->numberOfVertices() != 0 &&
+//                    m_front_object->numberOfColors() != 0 &&
+//                    m_front_object->numberOfNormals() != 0){
+//                before_Xform = kvs::Xform(m_screen->scene()->objectManager()->xform());
+//            }
 
             m_screen->attachPointObject(m_front_object,sp_level);
             delete m_front_object;
-            m_screen->scene()->objectManager()->translate(before_Xform.translation());
-            m_screen->scene()->objectManager()->scale(before_Xform.scaling());
-            m_screen->scene()->objectManager()->rotate(before_Xform.rotation());
+//            m_screen->scene()->objectManager()->translate(before_Xform.translation());
+//            m_screen->scene()->objectManager()->scale(before_Xform.scaling());
+//            m_screen->scene()->objectManager()->rotate(before_Xform.rotation());
             view_flag = true;
             m_command->m_particle_assign_flag = false;
         }
