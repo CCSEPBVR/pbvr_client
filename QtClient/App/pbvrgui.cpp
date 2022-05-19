@@ -127,7 +127,7 @@ PBVRGUI::PBVRGUI(ExtCommand* command) :
     connect(ui->actionPlayFrames,&QAction::triggered,
             this,&PBVRGUI::on_actionPlayFrames_triggered);
 
-    ui->RenderModeToolBar->setVisible(false);
+//    ui->RenderModeToolBar->setVisible(false);
 }
 
 
