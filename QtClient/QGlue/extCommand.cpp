@@ -36,7 +36,7 @@ int  repeatleveld = PBVR_REPEAT_LEVEL_DETAILED;
 extern int  subpixellevela;// = PBVR_SUB_PIXEL_LEVEL_ABSTRACT;
 extern int  subpixelleveld;//  = PBVR_SUB_PIXEL_LEVEL_DETAILED;
 
-int     samplingtypelevel = 1;
+int     samplingtypelevel = 2;
 
 int detailed_particle_transfer_typelevel = 1;
 #define DEFAULT_VOLUMEDATA ""
