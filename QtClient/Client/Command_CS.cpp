@@ -438,12 +438,13 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
                 }
 
                 std::stringstream polygon_file_tmp;
-                polygon_file_tmp << merger.getPolygonFilePath(i) << '_' << std::setw(5) << std::setfill( '0' ) << filestep << ".stl";
+                polygon_file_tmp << merger.getPolygonFilePath(i) << '_' << std::setw(5) << std::setfill( '0' ) << filestep << ".kvsml";
                 std::string polygon_file = polygon_file_tmp.str();
+                std::cout << polygon_file << std::endl;
                 QFile file(QString::fromStdString(polygon_file));
 
                 std::stringstream polygon_file_empty_tmp;
-                polygon_file_empty_tmp << merger.getPolygonFilePath(i) << '_' << std::setw(5) << std::setfill( '0' ) << merger.getLocalObjectInitialStep(i) << ".stl";
+                polygon_file_empty_tmp << merger.getPolygonFilePath(i) << '_' << std::setw(5) << std::setfill( '0' ) << merger.getLocalObjectInitialStep(i) << ".kvsml";
                 std::string polygon_file_empty = polygon_file_empty_tmp.str();
 
                 if(file.exists() == true)

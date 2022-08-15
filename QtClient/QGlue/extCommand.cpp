@@ -715,15 +715,20 @@ void ExtCommand::registerPolygonModel(std::string str, int currentIndex, double 
     kvs::FileFormatBase* io = nullptr;
 
     // select importer
-    if(extension == ".stl"){
-        io = new kvs::Stl;
-    }else{
-        std::cerr << "Unknown file format:" << filePath << std::endl;
-        return;
-    }
+//    if(extension == ".stl"){
+//        io = new kvs::Stl;
+//    }else if( extension == ".kvsml"){
+//    }else{
+//        std::cerr << "Unknown file format:" << filePath << std::endl;
+//        return;
+//    }
+    kvs::KVSMLPolygonObject* kvsml = new kvs::KVSMLPolygonObject(filePath);
+//    kvs::KVSMLPolygonObject* kvsml = new kvs::KVSMLPolygonObject("/home/osaki/Sandbox/STL/src/YAY.kvsml");
+
 
     kvs::PolygonObject* m_polygon_object_empty = new kvs::PolygonObject(); //空オブジェクト
-    kvs::PolygonObject* m_polygon_imp_object = new kvs::PolygonImporter(filePath);
+//    kvs::PolygonObject* m_polygon_imp_object = new kvs::PolygonImporter(filePath);
+    kvs::PolygonObject* m_polygon_imp_object = new kvs::PolygonImporter(kvsml);
 
     std::string ObjNameEmpty = "POLYGON_OBJ_EMPTY" + std::to_string(currentIndex - 5);
     std::string ObjNameImp = "POLYGON_OBJ_IMP" + std::to_string(currentIndex - 5);
@@ -735,7 +740,7 @@ void ExtCommand::registerPolygonModel(std::string str, int currentIndex, double 
     m_polygon_object_empty->setName(ObjNameEmpty);
     m_polygon_imp_object->setName(ObjNameImp);
     m_polygon_imp_object->setOpacity(opacity*255);
-    m_polygon_imp_object->setColor(color);
+//    m_polygon_imp_object->setColor(color);
 
     kvs::StochasticPolygonRenderer* renderer = new kvs::StochasticPolygonRenderer();
     if(m_screen->scene()->hasObject(ObjNameEmpty) == false && m_screen->scene()->hasObject(ObjNameImp) == false)
@@ -765,12 +770,13 @@ void ExtCommand::registerEmptyPolygonModel(std::string str, int currentIndex, do
     kvs::FileFormatBase* io = nullptr;
 
     // select importer
-    if(extension == ".stl"){
-        io = new kvs::Stl;
-    }else{
-        std::cerr << "Unknown file format:" << filePath << std::endl;
-        return;
-    }
+//    if(extension == ".stl"){
+//        io = new kvs::Stl;
+//    }else if( extension == ".kvsml"){
+//    }else{
+//        std::cerr << "Unknown file format:" << filePath << std::endl;
+//        return;
+//    }
 
     kvs::PolygonObject* m_polygon_object_empty = new kvs::PolygonObject(); //空オブジェクト
     kvs::PolygonObject* m_polygon_imp_object = new kvs::PolygonImporter(filePath);

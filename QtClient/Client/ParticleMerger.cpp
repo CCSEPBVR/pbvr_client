@@ -70,8 +70,8 @@ void ParticleMerger::setParam( const ParticleMergeParameter& param, const size_t
 
             size_t kvsml_file_length = f_prefix.length() + 1
                                + step_length + 1
-                               + div_length + 1
-                               + div_num_length + 1
+//                               + div_length + 1
+//                               + div_num_length + 1
                                + kvsml_suffix_length;
 
             size_t stl_file_length = f_prefix.length() + 1
@@ -98,13 +98,14 @@ void ParticleMerger::setParam( const ParticleMergeParameter& param, const size_t
                     std::string f_prefix = file_prefix.fileName();
                     size_t sep0 = f_prefix.length();
                     size_t sep1 = bn.find( "_", sep0 );
-                    size_t sep2 = bn.find( "_", sep1 + 1 );
-                    size_t sep3 = bn.find( "_", sep2 + 1 );
-                    if ( sep1 == std::string::npos || sep2 == std::string::npos || sep3 == std::string::npos )
+//                    size_t sep2 = bn.find( "_", sep1 + 1 );
+//                    size_t sep3 = bn.find( "_", sep2 + 1 );
+//                    if ( sep1 == std::string::npos || sep2 == std::string::npos || sep3 == std::string::npos )
+                    if ( sep1 == std::string::npos )
                         continue;
                     prefix = bn.substr( 0, sep1 );
                     sstep = bn.substr( sep1 + 1, step_length );
-                    sdiv = bn.substr( sep3 + 1, div_length );
+//                    sdiv = bn.substr( sep3 + 1, div_length );
 //                    std::cout << bn << " " << prefix << " " << sdiv << std::endl;
 
                     ss.clear();
