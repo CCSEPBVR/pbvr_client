@@ -68,10 +68,14 @@ void ParticleMerger::setParam( const ParticleMergeParameter& param, const size_t
             size_t stl_suffix_length = std::string("stl").length();
             std::string f_prefix = file_prefix.fileName();
 
-            size_t kvsml_file_length = f_prefix.length() + 1
+            size_t kvsml_file_length_point_object = f_prefix.length() + 1
                                + step_length + 1
-//                               + div_length + 1
-//                               + div_num_length + 1
+                               + div_length + 1
+                               + div_num_length + 1
+                               + kvsml_suffix_length;
+
+            size_t kvsml_file_length_polygon_object = f_prefix.length() + 1
+                               + step_length + 1
                                + kvsml_suffix_length;
 
             size_t stl_file_length = f_prefix.length() + 1
@@ -83,7 +87,9 @@ void ParticleMerger::setParam( const ParticleMergeParameter& param, const size_t
                 std::string bn = fi->baseName();
                 std::string f_name = fi->fileName();
                 size_t sep1 = bn.find(f_prefix, 0);
-                if (sep1 == 0 && kvsml_file_length == f_name.length())
+                if (sep1 == 0 && kvsml_file_length_point_object == f_name.length())
+                    files.push_back(*fi);
+                if (sep1 == 0 && kvsml_file_length_polygon_object == f_name.length())
                     files.push_back(*fi);
                 if (sep1 == 0 && stl_file_length == f_name.length())
                     files.push_back(*fi);
@@ -96,16 +102,34 @@ void ParticleMerger::setParam( const ParticleMergeParameter& param, const size_t
                 {
                     std::string bn = fi->baseName();
                     std::string f_prefix = file_prefix.fileName();
+
+                    bool is_multi_underbar = false;
+
+                    if( std::count(bn.cbegin(),bn.cend(),'_') < 2 )
+                    {
+                    }else{
+                     is_multi_underbar = true;
+                    }
+
                     size_t sep0 = f_prefix.length();
                     size_t sep1 = bn.find( "_", sep0 );
-//                    size_t sep2 = bn.find( "_", sep1 + 1 );
-//                    size_t sep3 = bn.find( "_", sep2 + 1 );
-//                    if ( sep1 == std::string::npos || sep2 == std::string::npos || sep3 == std::string::npos )
-                    if ( sep1 == std::string::npos )
+                    size_t sep2 = bn.find( "_", sep1 + 1 );
+                    size_t sep3 = bn.find( "_", sep2 + 1 );
+                    if(is_multi_underbar == true)
+                    {
+                    if ( sep1 == std::string::npos || sep2 == std::string::npos || sep3 == std::string::npos )
                         continue;
+                    }else
+                    {
+                        if ( sep1 == std::string::npos )
+                            continue;
+                    }
                     prefix = bn.substr( 0, sep1 );
                     sstep = bn.substr( sep1 + 1, step_length );
-//                    sdiv = bn.substr( sep3 + 1, div_length );
+                    if(is_multi_underbar == true)
+                    {
+                        sdiv = bn.substr( sep3 + 1, div_length );
+                    }
 //                    std::cout << bn << " " << prefix << " " << sdiv << std::endl;
 
                     ss.clear();
