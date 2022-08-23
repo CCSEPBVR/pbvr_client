@@ -21,7 +21,7 @@ public:
     void CallBackApply( const int i );
     //OSAKI
 #ifdef GPU_MODE
-    void registerPolygonModel(std::string,int currentIndex,double opacity,kvs::RGBColor color);
+    void registerPolygonModel(std::string,int currentIndex,double opacity,kvs::RGBColor color, bool isSTL );
     void registerEmptyPolygonModel(std::string,int currentIndex,double opacity,kvs::RGBColor color);
     void deletePolygonModel(int currentIndex);
 #endif

@@ -708,7 +708,7 @@ void ExtCommand::CallBackApply( const int i )
 
 //OSAKI
 #ifdef GPU_MODE
-void ExtCommand::registerPolygonModel(std::string str, int currentIndex, double opacity, kvs::RGBColor color){
+void ExtCommand::registerPolygonModel(std::string str, int currentIndex, double opacity, kvs::RGBColor color, bool isSTL){
     const std::string filePath = str;
     const std::string extension = filePath.substr(filePath.length()-4, 4);
 
@@ -722,13 +722,28 @@ void ExtCommand::registerPolygonModel(std::string str, int currentIndex, double 
 //        std::cerr << "Unknown file format:" << filePath << std::endl;
 //        return;
 //    }
-    kvs::KVSMLPolygonObject* kvsml = new kvs::KVSMLPolygonObject(filePath);
-//    kvs::KVSMLPolygonObject* kvsml = new kvs::KVSMLPolygonObject("/home/osaki/Sandbox/STL/src/YAY.kvsml");
+
+    kvs::KVSMLPolygonObject* kvsml;
+    if(isSTL == true)
+    {
+    }else
+    {
+        kvsml = new kvs::KVSMLPolygonObject(filePath);
+    }
+
+    //    kvs::KVSMLPolygonObject* kvsml = new kvs::KVSMLPolygonObject("/home/osaki/Sandbox/STL/src/YAY.kvsml");
 
 
     kvs::PolygonObject* m_polygon_object_empty = new kvs::PolygonObject(); //空オブジェクト
 //    kvs::PolygonObject* m_polygon_imp_object = new kvs::PolygonImporter(filePath);
-    kvs::PolygonObject* m_polygon_imp_object = new kvs::PolygonImporter(kvsml);
+    kvs::PolygonObject* m_polygon_imp_object;
+    if(isSTL ==true)
+    {
+        m_polygon_imp_object = new kvs::PolygonImporter(filePath);
+    }else
+    {
+        m_polygon_imp_object = new kvs::PolygonImporter(kvsml);
+    }
 
     std::string ObjNameEmpty = "POLYGON_OBJ_EMPTY" + std::to_string(currentIndex - 5);
     std::string ObjNameImp = "POLYGON_OBJ_IMP" + std::to_string(currentIndex - 5);
@@ -740,7 +755,7 @@ void ExtCommand::registerPolygonModel(std::string str, int currentIndex, double 
     m_polygon_object_empty->setName(ObjNameEmpty);
     m_polygon_imp_object->setName(ObjNameImp);
     m_polygon_imp_object->setOpacity(opacity*255);
-//    m_polygon_imp_object->setColor(color);
+    m_polygon_imp_object->setColor(color);
 
     kvs::StochasticPolygonRenderer* renderer = new kvs::StochasticPolygonRenderer();
     if(m_screen->scene()->hasObject(ObjNameEmpty) == false && m_screen->scene()->hasObject(ObjNameImp) == false)

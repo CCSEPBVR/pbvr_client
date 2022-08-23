@@ -471,7 +471,8 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
                     extCommand->registerPolygonModel(polygon_file,
                                                      i,
                                                      merger.getPolygon_opacity(i),
-                                                     merger.getPolygonColor(i));
+                                                     merger.getPolygonColor(i),
+                                                     isSTL);
                 }
                 else
                 {
