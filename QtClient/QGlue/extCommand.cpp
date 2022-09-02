@@ -709,6 +709,7 @@ void ExtCommand::CallBackApply( const int i )
 //OSAKI
 #ifdef GPU_MODE
 void ExtCommand::registerPolygonModel(std::string str, int currentIndex, double opacity, kvs::RGBColor color, bool isSTL){
+    std::cout << "[DEBUG_REG]" << str << std::endl;
     const std::string filePath = str;
     const std::string extension = filePath.substr(filePath.length()-4, 4);
 
@@ -731,7 +732,7 @@ void ExtCommand::registerPolygonModel(std::string str, int currentIndex, double 
         kvsml = new kvs::KVSMLPolygonObject(filePath);
     }
 
-    //    kvs::KVSMLPolygonObject* kvsml = new kvs::KVSMLPolygonObject("/home/osaki/Sandbox/STL/src/YAY.kvsml");
+//        kvs::KVSMLPolygonObject* kvsml = new kvs::KVSMLPolygonObject("/home/osaki/Sandbox/STL/src/YAY.kvsml");
 
 
     kvs::PolygonObject* m_polygon_object_empty = new kvs::PolygonObject(); //空オブジェクト
@@ -739,9 +740,11 @@ void ExtCommand::registerPolygonModel(std::string str, int currentIndex, double 
     kvs::PolygonObject* m_polygon_imp_object;
     if(isSTL ==true)
     {
+        std::cout << __LINE__ << std::endl;
         m_polygon_imp_object = new kvs::PolygonImporter(filePath);
     }else
     {
+        std::cout << __LINE__ << std::endl;
         m_polygon_imp_object = new kvs::PolygonImporter(kvsml);
     }
 
@@ -755,8 +758,15 @@ void ExtCommand::registerPolygonModel(std::string str, int currentIndex, double 
     m_polygon_object_empty->setName(ObjNameEmpty);
     m_polygon_imp_object->setName(ObjNameImp);
     m_polygon_imp_object->setOpacity(opacity*255);
-    m_polygon_imp_object->setColor(color);
+    std::cout << isSTL << std::endl;
+    if(isSTL == true)
+    {
+        m_polygon_imp_object->setColor(color);
+    }else
+    {
+        std::cout << __LINE__ << std::endl;
 
+    }
     kvs::StochasticPolygonRenderer* renderer = new kvs::StochasticPolygonRenderer();
     if(m_screen->scene()->hasObject(ObjNameEmpty) == false && m_screen->scene()->hasObject(ObjNameImp) == false)
     {

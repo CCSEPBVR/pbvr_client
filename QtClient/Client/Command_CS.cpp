@@ -438,16 +438,23 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
                 }
 
                 std::stringstream polygon_file_tmp;
+                std::stringstream polygon_file_tmp_stl;
                 polygon_file_tmp << merger.getPolygonFilePath(i) << '_' << std::setw(5) << std::setfill( '0' ) << filestep << ".kvsml";
                 std::string polygon_file = polygon_file_tmp.str();
-                std::cout << polygon_file << std::endl;
+                std::cout << __LINE__ << " : " << polygon_file << std::endl;
                 QFile file(QString::fromStdString(polygon_file));
                 bool isSTL = false;
 
                 if(file.exists() == false)
                 {
-                    polygon_file_tmp << merger.getPolygonFilePath(i) << '_' << std::setw(5) << std::setfill( '0' ) << filestep << ".stl";
-                    polygon_file = polygon_file_tmp.str();
+                    std::cout << __LINE__ << std::endl;
+//                    std::cout << merger.getPolygonFilePath(i) << std::endl;
+//                    polygon_file_tmp << merger.getPolygonFilePath(i) << '_' << std::setw(5) << std::setfill( '0' ) << filestep << ".stl";
+                    polygon_file_tmp_stl << merger.getPolygonFilePath(i) << '_' << std::setw(5) << std::setfill( '0' ) << filestep << ".stl";
+                    polygon_file = polygon_file_tmp_stl.str();
+                    std::cout << __LINE__ << " : " << polygon_file_tmp_stl.str() << std::endl;
+                    std::cout << __LINE__ << " : " << polygon_file << std::endl;
+                    file.setFileName(QString::fromStdString(polygon_file));
                     std::cout << polygon_file << std::endl;
                     isSTL = true;
                 }
@@ -465,7 +472,7 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
 
                 std::string polygon_file_empty = polygon_file_empty_tmp.str();
 
-
+                std::cout << __LINE__ << " : " << polygon_file << std::endl;
                 if(file.exists() == true)
                 {
                     extCommand->registerPolygonModel(polygon_file,
