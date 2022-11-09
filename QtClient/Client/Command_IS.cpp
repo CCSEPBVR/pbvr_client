@@ -274,15 +274,15 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
                     {
 #endif
                         //delete detailedParticles[param.timeStep];
-                        m_detailed_particles[param->m_time_step] = m_server->getPointObjectFromServer(*param, result, numvol, param->m_time_step ,PBVRmincoords,PBVRmaxcoords);
-//                        m_detailed_particles[param->m_time_step] = m_server->getPointObjectFromServer(*param, result, numvol, param->m_time_step);
+                        m_detailed_particles[m_detailed_particles.size()-1] = m_server->getPointObjectFromServer(*param, result, numvol, param->m_time_step ,PBVRmincoords,PBVRmaxcoords);
+//                        m_detailed_particles[m_detailed_particles.size()-1] = m_server->getPointObjectFromServer(*param, result, numvol, param->m_time_step);
 #ifndef CPUMODE
                     }
                     else if (  param->m_repeat_level < param->m_detailed_repeat_level )
                     {
                         PointObject* dividedObject = m_server->getPointObjectFromServer(*param, result, numvol, param->m_time_step ,PBVRmincoords,PBVRmaxcoords);
 //                        PointObject* dividedObject = m_server->getPointObjectFromServer(*param, result, numvol, param->m_time_step);
-                        m_detailed_particles[param->m_time_step]->add( *dividedObject );
+                        m_detailed_particles[m_detailed_particles.size()-1]->add( *dividedObject );
                         delete dividedObject;
                     }
                     else
@@ -304,7 +304,7 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
 
                     this->m_result = *result;
                     generateDetailedParticles();
-                    m_detailed_particles[param->m_time_step] = tmp_po;
+                    m_detailed_particles[m_detailed_particles.size()-1] = tmp_po;
                     FilterinfoPanel::updateFilterInfo(result);
                     SystemstatusPanel::updateSystemStatus(result->numParticle);
                 }
@@ -323,7 +323,7 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
                 m_server_particles.resize( param->m_time_step + 1, NULL );
             }
 //          delete serverParticles[param.timeStep];
-            m_server_particles[param->m_time_step] = m_detailed_particles[param->m_time_step];
+            m_server_particles[param->m_time_step] = m_detailed_particles[m_detailed_particles.size()-1];
             m_particle_assign_flag = true;
             m_is_under_animation = result->isUnderAnimation;
         }
@@ -341,7 +341,7 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
         kvs::PointObject* object;
         merger.setParam( param->m_particle_merge_param, param->m_min_server_time_step, param->m_max_server_time_step );
         object = merger.doMerge( server_object, param->m_time_step ,true);
-
+#ifdef GPU_MODE
         m_is_polygon_checkbox_current[0] = merger.isPolygonEnable(6);
         m_is_polygon_checkbox_current[1] = merger.isPolygonEnable(7);
         m_is_polygon_checkbox_current[2] = merger.isPolygonEnable(8);
@@ -396,20 +396,48 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
                 }
 
                 std::stringstream polygon_file_tmp;
-                polygon_file_tmp << merger.getPolygonFilePath(i) << '_' << std::setw(5) << std::setfill( '0' ) << filestep << ".stl";
+                std::stringstream polygon_file_tmp_stl;
+                polygon_file_tmp << merger.getPolygonFilePath(i) << '_' << std::setw(5) << std::setfill( '0' ) << filestep << ".kvsml";
                 std::string polygon_file = polygon_file_tmp.str();
+                std::cout << __LINE__ << " : " << polygon_file << std::endl;
                 QFile file(QString::fromStdString(polygon_file));
+                bool isSTL = false;
+
+                if(file.exists() == false)
+                {
+                    std::cout << __LINE__ << std::endl;
+//                    std::cout << merger.getPolygonFilePath(i) << std::endl;
+//                    polygon_file_tmp << merger.getPolygonFilePath(i) << '_' << std::setw(5) << std::setfill( '0' ) << filestep << ".stl";
+                    polygon_file_tmp_stl << merger.getPolygonFilePath(i) << '_' << std::setw(5) << std::setfill( '0' ) << filestep << ".stl";
+                    polygon_file = polygon_file_tmp_stl.str();
+                    std::cout << __LINE__ << " : " << polygon_file_tmp_stl.str() << std::endl;
+                    std::cout << __LINE__ << " : " << polygon_file << std::endl;
+                    file.setFileName(QString::fromStdString(polygon_file));
+                    std::cout << polygon_file << std::endl;
+                    isSTL = true;
+                }
 
                 std::stringstream polygon_file_empty_tmp;
-                polygon_file_empty_tmp << merger.getPolygonFilePath(i) << '_' << std::setw(5) << std::setfill( '0' ) << merger.getLocalObjectInitialStep(i) << ".stl";
+                if(isSTL == false)
+                {
+                    std::cout << "it is kvsml" << std::endl;
+                    polygon_file_empty_tmp << merger.getPolygonFilePath(i) << '_' << std::setw(5) << std::setfill( '0' ) << merger.getLocalObjectInitialStep(i) << ".kvsml";
+                }else
+                {
+                    std::cout << "it is stl" << std::endl;
+                    polygon_file_empty_tmp << merger.getPolygonFilePath(i) << '_' << std::setw(5) << std::setfill( '0' ) << merger.getLocalObjectInitialStep(i) << ".stl";
+                }
+
                 std::string polygon_file_empty = polygon_file_empty_tmp.str();
 
+                std::cout << __LINE__ << " : " << polygon_file << std::endl;
                 if(file.exists() == true)
                 {
                     extCommand->registerPolygonModel(polygon_file,
                                                      i,
                                                      merger.getPolygon_opacity(i),
-                                                     merger.getPolygonColor(i));
+                                                     merger.getPolygonColor(i),
+                                                     isSTL);
                 }
                 else
                 {
@@ -424,12 +452,13 @@ void Command::update( VisualizationParameter* param, ReceivedMessage* result )
                 extCommand->deletePolygonModel(i);
             }
         }
+#endif
 
         extCommand->m_screen->update();
 
         result->m_min_merged_time_step = merger.getMergedInitialTimeStep();
         result->m_max_merged_time_step = merger.getMergedFinalTimeStep();
-        m_detailed_particles[param->m_time_step] = object;
+        m_detailed_particles[m_detailed_particles.size()-1] = object;
 
         // set last TransferFunction
         if ( param->m_time_step == result->m_max_merged_time_step )
