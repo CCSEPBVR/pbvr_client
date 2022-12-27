@@ -23,7 +23,6 @@
 
 #include "v3defines.h"
 #include "timer_simple.h"
-#include "ParamExTransFunc.h"
 
 
 #ifdef KVS_COMPILER_VC

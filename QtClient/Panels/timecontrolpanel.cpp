@@ -136,7 +136,7 @@ void TimecontrolPanel::setServerRange(int min, int max)
         extCommand->m_parameter.m_min_time_step=ui->sliderControl->min;
 }
 #include <QMutex>
-QMutex updateMutex(QMutex::NonRecursive);
+//QMutex updateMutex(QMutex::NonRecursive);
 void TimecontrolPanel::requestUpdate(  kvs::visclient::VisualizationParameter* param,
                                        kvs::visclient::ReceivedMessage* result)
 {
