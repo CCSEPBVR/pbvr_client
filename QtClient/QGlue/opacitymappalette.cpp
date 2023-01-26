@@ -24,7 +24,8 @@ OpacityMapPalette::OpacityMapPalette(QWidget *parent ):
 {
 //    this->setCaption( "Opacity map palette " + kvs::String( OpacityMapPalette::InstanceCounter++ ).toStdString() );
     //    MOD BY)T.Osaki 2020.04.28
-    pixelRatio=QPaintDevice::devicePixelRatioF();
+//    pixelRatio=QPaintDevice::devicePixelRatioF();
+    pixelRatio=parent->screen()->devicePixelRatio();
 
     m_upper_edge_color = DEFAULT_BORDER_DARK;
     m_lower_edge_color = DEFAULT_BORDER;

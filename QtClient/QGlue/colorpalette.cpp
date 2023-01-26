@@ -54,7 +54,8 @@ ColorPalette::ColorPalette(QWidget* parent):
 {
     this->setAutoFillBackground(false);
     //    MOD BY)T.Osaki 2020.04.28
-    pixelRatio=QPaintDevice::devicePixelRatioF();
+//    pixelRatio=QPaintDevice::devicePixelRatioF();
+    pixelRatio=pixelRatio=parent->screen()->devicePixelRatio();
 }
 
 ColorPalette::~ColorPalette( void )

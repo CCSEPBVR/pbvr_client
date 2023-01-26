@@ -28,7 +28,8 @@ Histogram::Histogram( QWidget* parent ):
     m_bias_parameter( 0.5f )
 {
     //    MOD BY)T.Osaki 2020.04.28
-    pixelRatio=QPaintDevice::devicePixelRatioF();
+//    pixelRatio=QPaintDevice::devicePixelRatioF();
+    pixelRatio=parent->screen()->devicePixelRatio();
     m_editable=false;
     m_palette_active=false;
     m_upper_edge_color = DEFAULT_BORDER_DARK;

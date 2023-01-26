@@ -30,7 +30,9 @@ RenderArea::RenderArea( QWidget* parent_surface):
 {
 
     Q_UNUSED( parent_surface);
-    pixelRatio=QPaintDevice::devicePixelRatioF();
+//    pixelRatio=QPaintDevice::devicePixelRatioF();
+//    pixelRatio=2;
+    pixelRatio = parent_surface->devicePixelRatio();
 
     this->m_scene->background()->setColor( kvs::RGBAColor(0,0,22,1.0f) );
     this->i_w= 620;//Qthis->width();

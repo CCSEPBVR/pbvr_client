@@ -36,6 +36,7 @@ LegendBar::LegendBar( kvs::ScreenBase* screen, const Command& command ) :
     maxLabel.setText(QString("1"), Qt::black);
     //    MOD BY)T.Osaki 2020.04.28
 //    pixelRatio=QApplication::desktop()->devicePixelRatioF();
+    pixelRatio=2;
 }
 /*===========================================================================*/
 /**
